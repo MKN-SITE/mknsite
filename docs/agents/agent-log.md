@@ -41,10 +41,31 @@ Username GitHub yang diberikan untuk atribusi boleh dicatat; jangan menyertakan 
 
 ## Tabel aktivitas
 
+## Author commit dan pengguna (wajib)
+
+Pertahankan tiga kolom tabel. Cantumkan identitas berikut di Deskripsi Aktivitas setiap pekerjaan agen atau aktivitas commit/push:
+
+- `User/Pengarah`: nama pengguna yang memberi tugas, berdasarkan keterangan pengguna; username GitHub dicantumkan terpisah bila sudah dikonfirmasi. Jika nama sudah diketahui tetapi handle belum, tulis misalnya `User/Pengarah: Jupri Pratama; GitHub: belum dikonfirmasi`.
+- `Author Git`: author dari commit yang terkait, bukan author commit terakhir yang tidak berhubungan. Sertakan hash agar atribusinya dapat ditelusuri.
+- `Committer Git`: cantumkan bila berbeda dari author.
+- `Pelaku push`: siapa yang menjalankan push, berdasarkan aktivitas yang teramati atau konfirmasi pengguna. Git log tidak membuktikan siapa yang melakukan push.
+
+Untuk membaca metadata tanpa mencetak email pribadi, gunakan perintah read-only berikut dengan hash commit yang relevan:
+
+```sh
+git show -s --format="%h | Author Git: %an | Committer Git: %cn | %s" <commit>
+```
+
+Jika perubahan belum di-commit, tulis `Author Git: belum ada (belum di-commit)`. Bila diperlukan, `git config user.name` boleh dicatat sebagai `Identitas Git terkonfigurasi`, tetapi bukan author aktual perubahan tersebut dan bukan bukti username GitHub.
+
+Aktor tetap menunjukkan pelaksana aktivitas: `Agent (Codex)` untuk pekerjaan Codex atau `User (nama/username terkonfirmasi)` untuk tindakan pengguna. Author Git tidak menggantikan aktor. Identitas manusia tidak otomatis hilang saat aktornya agen.
+
+## Format baris
+
 | Waktu (WITA) | Aktor | Deskripsi Aktivitas |
 |---|---|---|
 
-Pola deskripsi agen: `[ID tugas jika ada] Peran: Backend Agent; aktivitas dan hasil; file yang dibuat/diubah; verifikasi dan batasannya; Pengarah: username-github jika diketahui; commit jika tersedia.`
+Pola deskripsi agen: `[ID tugas jika ada] Peran: Backend Agent; aktivitas dan hasil; file; verifikasi; User/Pengarah: nama; GitHub: handle terkonfirmasi atau belum dikonfirmasi; Author Git: nama (commit hash) atau belum di-commit; Committer Git jika berbeda; Pelaku push jika aktivitas terkait push.`
 
 Baris contoh di panduan penggunaan adalah ilustrasi, bukan bukti yang boleh disalin sebagai aktivitas nyata.
 

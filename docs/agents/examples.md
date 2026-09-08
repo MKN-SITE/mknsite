@@ -117,6 +117,9 @@ Template berikut diisi dengan hasil nyata setelah pengerjaan.
 ID tugas / Peran: ADMIN-USERS-01 / Backend Agent
 Platform pelaksana: [platform yang benar-benar mengerjakan]
 Username GitHub pengarah: [username terkonfirmasi / belum dikonfirmasi]
+User/Pengarah: [nama pengguna yang diketahui]
+Author Git / commit: [metadata commit terkait / belum di-commit]
+Pelaku push: [pelaku berdasarkan bukti / belum dilakukan]
 Status: [Selesai / Sebagian / Terblokir]
 Hasil: [Perilaku endpoint yang benar-benar tersedia]
 File: [Path yang benar-benar berubah]
@@ -141,3 +144,13 @@ Ganti placeholder berdasarkan bukti saat pencatatan. Simpan contoh hanya pada pa
 Contoh atribusi pengguna: jika pengguna menyatakan username GitHub-nya `arwan-d3v`, tulis `User (arwan-d3v)`. Nama pada contoh yang ditempel bukan konfirmasi identitas pengguna saat ini.
 
 Dengan format ini, kolom Aktor menjelaskan siapa atau platform apa yang mengerjakan; deskripsi menjelaskan peran agen, lokasi file yang diedit, hasil, dan anggota tim pengarahnya. Agent-log menyimpan semuanya di `docs/CHANGELOG.md`.
+
+## Contoh atribusi author dan pengguna
+
+Ilustrasi format untuk metadata yang sudah tersedia; jangan menganggap author Git sama dengan akun yang melakukan push.
+
+| Waktu (WITA) | Aktor | Deskripsi Aktivitas |
+|---|---|---|
+| YYYY-MM-DD HH:mm WITA | Agent (Codex) | Peran: Frontend Agent; memperbarui komponen; User/Pengarah: nama pengguna; GitHub: handle terkonfirmasi; Author Git: nama author (hash terkait); hasil uji aktual. |
+| YYYY-MM-DD HH:mm WITA | User (nama pengguna) | Melakukan push commit terkait; User/Pengarah: nama pengguna; Author Git: nama author (hash terkait); Pelaku push: nama pengguna, berdasarkan konfirmasi pengguna; GitHub: belum dikonfirmasi. |
+| YYYY-MM-DD HH:mm WITA | Agent (Codex) | Memperbarui dokumentasi; User/Pengarah: nama pengguna; GitHub: belum dikonfirmasi; Author Git: belum ada (belum di-commit). |

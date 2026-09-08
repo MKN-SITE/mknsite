@@ -42,6 +42,9 @@ Hasil yang diharapkan:
 ```text
 ID tugas / Peran:
 Platform pelaksana / Username GitHub pengarah:
+User/Pengarah (nama yang diketahui):
+Author Git / commit terkait: [metadata commit atau belum di-commit]
+Committer Git jika berbeda / Pelaku push jika relevan:
 Status: Selesai | Sebagian | Terblokir
 Hasil dan perubahan perilaku:
 File yang diubah:
