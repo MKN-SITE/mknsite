@@ -1,0 +1,14 @@
+{
+  "name": "mknsite",
+  "private": true,
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev:web": "bun --cwd apps/web dev",
+    "dev:api": "bun --cwd apps/api dev",
+    "build:web": "bun --cwd apps/web build",
+    "check": "bun --cwd apps/web typecheck && bun --cwd apps/api typecheck",
+    "db:generate": "bun --cwd apps/api db:generate",
+    "db:migrate": "bun --cwd apps/api db:migrate",
+    "db:seed": "bun --cwd apps/api db:seed"
+  }
+}

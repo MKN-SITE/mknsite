@@ -1,0 +1,70 @@
+services:
+  init:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: mknsite-dev
+    working_dir: /app/apps/api
+    command: ["sh", "-c", "until bun run db:migrate; do echo 'Menunggu MySQL siap menerima koneksi...'; sleep 3; done; bun run db:seed"]
+    environment:
+      DATABASE_URL: mysql://mknsite:mknsite-local-only@mysql:3306/mknsite
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  api:
+    image: mknsite-dev
+    pull_policy: never
+    working_dir: /app/apps/api
+    command: ["bun", "src/index.ts"]
+    environment:
+      NODE_ENV: development
+      PORT: "3001"
+      APP_ORIGIN: http://localhost:3100
+      BETTER_AUTH_URL: http://localhost:3001
+      DATABASE_URL: mysql://mknsite:mknsite-local-only@mysql:3306/mknsite
+    ports:
+      - "127.0.0.1:3001:3001"
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "bun", "-e", "const r = await fetch('http://localhost:3001/health'); process.exit(r.ok ? 0 : 1)"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  web:
+    image: mknsite-dev
+    pull_policy: never
+    working_dir: /app/apps/web
+    command: ["bun", "--bun", "next", "dev", "--hostname", "0.0.0.0", "--port", "3000"]
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_TELEMETRY_DISABLED: "1"
+    ports:
+      - "127.0.0.1:3100:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: mknsite
+      MYSQL_USER: mknsite
+      MYSQL_PASSWORD: mknsite-local-only
+      MYSQL_ROOT_PASSWORD: root-local-only
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - mknsite_mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mknsite_mysql:
