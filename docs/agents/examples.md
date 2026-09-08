@@ -20,6 +20,29 @@ kebutuhan backend dan labeli fixture sebagai data contoh.
 Serahkan file yang berubah, hasil uji aktual, serta keterbatasan integrasi.
 ```
 
+## Refactor global CSS dan komponen bersama
+
+```text
+Baca docs/agents/working-agreement.md dan docs/agents/frontend-agent.md,
+terutama standar wajib CSS dan komponen reusable.
+Jalankan tugas ini sebagai Frontend Agent.
+
+Tujuan: merapikan frontend MKN Site dengan global CSS dan komponen reusable.
+Cakupan: apps/web; pertahankan perilaku dan identitas visual saat ini.
+Audit komponen serta CSS existing terlebih dahulu, lalu:
+- Pisahkan token tema ke styles/tokens.css, diimpor oleh app/globals.css.
+- Pertahankan reset/base dan aksesibilitas global di globals.css.
+- Pindahkan gaya khusus komponen ke CSS Modules secara bertahap.
+- Ekstrak pola yang berulang, misalnya Button, Badge, dan PageHeader.
+- Migrasikan pemakai agar benar-benar menggunakan komponen bersama tersebut.
+- Jaga komponen UI bebas dari fetch dan aturan bisnis.
+Kriteria: tampilan dan alur login/portal/admin tidak berubah, typecheck lulus,
+dan browser mobile/desktop diperiksa untuk area yang direfactor.
+Laporkan bukti aktual dan catat hasil melalui Agent-log.
+```
+
+Prompt ini meminta refactor implementasi secara eksplisit. Menambahkan standar ke dokumen agen saja belum mengubah kode frontend.
+
 ## Backend
 
 ```text
