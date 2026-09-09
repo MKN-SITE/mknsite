@@ -18,12 +18,12 @@ async function login(path, email, password) {
 
 assert.equal((await call('/health')).status, 200);
 assert.equal((await call('/workspace/hr')).status, 401);
-const employee = await login('/auth/login', 'hr@mknsite.id', 'demo12345');
+const employee = await login('/auth/login', 'hr@mknsite.online', 'demo12345');
 assert.equal((await call('/workspace/hr', { cookie: employee })).status, 200);
 assert.equal((await call('/workspace/ops-telco', { cookie: employee })).status, 403);
 assert.equal((await call('/auth/admin/me', { cookie: employee })).status, 401);
-assert.equal((await call('/auth/admin/login', { body: { email: 'hr@mknsite.id', password: 'demo12345' } })).status, 401);
-const admin = await login('/auth/admin/login', 'admin@mknsite.id', 'admin12345');
+assert.equal((await call('/auth/admin/login', { body: { email: 'hr@mknsite.online', password: 'demo12345' } })).status, 401);
+const admin = await login('/auth/admin/login', 'admin@mknsite.online', 'admin12345');
 assert.equal((await call('/auth/admin/me', { cookie: admin })).status, 200);
 assert.equal((await call('/auth/me', { cookie: admin })).status, 401);
 const logout = await call('/auth/logout', { method: 'POST', cookie: employee + '; ' + admin });

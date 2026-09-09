@@ -2,23 +2,32 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { API_URL } from "@/lib/api";
+import { connectRealtime } from "@/lib/sse";
 
 export function RealtimeStatus({ loginPath }: { loginPath: "/login" | "/admin/login" }) {
   const router = useRouter();
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    const stream = new EventSource(`${API_URL}/realtime/events`, { withCredentials: true });
-    stream.addEventListener("connected", () => setConnected(true));
-    stream.addEventListener("access.updated", () => window.location.reload());
-    stream.addEventListener("session.revoked", () => {
-      stream.close();
-      router.replace(loginPath);
+    const context = loginPath === "/admin/login" ? "admin" : "employee";
+    const disconnect = connectRealtime(context, {
+      onConnected: () => setConnected(true),
+      onAccessUpdated: () => window.location.reload(),
+      onSessionRevoked: () => {
+        router.replace(loginPath);
+      },
+      onError: () => setConnected(false)
     });
-    stream.onerror = () => setConnected(false);
-    return () => stream.close();
+
+    return disconnect;
   }, [loginPath, router]);
 
-  return <span className={`realtime-status ${connected ? "connected" : ""}`} title={connected ? "Pembaruan langsung aktif" : "Menyambungkan pembaruan langsung"}>{connected ? "Live" : "Menyambungkan"}</span>;
+  return (
+    <span
+      className={`realtime-status ${connected ? "connected" : ""}`}
+      title={connected ? "Pembaruan langsung aktif" : "Menyambungkan pembaruan langsung"}
+    >
+      {connected ? "Live" : "Menyambungkan"}
+    </span>
+  );
 }
