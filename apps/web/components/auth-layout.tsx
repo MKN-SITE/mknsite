@@ -2,13 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Brand } from "./brand";
 import { LoginForm } from "./login-form";
-import heroImage from "@/public/assets/hero-operations.png";
+import authBgImage from "@/public/assets/hero-workers-drone.jpg";
 
 export function AuthLayout({ admin = false }: { admin?: boolean }) {
   return (
     <main className="auth-page" id="main">
       <aside className="auth-aside" aria-hidden="true">
-        <Image src={heroImage} alt="" fill sizes="50vw" />
+        <Image src={authBgImage} alt="Operasi Lapangan PT Multi Kontrol Nusantara" fill sizes="50vw" priority />
         <div className="auth-aside-content">
           <Brand />
           <div className="auth-aside-copy">
