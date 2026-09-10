@@ -106,7 +106,7 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
 
   // Agregasi permission unik dari role yang dimiliki user
   const aggregatedPermissions = useMemo(() => {
-    if (!currentUser || !allRoles.length) return [];
+    if (!currentUser || !Array.isArray(currentUser.roles) || !allRoles.length) return [];
     const userRoleIds = new Set(currentUser.roles.map((r) => r.id));
     const permissionsSet = new Set<string>();
 
@@ -119,6 +119,17 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
     }
     return Array.from(permissionsSet);
   }, [currentUser, allRoles]);
+
+  const isAdminAccount = currentUser?.accountType === "admin";
+  const isCallerSuperadmin = Boolean(callerAdmin?.permissions?.includes("admin.security.manage"));
+  const isTargetSuperadmin = useMemo(() => {
+    if (!currentUser) return false;
+    const hasSuperadminRole = Array.isArray(currentUser.roles) && currentUser.roles.some((r) => r.slug === "superadmin");
+    const hasSuperadminPerm = aggregatedPermissions.includes("admin.security.manage");
+    return Boolean(hasSuperadminRole || hasSuperadminPerm);
+  }, [currentUser, aggregatedPermissions]);
+
+  const isProtectedFromCaller = isTargetSuperadmin && !isCallerSuperadmin;
 
   if (!currentUser && !loadingUser) return null;
 
@@ -258,18 +269,6 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
       setSavingRevoke(false);
     }
   };
-
-  const isAdminAccount = currentUser?.accountType === "admin";
-  const isCallerSuperadmin = Boolean(callerAdmin?.permissions?.includes("admin.security.manage"));
-  const isTargetSuperadmin = useMemo(() => {
-    if (!currentUser) return false;
-    return (
-      currentUser.roles.some((r) => r.slug === "superadmin") ||
-      aggregatedPermissions.includes("admin.security.manage")
-    );
-  }, [currentUser, aggregatedPermissions]);
-
-  const isProtectedFromCaller = isTargetSuperadmin && !isCallerSuperadmin;
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "-";

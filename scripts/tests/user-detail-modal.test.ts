@@ -181,4 +181,38 @@ describe("UserDetailModal component", () => {
     expect(html).toContain("Nonaktifkan Akun");
     expect(html).toContain("Cabut Semua Sesi");
   });
+
+  test("handles closed initial state (user: null) without violating Rules of Hooks", () => {
+    // Initial closed render
+    const closedHtml = renderToStaticMarkup(
+      createElement(UserDetailModal, {
+        open: false,
+        user: null,
+        onClose: () => {}
+      })
+    );
+    expect(closedHtml).toBe("");
+
+    // Opened render with active user
+    const sampleUser: UserSummaryDto = {
+      id: 10,
+      name: "Bima Santosa",
+      email: "bima@mknsite.online",
+      accountType: "employee",
+      isActive: true,
+      roles: [{ id: 5, name: "Manager", slug: "manager" }],
+      createdAt: "2026-08-01T08:00:00.000Z",
+      updatedAt: "2026-08-01T08:00:00.000Z"
+    };
+
+    const openedHtml = renderToStaticMarkup(
+      createElement(UserDetailModal, {
+        open: true,
+        user: sampleUser,
+        onClose: () => {}
+      })
+    );
+    expect(openedHtml).toContain("Detail Pengguna — Bima Santosa");
+    expect(openedHtml).toContain("bima@mknsite.online");
+  });
 });
