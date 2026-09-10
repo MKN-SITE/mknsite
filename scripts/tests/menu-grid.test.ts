@@ -39,8 +39,9 @@ describe("MenuGrid component", () => {
     expect(html).toContain("MKN Site</span>");
     expect(html).toContain("PT Multi Kontrol Nusantara</span>");
     expect(html).toContain("Welcome, Budi</h1>");
-    expect(html).toContain("Empower your business with integrated operations");
+    expect(html).toContain("Empower your business with real-time insights");
     expect(html).toContain("Budi Santoso</span>");
+    expect(html).toContain("Pusat Bantuan");
   });
 
   test("renders initial loading state with skeleton cards", () => {

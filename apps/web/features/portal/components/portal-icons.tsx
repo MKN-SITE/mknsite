@@ -7,7 +7,25 @@ export type PortalIconProps = {
   style?: React.CSSProperties;
 };
 
+const ICON_COLORS: Record<string, string> = {
+  "user-circle": "#ea580c", // Warm Orange (Self-Service)
+  users: "#4f46e5", // Indigo (HR / People)
+  briefcase: "#0284c7", // Blue (Corporate / Operations)
+  "radio-tower": "#0d9488", // Teal (Telco Ops)
+  wrench: "#d97706", // Amber (Workshop Ops)
+  "folder-kanban": "#10b981", // Emerald (Project)
+  "chart-bar": "#7c3aed", // Violet (Analytics / Reports)
+  shield: "#dc2626", // Crimson (Security / Admin)
+  search: "#0284c7", // Sky (Audit / Search)
+  "file-text": "#64748b", // Slate (Docs / Policies)
+  calculator: "#059669", // Green (Accounting / Finance)
+  scale: "#b45309", // Bronze (Legal / Compliance)
+  settings: "#475569", // Slate (System / Config)
+  "clipboard-check": "#0891b2" // Cyan (Approval / Tasks)
+};
+
 export function PortalIcon({ name, size = 64, className, style }: PortalIconProps) {
+  const iconColor = style?.color || ICON_COLORS[name || ""] || "currentColor";
   const iconProps = {
     width: size,
     height: size,
@@ -18,7 +36,7 @@ export function PortalIcon({ name, size = 64, className, style }: PortalIconProp
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
     className,
-    style,
+    style: { color: iconColor, ...style },
     "aria-hidden": true
   };
 
