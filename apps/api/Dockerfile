@@ -10,4 +10,4 @@ COPY apps/api ./apps/api
 WORKDIR /app/apps/api
 ENV NODE_ENV=production
 EXPOSE 3001
-CMD ["bun", "src/index.ts"]
+CMD ["sh", "-c", "bunx drizzle-kit migrate && bun src/index.ts"]
