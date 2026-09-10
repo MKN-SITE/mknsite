@@ -1,0 +1,17 @@
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.icon { font-size: var(--text-xl); line-height: 1.2; color: var(--ink-soft); }
+.title { margin: 0; color: var(--ink); font-size: var(--text-lg); line-height: 1.3; }
+.description { max-width: 440px; margin: 0; color: var(--ink-soft); font-size: var(--text-md); line-height: 1.55; }
+
+@media (max-width: 620px) {
+  .emptyState { padding-inline: var(--space-3); }
+}

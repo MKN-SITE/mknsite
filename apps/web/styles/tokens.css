@@ -1,0 +1,30 @@
+:root {
+  --ink: #15221f;
+  --ink-soft: #51615d;
+  --paper: #f4f7f5;
+  --surface: #fbfdfc;
+  --line: #dbe3df;
+  --accent: #0b6b57;
+  --accent-dark: #075343;
+  --accent-soft: #dcece7;
+  --danger: #a33f36;
+  --warning: #8a5a09;
+  --radius: 14px;
+  --shadow: 0 20px 55px rgba(21, 60, 50, 0.12);
+  --on-accent: #f8fffc;
+  --danger-soft: #f9e9e7;
+  --warning-soft: #f7edd6;
+  --success: var(--accent-dark);
+  --success-soft: var(--accent-soft);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-8: 32px;
+  --radius-control: 10px;
+  --radius-badge: 7px;
+  --text-sm: 13px;
+  --text-md: 16px;
+  --text-lg: 22px;
+  --text-xl: 32px;
+}
