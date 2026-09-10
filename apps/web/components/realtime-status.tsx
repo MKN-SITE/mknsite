@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { connectRealtime } from "@/lib/sse";
+import styles from "./realtime-status.module.css";
 
-export function RealtimeStatus({ loginPath }: { loginPath: "/login" | "/admin/login" }) {
+export function RealtimeStatus({ loginPath, tone = "default" }: { loginPath: "/login" | "/admin/login"; tone?: "default" | "inverse" }) {
   let router: ReturnType<typeof useRouter> | null = null;
   try {
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -34,7 +35,7 @@ export function RealtimeStatus({ loginPath }: { loginPath: "/login" | "/admin/lo
 
   return (
     <span
-      className={`realtime-status ${connected ? "connected" : ""}`}
+      className={[styles.status, connected ? styles.connected : "", tone === "inverse" ? styles.inverse : ""].filter(Boolean).join(" ")}
       title={connected ? "Pembaruan langsung aktif" : "Menyambungkan pembaruan langsung"}
     >
       {connected ? "Live" : "Menyambungkan"}

@@ -27,4 +27,12 @@
   --text-md: 16px;
   --text-lg: 22px;
   --text-xl: 32px;
+  --space-6: 24px;
+  --space-12: 48px;
+  --portal-header-start: #162f3b;
+  --portal-header-end: #2a5a6a;
+  --portal-live: #a9e7d2;
+  --portal-muted: #d0e0e4;
+  --portal-glass: rgba(255, 255, 255, 0.1);
+  --portal-border: rgba(255, 255, 255, 0.24);
 }
