@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import { connectRealtime } from "@/lib/sse";
 
 export function RealtimeStatus({ loginPath }: { loginPath: "/login" | "/admin/login" }) {
-  const router = useRouter();
+  let router: ReturnType<typeof useRouter> | null = null;
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    router = useRouter();
+  } catch {
+    // Graceful fallback for non-AppRouter environments (e.g. SSR test runners)
+  }
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
@@ -14,7 +20,11 @@ export function RealtimeStatus({ loginPath }: { loginPath: "/login" | "/admin/lo
       onConnected: () => setConnected(true),
       onAccessUpdated: () => window.location.reload(),
       onSessionRevoked: () => {
-        router.replace(loginPath);
+        if (router) {
+          router.replace(loginPath);
+        } else if (typeof window !== "undefined") {
+          window.location.href = loginPath;
+        }
       },
       onError: () => setConnected(false)
     });
