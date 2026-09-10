@@ -10,6 +10,7 @@ import { SearchBar } from "@/components/ui/search-bar";
 import { connectRealtime } from "@/lib/sse";
 import { useUsers, type UserSummaryDto } from "../hooks/use-users";
 import { CreateUserModal } from "./create-user-modal";
+import { UserDetailModal } from "./user-detail-modal";
 import styles from "./user-list.module.css";
 
 export function UserList() {
@@ -18,6 +19,7 @@ export function UserList() {
   const [status, setStatus] = useState<"all" | "active" | "inactive">("all");
   const [accountType, setAccountType] = useState<"all" | "employee" | "admin">("all");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserSummaryDto | null>(null);
 
   const { data, pagination, loading, error, refresh } = useUsers({
     page,
@@ -132,9 +134,9 @@ export function UserList() {
         <Button
           variant="secondary"
           size="sm"
-          onClick={() => {
-            // eslint-disable-next-line no-console
-            console.log("Detail user ID:", row.id);
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedUser(row);
           }}
         >
           Detail
@@ -210,6 +212,7 @@ export function UserList() {
         columns={columns}
         data={data}
         loading={loading}
+        onRowClick={(row) => setSelectedUser(row)}
         emptyState={
           <EmptyState
             title="Tidak ada pengguna"
@@ -236,6 +239,13 @@ export function UserList() {
         open={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         onSuccess={refresh}
+      />
+
+      <UserDetailModal
+        open={Boolean(selectedUser)}
+        user={selectedUser}
+        onClose={() => setSelectedUser(null)}
+        onUpdated={refresh}
       />
     </section>
   );
