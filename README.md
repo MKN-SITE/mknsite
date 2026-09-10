@@ -135,14 +135,14 @@ GET /realtime/events?context=admin
 Backend MKN Site dilengkapi dengan pengujian otomatis komprehensif mencakup 14 skenario matriks penerimaan QA (Docs lokal & production, isolasi logout ganda, validasi input & malformed JSON, atomisitas rollback transaksi, dan audit sanitasi kredensial):
 
 ```sh
-# Menjalankan seluruh 49 unit & integration test
+# Menjalankan seluruh 54 unit & integration test (646 assertions)
 bun --cwd apps/api test
 
 # Menjalankan pemeriksaan statis TypeScript di seluruh workspace
 bun run check
 ```
 
-Lihat [deployment.md](docs/deployment.md) untuk topologi Vercel, Coolify, MySQL, dan Cloudflare.
+Lihat [deployment.md](docs/deployment.md) untuk topologi produksi, Cloudflare DNS, Vercel, Coolify, CI/CD pipeline, dan alur migrasi database.
 
 ## Kolaborasi Tim
 
