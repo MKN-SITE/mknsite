@@ -1,5 +1,8 @@
+// @ts-ignore
 import { describe, expect, test } from "bun:test";
+// @ts-ignore
 import { createElement } from "../../apps/web/node_modules/react";
+// @ts-ignore
 import { renderToStaticMarkup } from "../../apps/web/node_modules/react-dom/server";
 import { DataTable, type Column } from "../../apps/web/components/ui/data-table";
 import { Modal } from "../../apps/web/components/ui/modal";

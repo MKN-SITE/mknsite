@@ -1,5 +1,8 @@
+// @ts-ignore
 import { describe, expect, test } from "bun:test";
+// @ts-ignore
 import { createElement } from "../../apps/web/node_modules/react";
+// @ts-ignore
 import { renderToStaticMarkup } from "../../apps/web/node_modules/react-dom/server";
 import { Button } from "../../apps/web/components/ui/button";
 import { Badge } from "../../apps/web/components/ui/badge";
