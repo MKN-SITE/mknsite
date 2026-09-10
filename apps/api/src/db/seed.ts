@@ -51,23 +51,29 @@ async function seed() {
   const adminHash = await Bun.password.hash("admin12345", { algorithm: "argon2id" });
   const superadminHash = await Bun.password.hash("superadmin12345", { algorithm: "argon2id" });
   for (const [name, email, accountType, roleSlug] of accounts) {
+    // Cek apakah akun sudah ada — jika sudah, JANGAN timpa password/data
+    const [existing] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    if (existing) {
+      console.log(`  → Akun ${email} sudah ada (id=${existing.id}), dilewati.`);
+      // Pastikan role tetap terpasang (idempoten, tanpa mengubah data akun)
+      const role = allRoles.find((item) => item.slug === roleSlug)!;
+      await db.insert(userRoles).values({ userId: existing.id, roleId: role.id }).onDuplicateKeyUpdate({ set: { roleId: role.id } });
+      continue;
+    }
+
+    // Akun belum ada — buat baru
     const loginHash = email === "superadmin@mknsite.online" ? superadminHash : accountType === "admin" ? adminHash : passwordHash;
-    await db.insert(users).values({ name, email, accountType, passwordHash: loginHash }).onDuplicateKeyUpdate({ set: { name, accountType, passwordHash: loginHash } });
+    await db.insert(users).values({ name, email, accountType, passwordHash: loginHash });
     const [account] = await db.select().from(users).where(eq(users.email, email)).limit(1);
     const role = allRoles.find((item) => item.slug === roleSlug)!;
     await db.insert(userRoles).values({ userId: account.id, roleId: role.id }).onDuplicateKeyUpdate({ set: { roleId: role.id } });
 
-    let [identity] = await db.select().from(authUsers).where(eq(authUsers.mknUserId, account.id)).limit(1);
-    if (!identity) {
-      const id = crypto.randomUUID();
-      await db.insert(authUsers).values({ id, mknUserId: account.id, name, email, emailVerified: true });
-      [identity] = await db.select().from(authUsers).where(eq(authUsers.id, id)).limit(1);
-    } else {
-      await db.update(authUsers).set({ name, email, emailVerified: true }).where(eq(authUsers.id, identity.id));
-    }
+    const authUserId = crypto.randomUUID();
+    await db.insert(authUsers).values({ id: authUserId, mknUserId: account.id, name, email, emailVerified: true });
     await db.insert(authAccounts).values({
-      id: crypto.randomUUID(), accountId: identity.id, providerId: "credential", userId: identity.id, password: loginHash
-    }).onDuplicateKeyUpdate({ set: { password: loginHash } });
+      id: crypto.randomUUID(), accountId: authUserId, providerId: "credential", userId: authUserId, password: loginHash
+    });
+    console.log(`  ✓ Akun ${email} berhasil dibuat.`);
   }
   console.log("Seed MKN Site selesai.");
   await pool.end();
