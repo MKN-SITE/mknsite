@@ -1,0 +1,44 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+}
+
+.pageList {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pageButton {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 6px;
+  font-size: var(--text-sm);
+  font-weight: 650;
+}
+
+.ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 34px;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  user-select: none;
+}
+
+@media (max-width: 620px) {
+  .pagination {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .pageList {
+    display: none;
+  }
+}
