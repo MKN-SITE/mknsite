@@ -1,17 +1,7 @@
+@import '../styles/tokens.css';
+
 :root {
   color-scheme: light;
-  --ink: #15221f;
-  --ink-soft: #51615d;
-  --paper: #f4f7f5;
-  --surface: #fbfdfc;
-  --line: #dbe3df;
-  --accent: #0b6b57;
-  --accent-dark: #075343;
-  --accent-soft: #dcece7;
-  --danger: #a33f36;
-  --warning: #8a5a09;
-  --radius: 14px;
-  --shadow: 0 20px 55px rgba(21, 60, 50, 0.12);
   font-family: Aptos, "Segoe UI Variable", "Segoe UI", sans-serif;
 }
 
