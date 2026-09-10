@@ -9,6 +9,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { SearchBar } from "@/components/ui/search-bar";
 import { connectRealtime } from "@/lib/sse";
 import { useUsers, type UserSummaryDto } from "../hooks/use-users";
+import { CreateUserModal } from "./create-user-modal";
 import styles from "./user-list.module.css";
 
 export function UserList() {
@@ -16,6 +17,7 @@ export function UserList() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"all" | "active" | "inactive">("all");
   const [accountType, setAccountType] = useState<"all" | "employee" | "admin">("all");
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const { data, pagination, loading, error, refresh } = useUsers({
     page,
@@ -156,8 +158,7 @@ export function UserList() {
         <Button
           variant="primary"
           size="md"
-          disabled
-          title="Fitur tambah pengguna akan aktif pada tiket selanjutnya"
+          onClick={() => setIsCreateOpen(true)}
         >
           + Tambah Pengguna
         </Button>
@@ -230,6 +231,12 @@ export function UserList() {
           />
         </div>
       )}
+
+      <CreateUserModal
+        open={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        onSuccess={refresh}
+      />
     </section>
   );
 }
