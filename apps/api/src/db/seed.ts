@@ -1,6 +1,15 @@
 import { eq, like } from "drizzle-orm";
 import { db, pool } from ".";
-import { authAccounts, authUsers, permissions, rolePermissions, roles, userRoles, users } from "./schema";
+import { authAccounts, authUsers, menus, permissions, rolePermissions, roles, userRoles, users } from "./schema";
+
+const defaultMenus = [
+  { title: "Self-Service", icon: "user-circle", url: "/portal/self-service", requiredPermission: "dashboard.view", sortOrder: 1 },
+  { title: "HR", icon: "users", url: "/portal/hr", requiredPermission: "hr.view", sortOrder: 2 },
+  { title: "OPS Telco", icon: "radio-tower", url: "/portal/ops-telco", requiredPermission: "ops_telco.view", sortOrder: 3 },
+  { title: "OPS Workshop", icon: "wrench", url: "/portal/ops-workshop", requiredPermission: "ops_workshop.view", sortOrder: 4 },
+  { title: "Project", icon: "folder-kanban", url: "/portal/project", requiredPermission: "project.view", sortOrder: 5 }
+] as const;
+
 
 const permissionRows = [
   ["Lihat dashboard", "dashboard.view"], ["Lihat HR", "hr.view"], ["Kelola HR", "hr.manage"],
@@ -75,8 +84,29 @@ async function seed() {
     });
     console.log(`  ✓ Akun ${email} berhasil dibuat.`);
   }
+
+  // Seed default menus (idempoten)
+  const existingMenus = await db.select().from(menus);
+  for (const menu of defaultMenus) {
+    const found = existingMenus.find((m) => m.url === menu.url);
+    if (!found) {
+      await db.insert(menus).values({
+        title: menu.title,
+        icon: menu.icon,
+        url: menu.url,
+        requiredPermission: menu.requiredPermission,
+        sortOrder: menu.sortOrder,
+        isActive: 1
+      });
+      console.log(`  ✓ Menu ${menu.title} berhasil dibuat.`);
+    } else {
+      console.log(`  → Menu ${menu.title} (${menu.url}) sudah ada, dilewati.`);
+    }
+  }
+
   console.log("Seed MKN Site selesai.");
   await pool.end();
+
 }
 
 seed().catch(async (error) => { console.error(error); await pool.end(); process.exit(1); });

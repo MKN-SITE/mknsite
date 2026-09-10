@@ -8,12 +8,13 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { SearchBar } from "@/components/ui/search-bar";
 import { connectRealtime } from "@/lib/sse";
+import type { PortalUser } from "@/lib/api";
 import { useUsers, type UserSummaryDto } from "../hooks/use-users";
 import { CreateUserModal } from "./create-user-modal";
 import { UserDetailModal } from "./user-detail-modal";
 import styles from "./user-list.module.css";
 
-export function UserList() {
+export function UserList({ currentAdmin }: { currentAdmin?: PortalUser | null } = {}) {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"all" | "active" | "inactive">("all");
@@ -244,6 +245,7 @@ export function UserList() {
       <UserDetailModal
         open={Boolean(selectedUser)}
         user={selectedUser}
+        currentAdmin={currentAdmin}
         onClose={() => setSelectedUser(null)}
         onUpdated={refresh}
       />

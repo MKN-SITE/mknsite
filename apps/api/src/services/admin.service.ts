@@ -153,7 +153,24 @@ export class AdminService {
     }));
   }
 
-  async updateUserRoles(targetId: number, roleIds: number[], adminId: number): Promise<{ success: boolean } | { error: { status: number; code: string; message: string } }> {
+  async isUserSuperadmin(userId: number): Promise<boolean> {
+    const superGrants = await db
+      .select({ id: userRoles.userId })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .innerJoin(rolePermissions, eq(rolePermissions.roleId, roles.id))
+      .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
+      .where(and(eq(userRoles.userId, userId), eq(permissions.slug, "admin.security.manage")))
+      .limit(1);
+    return superGrants.length > 0;
+  }
+
+  async updateUserRoles(
+    targetId: number,
+    roleIds: number[],
+    adminId: number,
+    callerPermissions: string[] = []
+  ): Promise<{ success: boolean } | { error: { status: number; code: string; message: string } }> {
     const [target] = await db
       .select({ id: users.id, accountType: users.accountType })
       .from(users)
@@ -161,9 +178,42 @@ export class AdminService {
       .limit(1);
     if (!target) return { error: { status: 404, code: "USER_NOT_FOUND", message: "Pengguna tidak ditemukan." } };
 
+    const isCallerSuperadmin = callerPermissions.includes("admin.security.manage");
+
+    // Proteksi akun Superadministrator: hanya sesama Superadministrator yang boleh memodifikasi role-nya
+    const targetIsSuperadmin = await this.isUserSuperadmin(targetId);
+    if (targetIsSuperadmin && !isCallerSuperadmin) {
+      return {
+        error: {
+          status: 403,
+          code: "SUPERADMIN_PROTECTED",
+          message: "Akun Superadministrator dilindungi dari modifikasi oleh administrator standar."
+        }
+      };
+    }
+
     const selectedRoles = roleIds.length ? await db.select({ id: roles.id }).from(roles).where(inArray(roles.id, roleIds)) : [];
     if (selectedRoles.length !== roleIds.length) {
       return { error: { status: 400, code: "INVALID_ROLES", message: "Satu atau lebih role tidak ditemukan." } };
+    }
+
+    // Periksa apakah ada role yang diberikan memuat hak admin.security.manage
+    const superGrantsAssigned = roleIds.length
+      ? await db
+          .select({ roleId: rolePermissions.roleId })
+          .from(rolePermissions)
+          .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
+          .where(and(inArray(rolePermissions.roleId, roleIds), eq(permissions.slug, "admin.security.manage")))
+      : [];
+
+    if (superGrantsAssigned.length > 0 && !isCallerSuperadmin) {
+      return {
+        error: {
+          status: 403,
+          code: "SUPERADMIN_PERMISSION_REQUIRED",
+          message: "Hanya Superadministrator yang dapat menetapkan role Superadministrator."
+        }
+      };
     }
 
     if (target.accountType === "admin") {
@@ -239,7 +289,12 @@ export class AdminService {
     return { success: true };
   }
 
-  async updateUserStatus(targetId: number, isActive: boolean, adminId: number): Promise<{ success: boolean } | { error: { status: number; code: string; message: string } }> {
+  async updateUserStatus(
+    targetId: number,
+    isActive: boolean,
+    adminId: number,
+    callerPermissions: string[] = []
+  ): Promise<{ success: boolean } | { error: { status: number; code: string; message: string } }> {
     const [target] = await db
       .select({ id: users.id, accountType: users.accountType, isActive: users.isActive })
       .from(users)
@@ -247,17 +302,31 @@ export class AdminService {
       .limit(1);
     if (!target) return { error: { status: 404, code: "USER_NOT_FOUND", message: "Pengguna tidak ditemukan." } };
 
-    if (!isActive) {
-      if (targetId === adminId) {
-        return {
-          error: {
-            status: 403,
-            code: "SELF_DEACTIVATION_FORBIDDEN",
-            message: "Administrator tidak dapat menonaktifkan akun sendiri."
-          }
-        };
-      }
+    if (!isActive && targetId === adminId) {
+      return {
+        error: {
+          status: 403,
+          code: "SELF_DEACTIVATION_FORBIDDEN",
+          message: "Administrator tidak dapat menonaktifkan akun sendiri."
+        }
+      };
+    }
 
+    const isCallerSuperadmin = callerPermissions.includes("admin.security.manage");
+
+    // Proteksi akun Superadministrator: hanya sesama Superadministrator yang boleh mengubah statusnya
+    const targetIsSuperadmin = await this.isUserSuperadmin(targetId);
+    if (targetIsSuperadmin && !isCallerSuperadmin) {
+      return {
+        error: {
+          status: 403,
+          code: "SUPERADMIN_PROTECTED",
+          message: "Akun Superadministrator dilindungi dari modifikasi status oleh administrator standar."
+        }
+      };
+    }
+
+    if (!isActive) {
       if (target.accountType === "admin") {
         const [adminCount] = await db
           .select({ total: count() })
@@ -309,9 +378,27 @@ export class AdminService {
     return { success: true };
   }
 
-  async revokeUserSessions(targetId: number, adminId: number): Promise<{ success: boolean } | { error: { status: number; code: string; message: string } }> {
+  async revokeUserSessions(
+    targetId: number,
+    adminId: number,
+    callerPermissions: string[] = []
+  ): Promise<{ success: boolean } | { error: { status: number; code: string; message: string } }> {
     const [target] = await db.select({ id: users.id }).from(users).where(eq(users.id, targetId)).limit(1);
     if (!target) return { error: { status: 404, code: "USER_NOT_FOUND", message: "Pengguna tidak ditemukan." } };
+
+    const isCallerSuperadmin = callerPermissions.includes("admin.security.manage");
+
+    // Proteksi akun Superadministrator: hanya sesama Superadministrator yang boleh mencabut sesinya
+    const targetIsSuperadmin = await this.isUserSuperadmin(targetId);
+    if (targetIsSuperadmin && !isCallerSuperadmin) {
+      return {
+        error: {
+          status: 403,
+          code: "SUPERADMIN_PROTECTED",
+          message: "Akun Superadministrator dilindungi dari pencabutan sesi oleh administrator standar."
+        }
+      };
+    }
 
     await db.transaction(async (tx) => {
       const [authUser] = await tx

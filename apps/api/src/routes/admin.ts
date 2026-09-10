@@ -216,7 +216,7 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
     const auth = await authorizeAdmin(request);
     if (!auth.success) return status(auth.failure.status, auth.failure.error);
 
-    const result = await adminService.updateUserRoles(Number(params.id), body.roleIds, auth.admin.id);
+    const result = await adminService.updateUserRoles(Number(params.id), body.roleIds, auth.admin.id, auth.admin.permissions);
     if ("error" in result) {
       return status(result.error.status, { code: result.error.code, message: result.error.message });
     }
@@ -258,7 +258,7 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
     const auth = await authorizeAdmin(request);
     if (!auth.success) return status(auth.failure.status, auth.failure.error);
 
-    const result = await adminService.updateUserStatus(Number(params.id), body.isActive, auth.admin.id);
+    const result = await adminService.updateUserStatus(Number(params.id), body.isActive, auth.admin.id, auth.admin.permissions);
     if ("error" in result) {
       return status(result.error.status, { code: result.error.code, message: result.error.message });
     }
@@ -301,7 +301,7 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
       return status(404, { code: "USER_NOT_FOUND", message: "Pengguna tidak ditemukan." });
     }
 
-    const result = await adminService.revokeUserSessions(targetId, auth.admin.id);
+    const result = await adminService.revokeUserSessions(targetId, auth.admin.id, auth.admin.permissions);
     if ("error" in result) {
       return status(result.error.status, { code: result.error.code, message: result.error.message });
     }
