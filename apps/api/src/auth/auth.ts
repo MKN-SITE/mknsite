@@ -17,7 +17,7 @@ function createAuth(basePath: string, cookiePrefix: string) {
   return betterAuth({
     baseURL: config.apiOrigin,
     basePath,
-    trustedOrigins: [config.appOrigin],
+    trustedOrigins: config.allowedOrigins as unknown as string[],
     database: adapter,
     emailAndPassword: {
       enabled: true,

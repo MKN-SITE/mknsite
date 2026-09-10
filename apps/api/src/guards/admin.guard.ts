@@ -4,12 +4,10 @@ import { config } from "../config/env";
 export function isAllowedOrigin(originHeader: string | null): boolean {
   if (!originHeader) return true;
   const allowed = [
-    config.appOrigin,
+    ...config.allowedOrigins,
     config.apiOrigin,
     `http://localhost:${config.port}`,
     `http://127.0.0.1:${config.port}`,
-    `http://localhost:3000`,
-    `http://127.0.0.1:3000`,
     `http://localhost:3100`,
     `http://127.0.0.1:3100`
   ];

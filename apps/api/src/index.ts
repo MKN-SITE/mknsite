@@ -16,9 +16,9 @@ export const createServer = (options: { enableSwagger?: boolean } = {}) => {
   return new Elysia()
     .use(
       cors({
-        origin: config.appOrigin,
+        origin: config.allowedOrigins as any,
         credentials: true,
-        allowedHeaders: ["Content-Type"],
+        allowedHeaders: ["Content-Type", "Authorization", "Cookie", "Accept", "X-Requested-With"],
         methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"]
       })
     )
