@@ -50,6 +50,7 @@ Hasil verifikasi ulang:
 
 Laporkan cakupan, hasil tiap skenario, temuan terbuka, dan hal yang belum diperiksa. Berikan rekomendasi "siap untuk cakupan yang diuji" atau "perlu perbaikan" beserta alasannya. Jangan memberikan jaminan seluruh sistem aman berdasarkan smoke test.
 
-Perintah awal yang tersedia: `bun run check`, `bun --cwd apps/api test`, dan `bun scripts/verify-docker.mjs` jika stack uji sudah berjalan. Pilih pemeriksaan sesuai perubahan.
+Perintah awal yang tersedia: `bun run check`, `bun --cwd apps/api test`, `bun scripts/verify-docker.mjs` jika stack uji sudah berjalan, serta skrip inspeksi bundle frontend live seperti `bun scratch/check_api_url.ts`. Pilih pemeriksaan sesuai perubahan.
 
+Laporan verifikasi deployment dicatat pada `docs/api/qa-deployment-2026-09-10.md`.
 Contoh penugasan tersedia di [examples.md](examples.md#qa).
