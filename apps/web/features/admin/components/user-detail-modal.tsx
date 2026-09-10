@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { api } from "@/lib/api";
+import { api, type PortalUser } from "@/lib/api";
 import { useRoles, type RoleSummaryDto } from "../hooks/use-roles";
 import type { UserSummaryDto } from "../hooks/use-users";
 import styles from "./user-detail-modal.module.css";
@@ -12,16 +12,28 @@ import styles from "./user-detail-modal.module.css";
 export type UserDetailModalProps = {
   open: boolean;
   user: UserSummaryDto | null;
+  currentAdmin?: PortalUser | null;
   onClose: () => void;
   onUpdated?: () => void;
 };
 
-export function UserDetailModal({ open, user, onClose, onUpdated }: UserDetailModalProps) {
+export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }: UserDetailModalProps) {
   const { roles: allRoles, loading: loadingRoles } = useRoles();
 
   const [currentUser, setCurrentUser] = useState<UserSummaryDto | null>(user);
+  const [callerAdmin, setCallerAdmin] = useState<PortalUser | null>(currentAdmin ?? null);
   const [loadingUser, setLoadingUser] = useState(false);
   const [topError, setTopError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (currentAdmin !== undefined) {
+      setCallerAdmin(currentAdmin);
+    } else if (open) {
+      api<{ user: PortalUser }>("/auth/admin/me")
+        .then((res) => setCallerAdmin(res.user))
+        .catch(() => {});
+    }
+  }, [open, currentAdmin]);
 
   // Section 1: Profil edit states
   const [editingName, setEditingName] = useState(false);
@@ -248,6 +260,16 @@ export function UserDetailModal({ open, user, onClose, onUpdated }: UserDetailMo
   };
 
   const isAdminAccount = currentUser?.accountType === "admin";
+  const isCallerSuperadmin = Boolean(callerAdmin?.permissions?.includes("admin.security.manage"));
+  const isTargetSuperadmin = useMemo(() => {
+    if (!currentUser) return false;
+    return (
+      currentUser.roles.some((r) => r.slug === "superadmin") ||
+      aggregatedPermissions.includes("admin.security.manage")
+    );
+  }, [currentUser, aggregatedPermissions]);
+
+  const isProtectedFromCaller = isTargetSuperadmin && !isCallerSuperadmin;
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "-";
@@ -454,7 +476,7 @@ export function UserDetailModal({ open, user, onClose, onUpdated }: UserDetailMo
         <section className={styles.section} aria-label="Role dan Izin">
           <div className={styles.sectionHeader}>
             <h3 className={styles.sectionTitle}>2. Role & Izin Akses</h3>
-            {!editingRoles && (
+            {!editingRoles && !isProtectedFromCaller && (
               <Button
                 variant="secondary"
                 size="sm"
@@ -467,6 +489,9 @@ export function UserDetailModal({ open, user, onClose, onUpdated }: UserDetailMo
               >
                 Ubah Role
               </Button>
+            )}
+            {isProtectedFromCaller && (
+              <Badge variant="neutral">Role Terproteksi (Khusus Superadmin)</Badge>
             )}
           </div>
 
@@ -579,124 +604,130 @@ export function UserDetailModal({ open, user, onClose, onUpdated }: UserDetailMo
             <h3 className={styles.sectionTitle}>3. Tindakan Akun & Keamanan Sesi</h3>
           </div>
 
-          <div className={styles.actionsGroup}>
-            {/* Action 1: Status Toggle */}
-            <div className={styles.actionCard}>
-              <div>
-                <span className={styles.actionTitle}>Status Akun</span>
-                <p className={styles.actionDesc}>
-                  {currentUser?.isActive
-                    ? "Menonaktifkan akun akan langsung mencabut seluruh sesi dan mencegah user login."
-                    : "Mengaktifkan kembali akun ini agar pengguna dapat login dan mengakses modul."}
-                </p>
-              </div>
-
-              {statusError && (
-                <div className={`${styles.alert} ${styles.alertDanger}`} style={{ padding: "6px 8px", fontSize: "11px" }}>
-                  <span>{statusError}</span>
-                </div>
-              )}
-
-              {confirmingStatus ? (
-                <div className={styles.confirmBox}>
-                  <span>
+          {isProtectedFromCaller ? (
+            <div className={`${styles.alert} ${styles.alertWarning}`} style={{ marginTop: "4px" }}>
+              <span>🛡️ Akun Superadministrator memiliki proteksi keamanan sistem khusus. Tindakan penonaktifan akun dan pencabutan sesi hanya dapat dikelola oleh sesama Superadministrator.</span>
+            </div>
+          ) : (
+            <div className={styles.actionsGroup}>
+              {/* Action 1: Status Toggle */}
+              <div className={styles.actionCard}>
+                <div>
+                  <span className={styles.actionTitle}>Status Akun</span>
+                  <p className={styles.actionDesc}>
                     {currentUser?.isActive
-                      ? "Konfirmasi nonaktifkan akun ini? Pengguna tidak akan bisa login."
-                      : "Konfirmasi aktifkan kembali akun ini?"}
-                  </span>
-                  <div className={styles.confirmButtons}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setConfirmingStatus(false)}
-                      disabled={savingStatus}
-                    >
-                      Batal
-                    </Button>
-                    <Button
-                      variant={currentUser?.isActive ? "danger" : "primary"}
-                      size="sm"
-                      onClick={handleToggleStatus}
-                      loading={savingStatus}
-                      loadingText="Memproses..."
-                    >
-                      Ya, Lanjutkan
-                    </Button>
-                  </div>
+                      ? "Menonaktifkan akun akan langsung mencabut seluruh sesi dan mencegah user login."
+                      : "Mengaktifkan kembali akun ini agar pengguna dapat login dan mengakses modul."}
+                  </p>
                 </div>
-              ) : (
-                <Button
-                  variant={currentUser?.isActive ? "danger" : "secondary"}
-                  size="sm"
-                  onClick={() => {
-                    setConfirmingStatus(true);
-                    setStatusError(null);
-                  }}
-                >
-                  {currentUser?.isActive ? "Nonaktifkan Akun" : "Aktifkan Akun"}
-                </Button>
-              )}
-            </div>
 
-            {/* Action 2: Revoke Sessions */}
-            <div className={styles.actionCard}>
-              <div>
-                <span className={styles.actionTitle}>Cabut Semua Sesi Aktif</span>
-                <p className={styles.actionDesc}>
-                  Mengeluarkan pengguna dari seluruh perangkat dan browser yang sedang terhubung secara paksa.
-                </p>
+                {statusError && (
+                  <div className={`${styles.alert} ${styles.alertDanger}`} style={{ padding: "6px 8px", fontSize: "11px" }}>
+                    <span>{statusError}</span>
+                  </div>
+                )}
+
+                {confirmingStatus ? (
+                  <div className={styles.confirmBox}>
+                    <span>
+                      {currentUser?.isActive
+                        ? "Konfirmasi nonaktifkan akun ini? Pengguna tidak akan bisa login."
+                        : "Konfirmasi aktifkan kembali akun ini?"}
+                    </span>
+                    <div className={styles.confirmButtons}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setConfirmingStatus(false)}
+                        disabled={savingStatus}
+                      >
+                        Batal
+                      </Button>
+                      <Button
+                        variant={currentUser?.isActive ? "danger" : "primary"}
+                        size="sm"
+                        onClick={handleToggleStatus}
+                        loading={savingStatus}
+                        loadingText="Memproses..."
+                      >
+                        Ya, Lanjutkan
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <Button
+                    variant={currentUser?.isActive ? "danger" : "secondary"}
+                    size="sm"
+                    onClick={() => {
+                      setConfirmingStatus(true);
+                      setStatusError(null);
+                    }}
+                  >
+                    {currentUser?.isActive ? "Nonaktifkan Akun" : "Aktifkan Akun"}
+                  </Button>
+                )}
               </div>
 
-              {revokeSuccess && (
-                <div className={`${styles.alert} ${styles.alertSuccess}`} style={{ padding: "6px 8px", fontSize: "11px" }}>
-                  <span>{revokeSuccess}</span>
+              {/* Action 2: Revoke Sessions */}
+              <div className={styles.actionCard}>
+                <div>
+                  <span className={styles.actionTitle}>Cabut Semua Sesi Aktif</span>
+                  <p className={styles.actionDesc}>
+                    Mengeluarkan pengguna dari seluruh perangkat dan browser yang sedang terhubung secara paksa.
+                  </p>
                 </div>
-              )}
 
-              {revokeError && (
-                <div className={`${styles.alert} ${styles.alertDanger}`} style={{ padding: "6px 8px", fontSize: "11px" }}>
-                  <span>{revokeError}</span>
-                </div>
-              )}
-
-              {confirmingRevoke ? (
-                <div className={styles.confirmBox}>
-                  <span>Pengguna akan diminta login ulang di semua perangkat. Lanjutkan?</span>
-                  <div className={styles.confirmButtons}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setConfirmingRevoke(false)}
-                      disabled={savingRevoke}
-                    >
-                      Batal
-                    </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={handleRevokeSessions}
-                      loading={savingRevoke}
-                      loadingText="Mencabut..."
-                    >
-                      Ya, Cabut Sesi
-                    </Button>
+                {revokeSuccess && (
+                  <div className={`${styles.alert} ${styles.alertSuccess}`} style={{ padding: "6px 8px", fontSize: "11px" }}>
+                    <span>{revokeSuccess}</span>
                   </div>
-                </div>
-              ) : (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => {
-                    setConfirmingRevoke(true);
-                    setRevokeError(null);
-                    setRevokeSuccess(null);
-                  }}
-                >
-                  Cabut Semua Sesi
-                </Button>
-              )}
+                )}
+
+                {revokeError && (
+                  <div className={`${styles.alert} ${styles.alertDanger}`} style={{ padding: "6px 8px", fontSize: "11px" }}>
+                    <span>{revokeError}</span>
+                  </div>
+                )}
+
+                {confirmingRevoke ? (
+                  <div className={styles.confirmBox}>
+                    <span>Pengguna akan diminta login ulang di semua perangkat. Lanjutkan?</span>
+                    <div className={styles.confirmButtons}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setConfirmingRevoke(false)}
+                        disabled={savingRevoke}
+                      >
+                        Batal
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={handleRevokeSessions}
+                        loading={savingRevoke}
+                        loadingText="Mencabut..."
+                      >
+                        Ya, Cabut Sesi
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      setConfirmingRevoke(true);
+                      setRevokeError(null);
+                      setRevokeSuccess(null);
+                    }}
+                  >
+                    Cabut Semua Sesi
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </section>
       </div>
     </Modal>

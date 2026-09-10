@@ -101,4 +101,84 @@ describe("UserDetailModal component", () => {
     expect(aggregated).toContain("ops.manage");
     expect(aggregated.length).toBe(3); // dashboard.view deduplicated
   });
+
+  test("protects Superadministrator from modification when viewed by regular admin", () => {
+    const regularAdminCaller = {
+      id: 2,
+      name: "Admin Biasa",
+      email: "admin@mknsite.online",
+      actorType: "admin" as const,
+      roles: ["Administrator"],
+      permissions: ["admin.manage"]
+    };
+
+    const targetSuperadmin: UserSummaryDto = {
+      id: 1,
+      name: "Super Administrator",
+      email: "superadmin@mknsite.online",
+      accountType: "admin",
+      isActive: true,
+      roles: [{ id: 7, name: "Superadministrator", slug: "superadmin" }],
+      createdAt: "2026-08-01T08:00:00.000Z",
+      updatedAt: "2026-08-01T08:00:00.000Z"
+    };
+
+    const html = renderToStaticMarkup(
+      createElement(UserDetailModal, {
+        open: true,
+        user: targetSuperadmin,
+        currentAdmin: regularAdminCaller,
+        onClose: () => {}
+      })
+    );
+
+    // Section 1: Profil Read-Only
+    expect(html).toContain("Akun Administrator (Read-Only)");
+    expect(html).not.toContain(">Edit</button>");
+
+    // Section 2: Ubah Role disembunyikan & ada badge proteksi
+    expect(html).not.toContain("Ubah Role");
+    expect(html).toContain("Role Terproteksi (Khusus Superadmin)");
+
+    // Section 3: Tindakan Akun disembunyikan & ada banner proteksi
+    expect(html).not.toContain("Nonaktifkan Akun");
+    expect(html).not.toContain("Cabut Semua Sesi");
+    expect(html).toContain("Akun Superadministrator memiliki proteksi keamanan sistem khusus");
+  });
+
+  test("allows Superadministrator caller to manage roles and actions", () => {
+    const superadminCaller = {
+      id: 1,
+      name: "Super Administrator",
+      email: "superadmin@mknsite.online",
+      actorType: "admin" as const,
+      roles: ["Superadministrator"],
+      permissions: ["admin.manage", "admin.security.manage"]
+    };
+
+    const targetAdmin: UserSummaryDto = {
+      id: 2,
+      name: "Admin Biasa",
+      email: "admin@mknsite.online",
+      accountType: "admin",
+      isActive: true,
+      roles: [{ id: 6, name: "Administrator", slug: "administrator" }],
+      createdAt: "2026-08-01T08:00:00.000Z",
+      updatedAt: "2026-08-01T08:00:00.000Z"
+    };
+
+    const html = renderToStaticMarkup(
+      createElement(UserDetailModal, {
+        open: true,
+        user: targetAdmin,
+        currentAdmin: superadminCaller,
+        onClose: () => {}
+      })
+    );
+
+    // Superadmin dapat mengubah role dan melakukan tindakan akun
+    expect(html).toContain("Ubah Role");
+    expect(html).toContain("Nonaktifkan Akun");
+    expect(html).toContain("Cabut Semua Sesi");
+  });
 });

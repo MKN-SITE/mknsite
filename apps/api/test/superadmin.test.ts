@@ -125,4 +125,62 @@ describe("Superadmin RBAC & Guard Suite (Fase 1 Superadmin)", () => {
       expect(adminResult.failure.error.code).toBe("SUPERADMIN_PERMISSION_REQUIRED");
     }
   });
+
+  it("admin biasa dilarang memodifikasi akun superadmin (roles, status, revoke) dengan HTTP 403 SUPERADMIN_PROTECTED", async () => {
+    // 1. Login sebagai admin biasa
+    const adminLoginRes = await app.handle(
+      new Request("http://localhost/auth/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Origin: "http://localhost:3000" },
+        body: JSON.stringify({ email: "admin@mknsite.online", password: "admin12345" })
+      })
+    );
+    const adminCookie = adminLoginRes.headers.get("set-cookie") ?? "";
+
+    // 2. Ambil ID superadmin
+    const usersRes = await app.handle(
+      new Request("http://localhost/admin/users?search=superadmin@mknsite.online", {
+        headers: { Cookie: adminCookie }
+      })
+    );
+    const usersBody = (await usersRes.json()) as { data: Array<{ id: number; email: string }> };
+    const superadminUser = usersBody.data.find((u) => u.email === "superadmin@mknsite.online");
+    expect(superadminUser).toBeDefined();
+    const superadminId = superadminUser!.id;
+
+    // 3. Admin coba ubah role superadmin -> 403 SUPERADMIN_PROTECTED
+    const rolePatchRes = await app.handle(
+      new Request(`http://localhost/admin/users/${superadminId}/roles`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
+        body: JSON.stringify({ roleIds: [6] }) // role administrator biasa
+      })
+    );
+    expect(rolePatchRes.status).toBe(403);
+    const roleBody = (await rolePatchRes.json()) as { code: string };
+    expect(roleBody.code).toBe("SUPERADMIN_PROTECTED");
+
+    // 4. Admin coba nonaktifkan superadmin -> 403 SUPERADMIN_PROTECTED
+    const statusPatchRes = await app.handle(
+      new Request(`http://localhost/admin/users/${superadminId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
+        body: JSON.stringify({ isActive: false })
+      })
+    );
+    expect(statusPatchRes.status).toBe(403);
+    const statusBody = (await statusPatchRes.json()) as { code: string };
+    expect(statusBody.code).toBe("SUPERADMIN_PROTECTED");
+
+    // 5. Admin coba cabut sesi superadmin -> 403 SUPERADMIN_PROTECTED
+    const revokeRes = await app.handle(
+      new Request(`http://localhost/admin/users/${superadminId}/revoke-sessions`, {
+        method: "POST",
+        headers: { Origin: "http://localhost:3000", Cookie: adminCookie }
+      })
+    );
+    expect(revokeRes.status).toBe(403);
+    const revokeBody = (await revokeRes.json()) as { code: string };
+    expect(revokeBody.code).toBe("SUPERADMIN_PROTECTED");
+  });
 });
