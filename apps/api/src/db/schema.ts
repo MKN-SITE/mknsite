@@ -95,3 +95,24 @@ export const auditLogs = mysqlTable("audit_logs", {
   ipAddress: varchar("ip_address", { length: 64 }),
   createdAt: timestamp("created_at").notNull().defaultNow()
 }, (table) => [index("audit_actor_idx").on(table.actorId), index("audit_created_idx").on(table.createdAt)]);
+
+export const menus = mysqlTable("menus", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 100 }).notNull(),
+  icon: varchar("icon", { length: 100 }),
+  description: varchar("description", { length: 255 }),
+  url: varchar("url", { length: 500 }),
+  requiredPermission: varchar("required_permission", { length: 140 }),
+  sortOrder: int("sort_order").notNull().default(0),
+  isActive: int("is_active").notNull().default(1),
+  badgeCount: int("badge_count").default(0),
+  badgeColor: varchar("badge_color", { length: 20 }).default("orange"),
+  createdBy: int("created_by").references(() => users.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow()
+}, (table) => [
+  index("menus_sort_order_idx").on(table.sortOrder),
+  index("menus_is_active_idx").on(table.isActive),
+  index("menus_required_permission_idx").on(table.requiredPermission)
+]);
+

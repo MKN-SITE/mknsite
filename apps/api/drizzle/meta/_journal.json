@@ -15,6 +15,13 @@
       "when": 1788781540033,
       "tag": "0001_funny_marvex",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1789025983020,
+      "tag": "0002_strong_korath",
+      "breakpoints": true
     }
   ]
 }

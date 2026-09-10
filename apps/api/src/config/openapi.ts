@@ -19,8 +19,10 @@ export const openApiTags = [
   { name: "Auth Admin", description: "Autentikasi dan sesi terisolasi administrator" },
   { name: "Workspace", description: "Data modul bisnis berbasis otorisasi RBAC" },
   { name: "Admin", description: "Operasi administratif dan manajemen pengguna" },
-  { name: "Realtime", description: "Streaming event langsung Server-Sent Events (SSE)" }
+  { name: "Realtime", description: "Streaming event langsung Server-Sent Events (SSE)" },
+  { name: "Menus", description: "Pengelolaan menu portal karyawan dan menu gerbang dinamis" }
 ];
+
 
 export const openApiSchemas: Record<string, unknown> = {
   ErrorResponse: {
@@ -234,5 +236,45 @@ export const openApiSchemas: Record<string, unknown> = {
         }
       }
     }
+  },
+  MenuSummary: {
+    type: "object",
+    description: "Informasi detail satu item menu portal",
+    required: ["id", "title", "sortOrder", "isActive", "badgeCount", "badgeColor", "createdAt", "updatedAt"],
+    properties: {
+      id: { type: "integer", example: 1 },
+      title: { type: "string", example: "HR" },
+      icon: { type: "string", nullable: true, example: "users" },
+      description: { type: "string", nullable: true, example: "Manajemen Karyawan dan Organisasi" },
+      url: { type: "string", nullable: true, example: "/portal/hr" },
+      requiredPermission: { type: "string", nullable: true, example: "hr.view" },
+      sortOrder: { type: "integer", example: 1 },
+      isActive: { type: "boolean", example: true },
+      badgeCount: { type: "integer", example: 0 },
+      badgeColor: { type: "string", example: "orange" },
+      createdBy: { type: "integer", nullable: true, example: 1 },
+      createdAt: { type: "string", format: "date-time", example: "2026-09-07T11:53:50.000Z" },
+      updatedAt: { type: "string", format: "date-time", example: "2026-09-07T11:53:50.000Z" }
+    }
+  },
+  MenuListResponse: {
+    type: "object",
+    description: "Response daftar menu portal",
+    required: ["data"],
+    properties: {
+      data: {
+        type: "array",
+        items: { $ref: "#/components/schemas/MenuSummary" }
+      }
+    }
+  },
+  MenuDetailResponse: {
+    type: "object",
+    description: "Response detail item menu tunggal",
+    required: ["data"],
+    properties: {
+      data: { $ref: "#/components/schemas/MenuSummary" }
+    }
   }
 };
+
