@@ -136,7 +136,7 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
       return status(404, { code: "USER_NOT_FOUND", message: "Pengguna tidak ditemukan." });
     }
 
-    const result = await adminService.updateUserProfile(targetId, body, body as Record<string, unknown>, auth.admin.id);
+    const result = await adminService.updateUserProfile(targetId, body, body as Record<string, unknown>, auth.admin.id, auth.admin.permissions);
     if ("error" in result) {
       return status(result.error.status, { code: result.error.code, message: result.error.message });
     }
@@ -181,6 +181,126 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
           content: { "application/json": { schema: { $ref: "#/components/schemas/ValidationError" } } }
         }
       }
+    }
+  })
+  .delete("/users/:id", async ({ params, request, status }) => {
+    const auth = await authorizeAdmin(request);
+    if (!auth.success) return status(auth.failure.status, auth.failure.error);
+
+    const targetId = Number(params.id);
+    if (targetId <= 0 || !Number.isInteger(targetId)) {
+      return status(404, { code: "USER_NOT_FOUND", message: "Pengguna tidak ditemukan." });
+    }
+
+    const result = await adminService.deleteUser(targetId, auth.admin.id, auth.admin.permissions);
+    if ("error" in result) {
+      return status(result.error.status, { code: result.error.code, message: result.error.message });
+    }
+
+    return { success: true };
+  }, {
+    params: t.Object({ id: t.Numeric({ description: "ID pengguna internal MKN" }) }),
+    detail: {
+      summary: "Hapus Pengguna Sistem",
+      description: "Menghapus akun pengguna secara permanen, mencabut seluruh sesi aktif, dan mencatat audit log. Memerlukan hak admin.manage.",
+      tags: ["Admin"],
+      operationId: "deleteAdminUser",
+      security: [{ adminSession: [] }]
+    }
+  })
+  .post("/users/:id/avatar", async ({ params, request, status }) => {
+    const auth = await authorizeAdmin(request);
+    if (!auth.success) return status(auth.failure.status, auth.failure.error);
+
+    const targetId = Number(params.id);
+    if (targetId <= 0 || !Number.isInteger(targetId)) {
+      return status(404, { code: "USER_NOT_FOUND", message: "Pengguna tidak ditemukan." });
+    }
+
+    const contentType = request.headers.get("content-type") || "";
+    let avatarUrl = "";
+
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await request.formData();
+      const file = formData.get("file") || formData.get("avatar");
+      if (!file || !(file instanceof Blob)) {
+        return status(400, { code: "INVALID_FILE", message: "File gambar tidak ditemukan dalam permintaan." });
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        return status(400, { code: "FILE_TOO_LARGE", message: "Ukuran file avatar maksimal 5 MB." });
+      }
+      const ext = file.type.includes("png") ? "png" : file.type.includes("webp") ? "webp" : "jpg";
+      const filename = `avatar-${targetId}-${Date.now()}.${ext}`;
+      const filePath = `uploads/avatars/${filename}`;
+      const arrayBuffer = await file.arrayBuffer();
+      await Bun.write(filePath, arrayBuffer);
+      avatarUrl = `/uploads/avatars/${filename}`;
+    } else if (contentType.includes("application/json")) {
+      const json = (await request.json().catch(() => ({}))) as Record<string, any>;
+      if (typeof json.avatarUrl === "string") {
+        avatarUrl = json.avatarUrl;
+      } else if (typeof json.dataUrl === "string" && json.dataUrl.startsWith("data:image/")) {
+        const matches = json.dataUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+        if (!matches || matches.length !== 3) {
+          return status(400, { code: "INVALID_IMAGE_DATA", message: "Format data gambar base64 tidak valid." });
+        }
+        const mimeType = matches[1];
+        const base64Data = matches[2];
+        const buffer = Buffer.from(base64Data, "base64");
+        if (buffer.length > 5 * 1024 * 1024) {
+          return status(400, { code: "FILE_TOO_LARGE", message: "Ukuran gambar maksimal 5 MB." });
+        }
+        const ext = mimeType.includes("png") ? "png" : mimeType.includes("webp") ? "webp" : "jpg";
+        const filename = `avatar-${targetId}-${Date.now()}.${ext}`;
+        const filePath = `uploads/avatars/${filename}`;
+        await Bun.write(filePath, buffer);
+        avatarUrl = `/uploads/avatars/${filename}`;
+      } else {
+        return status(400, { code: "INVALID_BODY", message: "File atau data URL gambar diperlukan." });
+      }
+    } else {
+      return status(400, { code: "UNSUPPORTED_MEDIA_TYPE", message: "Content-Type harus multipart/form-data atau application/json." });
+    }
+
+    const result = await adminService.updateUserProfile(targetId, { avatarUrl }, { avatarUrl }, auth.admin.id, auth.admin.permissions);
+    if ("error" in result) {
+      return status(result.error.status, { code: result.error.code, message: result.error.message });
+    }
+
+    return { data: result.user };
+  }, {
+    params: t.Object({ id: t.Numeric({ description: "ID pengguna internal MKN" }) }),
+    detail: {
+      summary: "Unggah Foto Profil Pengguna",
+      description: "Mengunggah dan memperbarui foto profil pengguna.",
+      tags: ["Admin"],
+      operationId: "uploadAdminUserAvatar",
+      security: [{ adminSession: [] }]
+    }
+  })
+  .delete("/users/:id/avatar", async ({ params, request, status }) => {
+    const auth = await authorizeAdmin(request);
+    if (!auth.success) return status(auth.failure.status, auth.failure.error);
+
+    const targetId = Number(params.id);
+    if (targetId <= 0 || !Number.isInteger(targetId)) {
+      return status(404, { code: "USER_NOT_FOUND", message: "Pengguna tidak ditemukan." });
+    }
+
+    const result = await adminService.updateUserProfile(targetId, { avatarUrl: null }, { avatarUrl: null }, auth.admin.id, auth.admin.permissions);
+    if ("error" in result) {
+      return status(result.error.status, { code: result.error.code, message: result.error.message });
+    }
+
+    return { data: result.user };
+  }, {
+    params: t.Object({ id: t.Numeric({ description: "ID pengguna internal MKN" }) }),
+    detail: {
+      summary: "Hapus Foto Profil Pengguna",
+      description: "Menghapus foto profil pengguna (reset ke inisial).",
+      tags: ["Admin"],
+      operationId: "deleteAdminUserAvatar",
+      security: [{ adminSession: [] }]
     }
   })
   .get("/roles", async ({ request, status }) => {

@@ -14,6 +14,8 @@ export type PortalHeaderProps = {
   eyebrow: string;
   title: string;
   description: string;
+  avatarUrl?: string | null;
+  division?: string | null;
   onLogout: () => void;
   loggingOut?: boolean;
 };
@@ -25,6 +27,8 @@ export function PortalHeader({
   eyebrow,
   title,
   description,
+  avatarUrl,
+  division,
   onLogout,
   loggingOut
 }: PortalHeaderProps) {
@@ -77,7 +81,11 @@ export function PortalHeader({
               onClick={() => setOpen(!open)}
             >
               <span className={styles.avatar} aria-hidden="true">
-                {name.charAt(0).toUpperCase()}
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="" className={styles.avatarImg} />
+                ) : (
+                  name.charAt(0).toUpperCase()
+                )}
               </span>
               <span className={styles.accountName}>{name}</span>
               <svg
@@ -99,6 +107,7 @@ export function PortalHeader({
               <div className={styles.dropdown} id={panelId}>
                 <div className={styles.dropdownInfo}>
                   <strong>{name}</strong>
+                  {division && <span className={styles.dropdownDivision}>{division}</span>}
                   <span>{role}</span>
                 </div>
                 <Button variant="danger" onClick={onLogout} loading={loggingOut} loadingText="Keluar...">

@@ -45,8 +45,8 @@ describe("RBAC CRUD API", () => {
     expect((await app.handle(new Request("http://localhost/admin/rbac/roles"))).status).toBe(401);
     const adminCookie = await login("admin@mknsite.online", "admin12345");
     const denied = await request("/admin/rbac/roles", adminCookie, "POST", {
-      name: "QA Restricted",
-      slug: `${marker}-restricted`
+      name: "QA Restricted Superadmin",
+      slug: "superadmin"
     });
     expect(denied.status).toBe(403);
     expect((await denied.json() as { code: string }).code).toBe("SUPERADMIN_PERMISSION_REQUIRED");

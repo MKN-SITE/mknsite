@@ -12,7 +12,11 @@ export type UserSummaryDto = {
   name: string;
   email: string;
   accountType: "employee" | "admin";
+  division?: string | null;
+  avatarUrl?: string | null;
   isActive: boolean;
+  lastLoginAt?: string | null;
+  isOnline?: boolean;
   roles: UserRoleDto[];
   createdAt: string;
   updatedAt: string;
@@ -36,6 +40,7 @@ export type UseUsersOptions = {
   search?: string;
   status?: "all" | "active" | "inactive";
   accountType?: "all" | "employee" | "admin";
+  division?: string;
 };
 
 const cachedUsersMap = new Map<string, UserListResponseDto>();
@@ -49,9 +54,10 @@ export function useUsers({
   pageSize = 20,
   search = "",
   status = "all",
-  accountType = "all"
+  accountType = "all",
+  division = "all"
 }: UseUsersOptions = {}) {
-  const cacheKey = `${page}:${pageSize}:${search}:${status}:${accountType}`;
+  const cacheKey = `${page}:${pageSize}:${search}:${status}:${accountType}:${division}`;
   const initialCached = cachedUsersMap.get(cacheKey);
 
   const [data, setData] = useState<UserSummaryDto[]>(() => initialCached?.data ?? []);
@@ -85,6 +91,7 @@ export function useUsers({
       if (search.trim()) params.set("search", search.trim());
       if (status !== "all") params.set("status", status);
       if (accountType !== "all") params.set("accountType", accountType);
+      if (division !== "all") params.set("division", division);
 
       const response = await api<UserListResponseDto>(`/admin/users?${params.toString()}`);
       cachedUsersMap.set(cacheKey, response);
@@ -95,7 +102,7 @@ export function useUsers({
     } finally {
       setLoading(false);
     }
-  }, [cacheKey, page, pageSize, search, status, accountType]);
+  }, [cacheKey, page, pageSize, search, status, accountType, division]);
 
   useEffect(() => {
     fetchUsers();

@@ -142,7 +142,11 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
               aria-label="Menu profil pengguna"
             >
               <div className={styles.avatarCircle} aria-hidden="true">
-                {initial}
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt="" className={styles.avatarImg} />
+                ) : (
+                  initial
+                )}
               </div>
               <span className={styles.userName}>{user.name}</span>
               <svg
@@ -165,6 +169,9 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
               <div className={styles.userDropdown} role="menu">
                 <div className={styles.userDropdownInfo}>
                   <strong className={styles.dropdownUserName}>{user.name}</strong>
+                  {user.division && (
+                    <span className={styles.dropdownUserDivision}>{user.division}</span>
+                  )}
                   <span className={styles.dropdownUserRoles}>{user.roles.join(", ")}</span>
                 </div>
                 <button

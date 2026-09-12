@@ -88,7 +88,7 @@ export function RolePermissionViewer({ view = "roles", canManage = false }: { vi
         <div><p className={styles.kicker}>{isRoles ? "ROLE" : "IZIN AKSES"}</p><h3 className={styles.title}>{isRoles ? "Role dan cakupan akses" : "Katalog izin sistem"}</h3><p className={styles.subtitle}>{isRoles ? "Atur kelompok akses dan izin yang dimiliki setiap role." : "Kelola identifier izin yang dipakai oleh role dan menu."}</p></div>
         {canManage && <Button onClick={() => { setFormError(null); setEditor({ kind: isRoles ? "role" : "permission" }); }}>+ Tambah {isRoles ? "Role" : "Izin"}</Button>}
       </div>
-      {!canManage && <p className={styles.readonlyNote}>Mode baca. Perubahan role dan izin hanya tersedia untuk Superadministrator.</p>}
+      {!canManage && <p className={styles.readonlyNote}>Mode baca. Perubahan role dan izin hanya tersedia untuk Administrator.</p>}
       {notice && <div className={styles.notice} role="status"><span>{notice}</span><button type="button" onClick={() => setNotice(null)} aria-label="Tutup pemberitahuan">×</button></div>}
       <div className={styles.toolbar}><FormField label={`Cari ${isRoles ? "role" : "izin"}`} name="access-search" type="text" placeholder={`Cari nama atau slug ${isRoles ? "role" : "izin"}...`} value={search} onChange={(event) => setSearch(event.target.value)} /><Button variant="secondary" size="sm" loading={loading} loadingText="Memuat..." onClick={refreshAll}>Muat ulang</Button></div>
       {error && <div className={styles.errorBanner} role="alert"><span>{error}</span><Button variant="secondary" size="sm" onClick={refreshAll}>Coba lagi</Button></div>}

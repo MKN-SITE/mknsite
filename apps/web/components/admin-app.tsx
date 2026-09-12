@@ -7,6 +7,7 @@ import { api, ApiError, type PortalUser } from "@/lib/api";
 import { PortalHeader } from "@/components/layout/portal-header";
 import { Button } from "@/components/ui/button";
 import { UserList } from "@/features/admin/components/user-list";
+import { DivisionManager } from "@/features/admin/components/division-manager";
 import { RolePermissionViewer } from "@/features/admin/components/role-permission-viewer";
 import { MenuManager } from "@/features/admin/components/menu-manager";
 import { AdminPortalHome, UserManagementNav } from "@/features/admin/components/admin-portal";
@@ -125,6 +126,8 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
   const description =
     view === "users"
       ? "Kelola akun, status, dan penetapan role untuk setiap pengguna."
+      : view === "divisions"
+      ? "Kelola divisi & departemen tim, pantau jumlah personel, dan atur penamaan divisi."
       : view === "roles"
       ? "Tinjau role dan izin yang diberikan kepada masing-masing peran."
       : view === "permissions"
@@ -138,6 +141,8 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
       <PortalHeader
         homeHref="/admin"
         name={admin.name}
+        avatarUrl={admin.avatarUrl}
+        division={admin.division}
         role={admin.roles.join(", ") || "Administrator"}
         eyebrow="ADMINISTRATOR"
         title={view === "home" ? `Selamat datang, ${admin.name.split(" ")[0]}.` : inUserManagement ? "User Management" : title}
@@ -180,11 +185,14 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
                     <p>{description}</p>
                   </div>
                   {view === "users" && <UserList currentAdmin={admin} />}
+                  {view === "divisions" && (
+                    <DivisionManager canManage={admin.permissions.includes("admin.manage")} />
+                  )}
                   {(view === "roles" || view === "permissions") && (
                     <RolePermissionViewer
                       key={view}
                       view={view}
-                      canManage={admin.permissions.includes("admin.security.manage")}
+                      canManage={admin.permissions.includes("admin.manage")}
                     />
                   )}
                   {view === "menus" && <MenuManager />}

@@ -19,6 +19,7 @@ export function UserList({ currentAdmin }: { currentAdmin?: PortalUser | null } 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"all" | "active" | "inactive">("all");
   const [accountType, setAccountType] = useState<"all" | "employee" | "admin">("all");
+  const [division, setDivision] = useState<string>("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserSummaryDto | null>(null);
 
@@ -26,7 +27,8 @@ export function UserList({ currentAdmin }: { currentAdmin?: PortalUser | null } 
     page,
     search,
     status,
-    accountType
+    accountType,
+    division: division || undefined
   });
 
   // Realtime subscription: auto-refresh user list on admin.users.updated
@@ -57,17 +59,59 @@ export function UserList({ currentAdmin }: { currentAdmin?: PortalUser | null } 
     setPage(1);
   };
 
+  const handleDivisionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setDivision(e.target.value);
+    setPage(1);
+  };
+
   const columns: Column<UserSummaryDto>[] = [
     {
       key: "name",
       header: "Nama",
       render: (row) => (
         <div className={styles.nameCell}>
-          <span className={styles.avatar} aria-hidden="true">
-            {row.name.charAt(0).toUpperCase()}
+          <span className={styles.avatar} aria-hidden="true" style={{ position: "relative" }}>
+            {row.avatarUrl ? (
+              <img src={row.avatarUrl} alt="" className={styles.avatarImg} />
+            ) : (
+              row.name.charAt(0).toUpperCase()
+            )}
+            <span
+              style={{
+                position: "absolute",
+                bottom: "-1px",
+                right: "-1px",
+                width: "9px",
+                height: "9px",
+                borderRadius: "50%",
+                backgroundColor: row.isOnline ? "#10b981" : "#94a3b8",
+                border: "1.5px solid #ffffff"
+              }}
+              title={row.isOnline ? "Online (Sesi Aktif)" : "Offline"}
+            />
           </span>
-          <span className={styles.userName}>{row.name}</span>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span className={styles.userName}>{row.name}</span>
+            {row.lastLoginAt && (
+              <span style={{ fontSize: "10px", color: "var(--ink-soft, #51615d)" }}>
+                Login: {new Date(row.lastLoginAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+              </span>
+            )}
+          </div>
         </div>
+      )
+    },
+    {
+      key: "division",
+      header: "Divisi",
+      render: (row) => (
+        <span className={styles.divisionCell}>
+          {row.division ? (
+            <Badge variant="neutral">{row.division}</Badge>
+          ) : (
+            <span className={styles.noDivision}>-</span>
+          )}
+        </span>
       )
     },
     {
@@ -196,6 +240,22 @@ export function UserList({ currentAdmin }: { currentAdmin?: PortalUser | null } 
             <option value="all">Semua Tipe Akun</option>
             <option value="employee">Karyawan</option>
             <option value="admin">Administrator</option>
+          </select>
+
+          <select
+            className={styles.filterSelect}
+            value={division}
+            onChange={handleDivisionChange}
+            aria-label="Filter divisi"
+          >
+            <option value="">Semua Divisi</option>
+            <option value="Direksi / Eksekutif">Direksi / Eksekutif</option>
+            <option value="Teknologi Informasi">Teknologi Informasi</option>
+            <option value="Human Resources">Human Resources</option>
+            <option value="Telekomunikasi">Telekomunikasi</option>
+            <option value="Workshop">Workshop</option>
+            <option value="Project Management">Project Management</option>
+            <option value="Manajemen & Operasional">Manajemen & Operasional</option>
           </select>
         </div>
       </div>
