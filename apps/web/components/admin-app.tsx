@@ -130,7 +130,7 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
       : view === "permissions"
       ? "Telusuri izin akses dan role yang menggunakannya."
       : view === "menus"
-      ? "Susun modul dan akses menu pada portal karyawan."
+      ? "Susun modul dan akses menu karyawan."
       : "Tinjau informasi akun dan sesi administrator Anda.";
 
   return (
@@ -139,9 +139,9 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
         homeHref="/admin"
         name={admin.name}
         role={admin.roles.join(", ") || "Administrator"}
-        eyebrow="PORTAL ADMINISTRATOR"
+        eyebrow="ADMINISTRATOR"
         title={view === "home" ? `Selamat datang, ${admin.name.split(" ")[0]}.` : inUserManagement ? "User Management" : title}
-        description={view === "home" ? "Kelola pengguna, akses tim, dan pengaturan portal MKN Site." : inUserManagement ? "Satu ruang untuk mengelola pengguna, role, dan izin akses." : description}
+        description={view === "home" ? "Kelola pengguna, akses tim, dan pengaturan MKN Site." : inUserManagement ? "Satu ruang untuk mengelola pengguna, role, dan izin akses." : description}
         onLogout={logout}
         loggingOut={loggingOut}
       />
@@ -162,7 +162,7 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
           ) : (
             <>
               <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
-                <Link href="/admin">Portal Admin</Link>
+                <Link href="/admin">Admin</Link>
                 <span aria-hidden="true">/</span>
                 {inUserManagement && (
                   <>
@@ -206,7 +206,7 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
                         </div>
                       </dl>
                       <p>
-                        Keluar dari portal admin hanya mengakhiri sesi administrator. Sesi portal karyawan dikelola secara
+                        Keluar dari sesi administrator hanya mengakhiri sesi admin saat ini. Sesi karyawan dikelola secara
                         terpisah.
                       </p>
                       <Button variant="secondary" onClick={logout} loading={loggingOut}>

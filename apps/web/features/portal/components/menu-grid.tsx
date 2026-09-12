@@ -51,7 +51,7 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
       })
       .catch((err) => {
         if (mounted) {
-          setError(err?.message ?? "Gagal memuat daftar menu portal.");
+          setError(err?.message ?? "Gagal memuat daftar menu.");
         }
       })
       .finally(() => {
@@ -335,7 +335,7 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
               </div>
             </div>
             <a
-              href="mailto:helpdesk@mknsite.online?subject=Permintaan%20Bantuan%20Portal%20MKN"
+              href="mailto:helpdesk@mknsite.online?subject=Permintaan%20Bantuan%20MKN%20Site"
               className={styles.supportActionBtn}
             >
               Kirim Tiket Bantuan

@@ -150,7 +150,7 @@ export function UserList({ currentAdmin }: { currentAdmin?: PortalUser | null } 
     <section className={styles.userListSection} aria-label="Manajemen Pengguna">
       <div className={styles.headerRow}>
         <div>
-          <h3 className={styles.sectionTitle}>Pengguna Portal</h3>
+          <h3 className={styles.sectionTitle}>Pengguna</h3>
           <p className={styles.sectionSubtitle}>
             Kelola akun, status akses, dan role pengguna di sistem MKN.
             {!loading && (

@@ -21,7 +21,7 @@ button { cursor: pointer; }
 .skip-link:focus { top: 16px; }
 
 .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font-weight: 800; letter-spacing: -0.03em; }
-.brand-logo-wrap { display: inline-flex; align-items: center; justify-content: center; height: 42px; width: 60px; background: #ffffff; border-radius: 10px; border: 1px solid rgba(226, 232, 240, 0.9); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); overflow: hidden; padding: 3px 6px; flex-shrink: 0; }
+.brand-logo-wrap { display: inline-flex; align-items: center; justify-content: center; height: 42px; width: auto; flex-shrink: 0; }
 .brand-logo-img { height: 32px !important; width: auto !important; max-width: 100% !important; object-fit: contain !important; display: block; }
 .brand-text-col { display: flex; flex-direction: column; line-height: 1.15; }
 .brand-title { font-size: 17px; font-weight: 850; letter-spacing: -0.03em; color: var(--ink); }

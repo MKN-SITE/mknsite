@@ -85,7 +85,7 @@ export function RolePermissionViewer({ view = "roles", canManage = false }: { vi
   return (
     <section className={styles.card} aria-label={isRoles ? "Manajemen role" : "Manajemen izin"}>
       <div className={styles.heading}>
-        <div><p className={styles.kicker}>{isRoles ? "ROLE" : "IZIN AKSES"}</p><h3 className={styles.title}>{isRoles ? "Role dan cakupan akses" : "Katalog izin sistem"}</h3><p className={styles.subtitle}>{isRoles ? "Atur kelompok akses dan izin yang dimiliki setiap role." : "Kelola identifier izin yang dipakai oleh role dan menu portal."}</p></div>
+        <div><p className={styles.kicker}>{isRoles ? "ROLE" : "IZIN AKSES"}</p><h3 className={styles.title}>{isRoles ? "Role dan cakupan akses" : "Katalog izin sistem"}</h3><p className={styles.subtitle}>{isRoles ? "Atur kelompok akses dan izin yang dimiliki setiap role." : "Kelola identifier izin yang dipakai oleh role dan menu."}</p></div>
         {canManage && <Button onClick={() => { setFormError(null); setEditor({ kind: isRoles ? "role" : "permission" }); }}>+ Tambah {isRoles ? "Role" : "Izin"}</Button>}
       </div>
       {!canManage && <p className={styles.readonlyNote}>Mode baca. Perubahan role dan izin hanya tersedia untuk Superadministrator.</p>}

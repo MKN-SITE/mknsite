@@ -35,18 +35,12 @@
 }
 
 .logoBadge {
-  width: 68px;
-  height: 48px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  background: #ffffff;
   flex-shrink: 0;
-  padding: 4px 6px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
-  overflow: hidden;
+  height: 46px;
+  width: auto;
 }
 
 .logoImg {

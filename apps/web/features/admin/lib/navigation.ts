@@ -5,7 +5,7 @@ export const userManagementLinks = [
   { view: "permissions", label: "Izin", description: "Izin yang digunakan role", icon: "clipboard-check", href: "/admin/user-management/permissions" }
 ] as const;
 export const adminViewTitles: Record<AdminView, string> = {
-  home: "Portal Admin", users: "Pengguna", roles: "Role", permissions: "Izin", menus: "Menu Portal", settings: "Pengaturan"
+  home: "Admin", users: "Pengguna", roles: "Role", permissions: "Izin", menus: "Menu", settings: "Pengaturan"
 };
 export function isUserManagementView(view: AdminView) {
   return userManagementLinks.some((link) => link.view === view);

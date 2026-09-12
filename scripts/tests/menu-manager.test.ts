@@ -11,8 +11,8 @@ import { AdminApp } from "../../apps/web/components/admin-app";
 describe("MenuManager component", () => {
   test("renders section title, subtitle, and add menu button", () => {
     const html = renderToStaticMarkup(createElement(MenuManager));
-    expect(html).toContain("Menu Portal Dinamis</h3>");
-    expect(html).toContain("Atur navigasi portal karyawan, gerbang modul bisnis, dan izin akses role.");
+    expect(html).toContain("Menu Dinamis</h3>");
+    expect(html).toContain("Atur navigasi karyawan, gerbang modul bisnis, dan izin akses role.");
     expect(html).toContain("+ Tambah Menu</button>");
   });
 
@@ -20,7 +20,7 @@ describe("MenuManager component", () => {
     const html = renderToStaticMarkup(createElement(MenuManager));
     expect(html).toContain("<table");
     expect(html).toContain(">Urutan</th>");
-    expect(html).toContain(">Menu Portal</th>");
+    expect(html).toContain(">Menu</th>");
     expect(html).toContain(">URL Tujuan</th>");
     expect(html).toContain(">Izin Akses</th>");
     expect(html).toContain(">Status</th>");

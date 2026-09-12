@@ -41,10 +41,10 @@ export function AdminPortalHome() {
             <PortalIcon name="folder-kanban" size={22} />
           </div>
           <div className={styles.summaryText}>
-            <strong>Modul Portal</strong>
+            <strong>Modul Operasional</strong>
             <span>
               {menusLoading
-                ? "Tata letak modul dinamis & indikator lencana portal karyawan"
+                ? "Tata letak modul dinamis & indikator lencana menu karyawan"
                 : `${menus.length} Modul Aktif Terintegrasi`}
             </span>
           </div>
@@ -85,7 +85,7 @@ export function AdminPortalHome() {
           </div>
         </Link>
 
-        {/* Category 2: Menu Portal */}
+        {/* Category 2: Menu */}
         <Link href="/admin/menus" className={styles.category}>
           <div className={styles.cardTop}>
             <div className={styles.categoryIcon}>
@@ -93,9 +93,9 @@ export function AdminPortalHome() {
             </div>
             <span className={styles.arrow} aria-hidden="true">↗</span>
           </div>
-          <span className={styles.categoryName}>Menu Portal</span>
+          <span className={styles.categoryName}>Menu</span>
           <span className={styles.categoryDescription}>
-            Atur modul dinamis, tautan operasional, dan urutan portal karyawan.
+            Atur modul dinamis, tautan operasional, dan urutan navigasi karyawan.
           </span>
           <div className={styles.categoryTags}>
             <span>Modul</span>
@@ -103,7 +103,7 @@ export function AdminPortalHome() {
             <span>Lencana</span>
           </div>
           <div className={styles.categoryFooter}>
-            <span>Buka Menu Portal</span>
+            <span>Buka Menu</span>
             <span aria-hidden="true">→</span>
           </div>
         </Link>
