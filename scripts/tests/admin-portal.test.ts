@@ -26,11 +26,21 @@ describe("Admin portal navigation", () => {
       expect(html).toContain('aria-label="User Management"');
     }
   });
-  test("permissions screen explicitly describes the assigned-permission scope", () => {
+  test("permissions screen exposes a searchable catalog and keeps mutations restricted", () => {
     const html = renderToStaticMarkup(createElement(RolePermissionViewer, { view: "permissions" }));
-    expect(html).toContain("Daftar izin pada role");
-    expect(html).toContain("Cari izin atau role");
+    expect(html).toContain("Katalog izin sistem");
+    expect(html).toContain("Cari nama atau slug izin");
+    expect(html).toContain("Mode baca");
+    expect(html).not.toContain("+ Tambah Izin");
     expect(html).not.toContain("Matriks akses RBAC");
+  });
+
+  test("superadministrator receives role and permission CRUD controls", () => {
+    const roles = renderToStaticMarkup(createElement(RolePermissionViewer, { view: "roles", canManage: true }));
+    const permissions = renderToStaticMarkup(createElement(RolePermissionViewer, { view: "permissions", canManage: true }));
+    expect(roles).toContain("+ Tambah Role");
+    expect(permissions).toContain("+ Tambah Izin");
+    expect(roles).not.toContain("Mode baca");
   });
 });
 

@@ -8,6 +8,7 @@
 
 .table {
   width: 100%;
+  min-width: 760px;
   border-collapse: collapse;
   text-align: left;
   font-size: var(--text-sm);
@@ -100,6 +101,7 @@
 
   .table {
     display: block;
+    min-width: 0;
   }
 
   .thead {

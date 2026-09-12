@@ -7,18 +7,18 @@ import { renderToStaticMarkup } from "../../apps/web/node_modules/react-dom/serv
 import { RolePermissionViewer } from "../../apps/web/features/admin/components/role-permission-viewer";
 
 describe("RolePermissionViewer component", () => {
-  test("renders RBAC matrix card with title and subtitle", () => {
+  test("renders role management card with title and guidance", () => {
     const html = renderToStaticMarkup(createElement(RolePermissionViewer));
 
-    expect(html).toContain("Matriks akses RBAC");
-    expect(html).toContain("Role menentukan modul yang dapat dilihat dan tindakan yang diizinkan");
+    expect(html).toContain("Role dan cakupan akses");
+    expect(html).toContain("Atur kelompok akses dan izin yang dimiliki setiap role");
   });
 
   test("renders initial loading state with skeleton placeholders", () => {
     const html = renderToStaticMarkup(createElement(RolePermissionViewer));
 
     expect(html).toContain('data-skeleton="true"');
-    expect(html).toContain('aria-label="Memuat matriks role..."');
+    expect(html).toContain('aria-label="Memuat role..."');
   });
 
   test("formats role rows and permission badges cleanly", () => {

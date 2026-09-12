@@ -3,6 +3,7 @@ import { db } from "../db";
 import { auditLogs, authSessions, authUsers, permissions, rolePermissions, roles, userRoles, users } from "../db/schema";
 import { mapUserSummary, type RoleSummaryDto, type UpdateUserProfileDto, type UserListResponseDto, type UserSummaryDto } from "../schemas/admin.dto";
 import { publishAdminUsersUpdated, publishRealtimeEvent } from "../realtime/hub";
+import { rbacService } from "./rbac.service";
 
 export type GetUsersOptions = {
   page?: number;
@@ -124,33 +125,7 @@ export class AdminService {
   }
 
   async getRoles(): Promise<RoleSummaryDto[]> {
-    const allRoles = await db
-      .select({ id: roles.id, name: roles.name, slug: roles.slug })
-      .from(roles)
-      .orderBy(roles.id);
-
-    const allGrants = await db
-      .select({
-        roleId: rolePermissions.roleId,
-        permission: permissions.slug
-      })
-      .from(rolePermissions)
-      .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
-      .orderBy(permissions.id);
-
-    const grantsMap = new Map<number, string[]>();
-    for (const grant of allGrants) {
-      const list = grantsMap.get(grant.roleId) ?? [];
-      list.push(grant.permission);
-      grantsMap.set(grant.roleId, list);
-    }
-
-    return allRoles.map((role) => ({
-      id: role.id,
-      name: role.name,
-      slug: role.slug,
-      permissions: grantsMap.get(role.id) ?? []
-    }));
+    return rbacService.getRoles();
   }
 
   async isUserSuperadmin(userId: number): Promise<boolean> {

@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useId, useRef, useState, type ReactNode } from "react";
-import mknLogo from "@/public/assets/mkn-logo.webp";
+import { useId, useRef, useState } from "react";
+import mknLogo from "@/public/assets/Logo MKN.png";
 import { Button } from "@/components/ui/button";
 import styles from "./portal-header.module.css";
 
@@ -14,12 +14,11 @@ export type PortalHeaderProps = {
   eyebrow: string;
   title: string;
   description: string;
-  status?: ReactNode;
   onLogout: () => void;
   loggingOut?: boolean;
 };
 
-export function PortalHeader({ homeHref, name, role, eyebrow, title, description, status, onLogout, loggingOut }: PortalHeaderProps) {
+export function PortalHeader({ homeHref, name, role, eyebrow, title, description, onLogout, loggingOut }: PortalHeaderProps) {
   const [open, setOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   const panelId = useId();
@@ -27,11 +26,9 @@ export function PortalHeader({ homeHref, name, role, eyebrow, title, description
     <header className={styles.header}>
       <div className={styles.top}>
         <Link href={homeHref} className={styles.brand} aria-label="MKN Site — beranda admin">
-          <span className={styles.logo}><Image src={mknLogo} alt="" width={34} height={34} priority /></span>
-          <span><strong>MKN Site</strong><small>PT Multi Kontrol Nusantara</small></span>
+          <span className={styles.logo}><Image src={mknLogo} alt="Multi Kontrol Nusantara" priority /></span>
         </Link>
         <div className={styles.accountArea}>
-          <span className={styles.status}>{status}</span>
           <div className={styles.account}
             onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}
             onKeyDown={(event) => { if (event.key === "Escape") { setOpen(false); trigger.current?.focus(); } }}>

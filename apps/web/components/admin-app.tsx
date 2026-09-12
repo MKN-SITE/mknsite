@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError, type PortalUser } from "@/lib/api";
 import { PortalHeader } from "@/components/layout/portal-header";
@@ -12,7 +12,6 @@ import { MenuManager } from "@/features/admin/components/menu-manager";
 import { AdminPortalHome, UserManagementNav } from "@/features/admin/components/admin-portal";
 import { adminViewTitles, isUserManagementView, type AdminView } from "@/features/admin/lib/navigation";
 import styles from "@/features/admin/components/admin-portal.module.css";
-import { RealtimeStatus } from "./realtime-status";
 
 export function AdminApp({ view = "home" }: { view?: AdminView }) {
   const router = useRouter();
@@ -22,8 +21,6 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
   const [attempt, setAttempt] = useState(0);
   const [loggingOut, setLoggingOut] = useState(false);
   const [logoutError, setLogoutError] = useState<string | null>(null);
-  const [supportOpen, setSupportOpen] = useState(false);
-  const supportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -43,26 +40,6 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
       });
     return () => controller.abort();
   }, [router, attempt]);
-
-  // Handle outside click & Escape key for support popover
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (supportRef.current && !supportRef.current.contains(event.target as Node)) {
-        setSupportOpen(false);
-      }
-    }
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setSupportOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
 
   async function logout() {
     if (loggingOut) return;
@@ -131,7 +108,6 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
         eyebrow="PORTAL ADMINISTRATOR"
         title={view === "home" ? `Selamat datang, ${admin.name.split(" ")[0]}.` : inUserManagement ? "User Management" : title}
         description={view === "home" ? "Kelola pengguna, akses tim, dan pengaturan portal MKN Site." : inUserManagement ? "Satu ruang untuk mengelola pengguna, role, dan izin akses." : description}
-        status={<RealtimeStatus loginPath="/admin/login" tone="inverse" />}
         onLogout={logout}
         loggingOut={loggingOut}
       />
@@ -170,7 +146,13 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
                     <p>{description}</p>
                   </div>
                   {view === "users" && <UserList currentAdmin={admin} />}
-                  {(view === "roles" || view === "permissions") && <RolePermissionViewer key={view} view={view} />}
+                  {(view === "roles" || view === "permissions") && (
+                    <RolePermissionViewer
+                      key={view}
+                      view={view}
+                      canManage={admin.permissions.includes("admin.security.manage")}
+                    />
+                  )}
                   {view === "menus" && <MenuManager />}
                   {view === "settings" && (
                     <section className={styles.settings}>
@@ -205,100 +187,6 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
         </div>
       </main>
 
-      {/* Floating Action Button (FAB Support & Helpdesk) */}
-      <div className={styles.fabContainer} ref={supportRef}>
-        {supportOpen && (
-          <div
-            className={styles.supportPopover}
-            role="dialog"
-            aria-labelledby="admin-support-title"
-            aria-modal="false"
-          >
-            <div className={styles.supportHeader}>
-              <div className={styles.supportHeaderTitle}>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#0284c7"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
-                <span id="admin-support-title">Pusat Bantuan & Layanan IT</span>
-              </div>
-              <button
-                type="button"
-                className={styles.supportCloseBtn}
-                onClick={() => setSupportOpen(false)}
-                aria-label="Tutup pusat bantuan"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
-            <p className={styles.supportDesc}>
-              Memerlukan bantuan teknis, eskalasi izin akses superadmin, atau kendala portal administrasi?
-            </p>
-            <div className={styles.supportMeta}>
-              <div className={styles.supportMetaItem}>
-                <span className={styles.supportMetaLabel}>Email Helpdesk</span>
-                <a href="mailto:helpdesk@mknsite.online" className={styles.supportMetaValue}>
-                  helpdesk@mknsite.online
-                </a>
-              </div>
-              <div className={styles.supportMetaItem}>
-                <span className={styles.supportMetaLabel}>Ekstensi</span>
-                <span className={styles.supportMetaValue}>Ext. 1010 / 1012</span>
-              </div>
-              <div className={styles.supportMetaItem}>
-                <span className={styles.supportMetaLabel}>Jam Layanan</span>
-                <span className={styles.supportMetaValue}>Senin – Jumat (08:00 – 17:00)</span>
-              </div>
-            </div>
-            <a
-              href="mailto:helpdesk@mknsite.online?subject=Bantuan%20Portal%20Administrator%20MKN"
-              className={styles.supportActionBtn}
-            >
-              Kirim Tiket Bantuan
-            </a>
-          </div>
-        )}
-
-        <button
-          type="button"
-          className={styles.fabButton}
-          onClick={() => setSupportOpen((prev) => !prev)}
-          aria-expanded={supportOpen}
-          aria-label="Pusat Bantuan & IT Support"
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
-          </svg>
-        </button>
-      </div>
     </div>
   );
 }

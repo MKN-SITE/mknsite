@@ -38,6 +38,19 @@ export type RoleSummaryDto = {
   name: string;
   slug: string;
   permissions: string[];
+  permissionIds: number[];
+  userCount: number;
+  isSystem: boolean;
+};
+
+export type PermissionSummaryDto = {
+  id: number;
+  name: string;
+  slug: string;
+  roleCount: number;
+  menuCount: number;
+  isSystem: boolean;
+  createdAt: string;
 };
 
 export type RoleListResponseDto = {
@@ -81,12 +94,56 @@ export const RoleSummarySchema = t.Object({
   id: t.Integer({ description: "ID role" }),
   name: t.String({ description: "Nama role" }),
   slug: t.String({ description: "Slug role" }),
-  permissions: t.Array(t.String(), { description: "Daftar slug izin akses (permissions) yang dimiliki role" })
+  permissions: t.Array(t.String(), { description: "Daftar slug izin akses (permissions) yang dimiliki role" }),
+  permissionIds: t.Array(t.Integer(), { description: "Daftar ID permission yang dimiliki role" }),
+  userCount: t.Integer({ description: "Jumlah pengguna yang memakai role" }),
+  isSystem: t.Boolean({ description: "Role bawaan yang tidak dapat dihapus atau diubah slug-nya" })
 });
 
 export const RoleListResponseSchema = t.Object({
   data: t.Array(RoleSummarySchema, { description: "Daftar seluruh role beserta izin aksesnya" })
 });
+
+const roleSlugSchema = t.String({
+  minLength: 2,
+  maxLength: 100,
+  pattern: "^[a-z0-9]+(?:[._-][a-z0-9]+)*$",
+  description: "Identifier lowercase; boleh memakai titik, garis bawah, atau tanda hubung"
+});
+
+const permissionSlugSchema = t.String({
+  minLength: 2,
+  maxLength: 140,
+  pattern: "^[a-z0-9]+(?:[._-][a-z0-9]+)*$",
+  description: "Identifier lowercase; boleh memakai titik, garis bawah, atau tanda hubung"
+});
+
+export const CreateRoleSchema = t.Object({
+  name: t.String({ minLength: 2, maxLength: 100 }),
+  slug: roleSlugSchema,
+  permissionIds: t.Optional(t.Array(t.Integer({ minimum: 1 }), { default: [], uniqueItems: true, maxItems: 200 }))
+});
+
+export const UpdateRoleSchema = t.Object({
+  name: t.Optional(t.String({ minLength: 2, maxLength: 100 })),
+  slug: t.Optional(roleSlugSchema),
+  permissionIds: t.Optional(t.Array(t.Integer({ minimum: 1 }), { uniqueItems: true, maxItems: 200 }))
+}, { minProperties: 1 });
+
+export const CreatePermissionSchema = t.Object({
+  name: t.String({ minLength: 2, maxLength: 140 }),
+  slug: permissionSlugSchema
+});
+
+export const UpdatePermissionSchema = t.Object({
+  name: t.Optional(t.String({ minLength: 2, maxLength: 140 })),
+  slug: t.Optional(permissionSlugSchema)
+}, { minProperties: 1 });
+
+export type CreateRoleDto = typeof CreateRoleSchema.static;
+export type UpdateRoleDto = typeof UpdateRoleSchema.static;
+export type CreatePermissionDto = typeof CreatePermissionSchema.static;
+export type UpdatePermissionDto = typeof UpdatePermissionSchema.static;
 
 export const UserQuerySchema = t.Object({
   page: t.Optional(t.Numeric({ minimum: 1, default: 1, description: "Nomor halaman (default 1)" })),

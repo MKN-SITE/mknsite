@@ -9,6 +9,7 @@ import { adminRoutes } from "./routes/admin";
 import { authRoutes } from "./routes/auth";
 import { menuRoutes } from "./routes/menu";
 import { realtimeRoutes } from "./routes/realtime";
+import { rbacRoutes } from "./routes/rbac";
 import { workspaceRoutes } from "./routes/workspace";
 
 export const createServer = (options: { enableSwagger?: boolean } = {}) => {
@@ -65,6 +66,7 @@ export const createServer = (options: { enableSwagger?: boolean } = {}) => {
     .mount(adminAuth.handler)
     .use(authRoutes)
     .use(adminRoutes)
+    .use(rbacRoutes)
     .use(realtimeRoutes)
     .use(workspaceRoutes)
     .use(menuRoutes);
