@@ -13,32 +13,61 @@ import { AdminPortalHome, UserManagementNav } from "@/features/admin/components/
 import { adminViewTitles, isUserManagementView, type AdminView } from "@/features/admin/lib/navigation";
 import styles from "@/features/admin/components/admin-portal.module.css";
 
+let cachedAdmin: PortalUser | null = null;
+let inFlightAdminMe: Promise<PortalUser> | null = null;
+
+export function clearAdminSessionCache() {
+  cachedAdmin = null;
+  inFlightAdminMe = null;
+}
+
 export function AdminApp({ view = "home" }: { view?: AdminView }) {
   const router = useRouter();
-  const [admin, setAdmin] = useState<PortalUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [admin, setAdmin] = useState<PortalUser | null>(() => cachedAdmin);
+  const [loading, setLoading] = useState<boolean>(() => cachedAdmin === null);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [loggingOut, setLoggingOut] = useState(false);
   const [logoutError, setLogoutError] = useState<string | null>(null);
 
   useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
+    let active = true;
+    if (cachedAdmin === null) {
+      setLoading(true);
+    }
     setError(null);
-    api<{ user: PortalUser }>("/auth/admin/me", { signal: controller.signal })
+
+    const req = inFlightAdminMe || (inFlightAdminMe = api<{ user: PortalUser }>("/auth/admin/me")
       .then(({ user }) => {
-        if (!controller.signal.aborted) setAdmin(user);
+        cachedAdmin = user;
+        inFlightAdminMe = null;
+        return user;
+      })
+      .catch((err) => {
+        inFlightAdminMe = null;
+        throw err;
+      }));
+
+    req
+      .then((user) => {
+        if (!active) return;
+        setAdmin(user);
+        setLoading(false);
       })
       .catch((reason: unknown) => {
-        if (controller.signal.aborted) return;
-        if (reason instanceof ApiError && reason.status === 401) router.replace("/admin/login");
-        else setError("Portal admin belum dapat dimuat. Periksa koneksi lalu coba lagi.");
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
+        if (!active) return;
+        if (reason instanceof ApiError && reason.status === 401) {
+          cachedAdmin = null;
+          router.replace("/admin/login");
+        } else if (!cachedAdmin) {
+          setError("Portal admin belum dapat dimuat. Periksa koneksi lalu coba lagi.");
+        }
+        setLoading(false);
       });
-    return () => controller.abort();
+
+    return () => {
+      active = false;
+    };
   }, [router, attempt]);
 
   async function logout() {
@@ -47,10 +76,15 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
     setLogoutError(null);
     try {
       await api("/auth/admin/logout", { method: "POST" });
+      clearAdminSessionCache();
       router.replace("/admin/login");
     } catch (reason) {
-      if (reason instanceof ApiError && reason.status === 401) router.replace("/admin/login");
-      else setLogoutError("Gagal keluar. Sesi Anda masih aktif; silakan coba lagi.");
+      if (reason instanceof ApiError && reason.status === 401) {
+        clearAdminSessionCache();
+        router.replace("/admin/login");
+      } else {
+        setLogoutError("Gagal keluar. Sesi Anda masih aktif; silakan coba lagi.");
+      }
     } finally {
       setLoggingOut(false);
     }
@@ -132,7 +166,7 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
                 <span aria-hidden="true">/</span>
                 {inUserManagement && (
                   <>
-                    <Link href="/admin/user-management/users">User Management</Link>
+                    <Link href="/admin/user-management/users" scroll={false}>User Management</Link>
                     <span aria-hidden="true">/</span>
                   </>
                 )}

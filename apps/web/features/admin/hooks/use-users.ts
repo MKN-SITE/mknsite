@@ -38,6 +38,12 @@ export type UseUsersOptions = {
   accountType?: "all" | "employee" | "admin";
 };
 
+const cachedUsersMap = new Map<string, UserListResponseDto>();
+
+export function clearUserCache() {
+  cachedUsersMap.clear();
+}
+
 export function useUsers({
   page = 1,
   pageSize = 20,
@@ -45,19 +51,33 @@ export function useUsers({
   status = "all",
   accountType = "all"
 }: UseUsersOptions = {}) {
-  const [data, setData] = useState<UserSummaryDto[]>([]);
-  const [pagination, setPagination] = useState<PaginationMetaDto>({
-    page: 1,
-    pageSize: 20,
+  const cacheKey = `${page}:${pageSize}:${search}:${status}:${accountType}`;
+  const initialCached = cachedUsersMap.get(cacheKey);
+
+  const [data, setData] = useState<UserSummaryDto[]>(() => initialCached?.data ?? []);
+  const [pagination, setPagination] = useState<PaginationMetaDto>(() => initialCached?.pagination ?? {
+    page,
+    pageSize,
     total: 0,
     totalPages: 1
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(() => !initialCached);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
+  const fetchUsers = useCallback(async (force = false) => {
+    const cached = cachedUsersMap.get(cacheKey);
+    if (!force && cached) {
+      setData(cached.data);
+      setPagination(cached.pagination);
+      setLoading(false);
+      return;
+    }
+
+    if (!cached) {
+      setLoading(true);
+    }
     setError(null);
+
     try {
       const params = new URLSearchParams();
       params.set("page", String(page));
@@ -67,6 +87,7 @@ export function useUsers({
       if (accountType !== "all") params.set("accountType", accountType);
 
       const response = await api<UserListResponseDto>(`/admin/users?${params.toString()}`);
+      cachedUsersMap.set(cacheKey, response);
       setData(response.data);
       setPagination(response.pagination);
     } catch (err: any) {
@@ -74,7 +95,7 @@ export function useUsers({
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, search, status, accountType]);
+  }, [cacheKey, page, pageSize, search, status, accountType]);
 
   useEffect(() => {
     fetchUsers();
@@ -85,6 +106,6 @@ export function useUsers({
     pagination,
     loading,
     error,
-    refresh: fetchUsers
+    refresh: () => fetchUsers(true)
   };
 }

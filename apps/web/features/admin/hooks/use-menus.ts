@@ -21,25 +21,51 @@ export type MenuListResponseDto = {
   data: MenuSummaryDto[];
 };
 
+let cachedMenus: MenuSummaryDto[] | null = null;
+let inFlightMenus: Promise<MenuSummaryDto[]> | null = null;
+
+export function clearMenuCache() {
+  cachedMenus = null;
+  inFlightMenus = null;
+}
+
 export function useMenus() {
-  const [menus, setMenus] = useState<MenuSummaryDto[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [menus, setMenus] = useState<MenuSummaryDto[]>(() => cachedMenus ?? []);
+  const [loading, setLoading] = useState<boolean>(() => cachedMenus === null);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchMenus = useCallback(async () => {
+  const fetchMenus = useCallback(async (force = false) => {
+    if (!force && cachedMenus !== null) {
+      setMenus(cachedMenus);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      const res = await api<MenuListResponseDto>("/admin/menus");
-      // Sort by sortOrder ASC, then id ASC
-      const sorted = [...res.data].sort((a, b) => {
-        if (a.sortOrder !== b.sortOrder) {
-          return a.sortOrder - b.sortOrder;
-        }
-        return a.id - b.id;
-      });
-      setMenus(sorted);
+      if (!inFlightMenus || force) {
+        inFlightMenus = api<MenuListResponseDto>("/admin/menus")
+          .then((res) => {
+            const sorted = [...res.data].sort((a, b) => {
+              if (a.sortOrder !== b.sortOrder) {
+                return a.sortOrder - b.sortOrder;
+              }
+              return a.id - b.id;
+            });
+            cachedMenus = sorted;
+            inFlightMenus = null;
+            return sorted;
+          })
+          .catch((err) => {
+            inFlightMenus = null;
+            throw err;
+          });
+      }
+
+      const data = await inFlightMenus;
+      setMenus(data);
     } catch (err: any) {
       setError(err?.message ?? "Gagal memuat daftar menu.");
     } finally {

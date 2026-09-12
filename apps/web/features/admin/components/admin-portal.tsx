@@ -156,6 +156,7 @@ export function UserManagementNav({ view }: { view: AdminView }) {
           <li key={link.view}>
             <Link
               href={link.href}
+              scroll={false}
               className={`${styles.moduleLink} ${view === link.view ? styles.activeLink : ""}`}
               aria-current={view === link.view ? "page" : undefined}
             >
