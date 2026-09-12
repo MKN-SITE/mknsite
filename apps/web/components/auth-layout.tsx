@@ -24,7 +24,7 @@ export function AuthLayout({ admin = false }: { admin?: boolean }) {
           <p className="auth-subtitle">{admin ? "Gunakan kredensial administrator yang terpisah." : "Masuk untuk membuka ruang kerja Anda."}</p>
           <LoginForm admin={admin} />
           <div className="admin-separation">
-            {admin ? "Login ini tidak menggunakan sesi portal karyawan. " : "Perlu mengatur pengguna atau izin? "}
+            {admin ? "Login ini tidak menggunakan sesi karyawan. " : "Perlu mengatur pengguna atau izin? "}
             <Link href={admin ? "/login" : "/admin/login"}>{admin ? "Login sebagai karyawan" : "Buka login admin"}</Link>
           </div>
         </div>

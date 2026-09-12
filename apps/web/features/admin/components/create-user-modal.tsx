@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/lib/api";
 import { useRoles, type RoleSummaryDto } from "../hooks/use-roles";
+import { useDivisions } from "../hooks/use-divisions";
 import styles from "./create-user-modal.module.css";
 
 export type CreateUserModalProps = {
@@ -17,9 +18,11 @@ export type CreateUserModalProps = {
 
 export function CreateUserModal({ open, onClose, onSuccess }: CreateUserModalProps) {
   const { roles, loading: loadingRoles, error: rolesError } = useRoles();
+  const { divisions } = useDivisions();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [division, setDivision] = useState("");
   const [password, setPassword] = useState("");
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
 
@@ -43,6 +46,7 @@ export function CreateUserModal({ open, onClose, onSuccess }: CreateUserModalPro
   const resetForm = () => {
     setName("");
     setEmail("");
+    setDivision("");
     setPassword("");
     setSelectedRoleIds([]);
     setFieldErrors({});
@@ -108,6 +112,7 @@ export function CreateUserModal({ open, onClose, onSuccess }: CreateUserModalPro
         body: JSON.stringify({
           name: name.trim(),
           email: email.trim().toLowerCase(),
+          division: division.trim() || undefined,
           password,
           roleIds: selectedRoleIds
         })
@@ -214,6 +219,22 @@ export function CreateUserModal({ open, onClose, onSuccess }: CreateUserModalPro
           }}
           disabled={submitting}
         />
+
+        <FormField
+          label="Divisi / Departemen"
+          name="division"
+          placeholder="Pilih atau ketik divisi (cth. Human Resources)"
+          value={division}
+          maxLength={100}
+          list="division-options"
+          onChange={(e) => setDivision(e.target.value)}
+          disabled={submitting}
+        />
+        <datalist id="division-options">
+          {divisions.map((d) => (
+            <option key={d.id} value={d.name} />
+          ))}
+        </datalist>
 
         <div className={styles.fieldWrapper}>
           <FormField

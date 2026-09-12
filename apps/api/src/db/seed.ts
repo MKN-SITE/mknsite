@@ -1,6 +1,6 @@
 import { eq, like } from "drizzle-orm";
 import { db, pool } from ".";
-import { authAccounts, authUsers, menus, permissions, rolePermissions, roles, userRoles, users } from "./schema";
+import { authAccounts, authUsers, divisions, menus, permissions, rolePermissions, roles, userRoles, users } from "./schema";
 
 const defaultMenus = [
   { title: "Self-Service", icon: "user-circle", url: "/portal/self-service", requiredPermission: "dashboard.view", sortOrder: 1 },
@@ -30,13 +30,13 @@ const roleRows = [
 ] as const;
 
 const accounts = [
-  ["Ayu Prameswari", "hr@mknsite.online", "employee", "hr"],
-  ["Rizky Mahendra", "telco@mknsite.online", "employee", "ops-telco"],
-  ["Fajar Nugraha", "workshop@mknsite.online", "employee", "ops-workshop"],
-  ["Nadia Kusuma", "project@mknsite.online", "employee", "project"],
-  ["Bima Santosa", "manager@mknsite.online", "employee", "manager"],
-  ["System Administrator", "admin@mknsite.online", "admin", "administrator"],
-  ["Super Administrator", "superadmin@mknsite.online", "admin", "superadmin"]
+  ["Ayu Prameswari", "hr@mknsite.online", "employee", "hr", "Human Resources"],
+  ["Rizky Mahendra", "telco@mknsite.online", "employee", "ops-telco", "Telekomunikasi"],
+  ["Fajar Nugraha", "workshop@mknsite.online", "employee", "ops-workshop", "Workshop"],
+  ["Nadia Kusuma", "project@mknsite.online", "employee", "project", "Project Management"],
+  ["Bima Santosa", "manager@mknsite.online", "employee", "manager", "Manajemen & Operasional"],
+  ["System Administrator", "admin@mknsite.online", "admin", "administrator", "Teknologi Informasi"],
+  ["Super Administrator", "superadmin@mknsite.online", "admin", "superadmin", "Direksi / Eksekutif"]
 ] as const;
 
 async function seed() {
@@ -59,11 +59,14 @@ async function seed() {
   const passwordHash = await Bun.password.hash("demo12345", { algorithm: "argon2id" });
   const adminHash = await Bun.password.hash("admin12345", { algorithm: "argon2id" });
   const superadminHash = await Bun.password.hash("superadmin12345", { algorithm: "argon2id" });
-  for (const [name, email, accountType, roleSlug] of accounts) {
+  for (const [name, email, accountType, roleSlug, division] of accounts) {
     // Cek apakah akun sudah ada — jika sudah, JANGAN timpa password/data
     const [existing] = await db.select().from(users).where(eq(users.email, email)).limit(1);
     if (existing) {
       console.log(`  → Akun ${email} sudah ada (id=${existing.id}), dilewati.`);
+      if (!existing.division) {
+        await db.update(users).set({ division }).where(eq(users.id, existing.id));
+      }
       // Pastikan role tetap terpasang (idempoten, tanpa mengubah data akun)
       const role = allRoles.find((item) => item.slug === roleSlug)!;
       await db.insert(userRoles).values({ userId: existing.id, roleId: role.id }).onDuplicateKeyUpdate({ set: { roleId: role.id } });
@@ -72,7 +75,7 @@ async function seed() {
 
     // Akun belum ada — buat baru
     const loginHash = email === "superadmin@mknsite.online" ? superadminHash : accountType === "admin" ? adminHash : passwordHash;
-    await db.insert(users).values({ name, email, accountType, passwordHash: loginHash });
+    await db.insert(users).values({ name, email, accountType, division, passwordHash: loginHash });
     const [account] = await db.select().from(users).where(eq(users.email, email)).limit(1);
     const role = allRoles.find((item) => item.slug === roleSlug)!;
     await db.insert(userRoles).values({ userId: account.id, roleId: role.id }).onDuplicateKeyUpdate({ set: { roleId: role.id } });
@@ -102,6 +105,23 @@ async function seed() {
     } else {
       console.log(`  → Menu ${menu.title} (${menu.url}) sudah ada, dilewati.`);
     }
+  }
+
+  // Seed default divisions (idempoten)
+  const defaultDivisions = [
+    ["Direksi / Eksekutif", "Dewan pimpinan eksekutif dan direksi perusahaan"],
+    ["Teknologi Informasi", "Infrastruktur IT, pengembangan sistem, dan keamanan siber"],
+    ["Human Resources", "Pengelolaan sumber daya manusia, kepersonaliaan, dan budaya kerja"],
+    ["Telekomunikasi", "Operasional jaringan, infrastruktur telco, dan pemeliharaan site"],
+    ["Workshop", "Bengkel fabrikasi, perbaikan mekanik, dan peralatan lapangan"],
+    ["Project Management", "Manajemen proyek lapangan, timeline kerja, dan koordinasi site"],
+    ["Manajemen & Operasional", "Manajemen umum, kepengawasan, dan operasional harian"],
+    ["Keuangan & Akuntansi", "Manajemen keuangan, kas, faktur, dan akuntansi bisnis"],
+    ["Logistik & Pengadaan", "Pengadaan barang, logistik material, dan manajemen aset"]
+  ] as const;
+
+  for (const [name, description] of defaultDivisions) {
+    await db.insert(divisions).values({ name, description }).onDuplicateKeyUpdate({ set: { description } });
   }
 
   console.log("Seed MKN Site selesai.");

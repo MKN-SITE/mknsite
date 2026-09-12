@@ -9,6 +9,8 @@ import { adminRoutes } from "./routes/admin";
 import { authRoutes } from "./routes/auth";
 import { menuRoutes } from "./routes/menu";
 import { realtimeRoutes } from "./routes/realtime";
+import { rbacRoutes } from "./routes/rbac";
+import { divisionRoutes } from "./routes/division";
 import { workspaceRoutes } from "./routes/workspace";
 
 export const createServer = (options: { enableSwagger?: boolean } = {}) => {
@@ -61,14 +63,29 @@ export const createServer = (options: { enableSwagger?: boolean } = {}) => {
         }
       }
     })
+    .get("/uploads/*", async ({ params, set }) => {
+      const relativePath = (params as Record<string, string>)["*"];
+      if (!relativePath || relativePath.includes("..")) {
+        set.status = 400;
+        return "Invalid path";
+      }
+      const file = Bun.file(`uploads/${relativePath}`);
+      if (!(await file.exists())) {
+        set.status = 404;
+        return "File not found";
+      }
+      set.headers["Cache-Control"] = "public, max-age=31536000, immutable";
+      return file;
+    })
     .mount(employeeAuth.handler)
     .mount(adminAuth.handler)
     .use(authRoutes)
     .use(adminRoutes)
+    .use(rbacRoutes)
+    .use(divisionRoutes)
     .use(realtimeRoutes)
     .use(workspaceRoutes)
     .use(menuRoutes);
-
 };
 
 export const app = createServer();

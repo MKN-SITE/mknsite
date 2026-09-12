@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useId, useRef, useState, type ReactNode } from "react";
-import mknLogo from "@/public/assets/mkn-logo.webp";
+import { useId, useRef, useState } from "react";
+import mknLogo from "@/public/assets/Logo MKN.png";
 import { Button } from "@/components/ui/button";
 import styles from "./portal-header.module.css";
 
@@ -14,29 +14,79 @@ export type PortalHeaderProps = {
   eyebrow: string;
   title: string;
   description: string;
-  status?: ReactNode;
+  avatarUrl?: string | null;
+  division?: string | null;
   onLogout: () => void;
   loggingOut?: boolean;
 };
 
-export function PortalHeader({ homeHref, name, role, eyebrow, title, description, status, onLogout, loggingOut }: PortalHeaderProps) {
+export function PortalHeader({
+  homeHref,
+  name,
+  role,
+  eyebrow,
+  title,
+  description,
+  avatarUrl,
+  division,
+  onLogout,
+  loggingOut
+}: PortalHeaderProps) {
   const [open, setOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   const panelId = useId();
+
   return (
     <header className={styles.header}>
       <div className={styles.top}>
-        <Link href={homeHref} className={styles.brand} aria-label="MKN Site — beranda admin">
-          <span className={styles.logo}><Image src={mknLogo} alt="" width={34} height={34} priority /></span>
-          <span><strong>MKN Site</strong><small>PT Multi Kontrol Nusantara</small></span>
+        <Link href={homeHref} className={styles.brand} aria-label="MKN Site — Beranda Admin">
+          <span className={styles.logoBadge}>
+            <Image
+              src={mknLogo}
+              alt="Logo Multi Kontrol Nusantara"
+              width={51}
+              height={38}
+              priority
+              className={styles.logoImg}
+            />
+          </span>
+          <div className={styles.brandIdentity}>
+            <div className={styles.brandTitleRow}>
+              <span className={styles.brandTitle}>MKN Site</span>
+              <span className={styles.brandBadge}>ADMIN</span>
+            </div>
+            <span className={styles.brandCompany}>PT Multi Kontrol Nusantara</span>
+          </div>
         </Link>
+
         <div className={styles.accountArea}>
-          <span className={styles.status}>{status}</span>
-          <div className={styles.account}
-            onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}
-            onKeyDown={(event) => { if (event.key === "Escape") { setOpen(false); trigger.current?.focus(); } }}>
-            <button ref={trigger} type="button" className={styles.accountTrigger} aria-expanded={open} aria-controls={panelId} onClick={() => setOpen(!open)}>
-              <span className={styles.avatar} aria-hidden="true">{name.charAt(0).toUpperCase()}</span>
+          <div
+            className={styles.account}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                setOpen(false);
+                trigger.current?.focus();
+              }
+            }}
+          >
+            <button
+              ref={trigger}
+              type="button"
+              className={styles.accountTrigger}
+              aria-expanded={open}
+              aria-controls={panelId}
+              onClick={() => setOpen(!open)}
+            >
+              <span className={styles.avatar} aria-hidden="true">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="" className={styles.avatarImg} />
+                ) : (
+                  name.charAt(0).toUpperCase()
+                )}
+              </span>
               <span className={styles.accountName}>{name}</span>
               <svg
                 width="14"
@@ -57,6 +107,7 @@ export function PortalHeader({ homeHref, name, role, eyebrow, title, description
               <div className={styles.dropdown} id={panelId}>
                 <div className={styles.dropdownInfo}>
                   <strong>{name}</strong>
+                  {division && <span className={styles.dropdownDivision}>{division}</span>}
                   <span>{role}</span>
                 </div>
                 <Button variant="danger" onClick={onLogout} loading={loggingOut} loadingText="Keluar...">
@@ -67,9 +118,11 @@ export function PortalHeader({ homeHref, name, role, eyebrow, title, description
           </div>
         </div>
       </div>
+
       <div className={styles.intro}>
         <p className={styles.eyebrow}>{eyebrow}</p>
-        <h1>{title}</h1><p className={styles.description}>{description}</p>
+        <h1>{title}</h1>
+        <p className={styles.description}>{description}</p>
       </div>
     </header>
   );

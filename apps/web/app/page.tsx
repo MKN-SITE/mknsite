@@ -15,7 +15,7 @@ export default function PublicPage() {
         <nav className="nav-actions" aria-label="Navigasi utama">
           <a className="text-link" href="#kapabilitas">Kapabilitas</a>
           <a className="text-link" href="#operasi-lapangan">Operasi Lapangan</a>
-          <Link className="button button-primary" href="/login">Masuk portal</Link>
+          <Link className="button button-primary" href="/login">Masuk</Link>
         </nav>
       </header>
       <main id="main">
@@ -23,9 +23,9 @@ export default function PublicPage() {
           <div className="hero-copy">
             <p className="eyebrow">Satu ruang kerja operasional</p>
             <h1>Tim bergerak dengan <span>arah yang sama.</span></h1>
-            <p>Kelola pekerjaan HR, operasi telco, workshop, dan proyek dalam satu portal terkontrol PT Multi Kontrol Nusantara.</p>
+            <p>Kelola pekerjaan HR, operasi telco, workshop, dan proyek dalam satu ekosistem terkontrol PT Multi Kontrol Nusantara.</p>
             <div className="hero-actions">
-              <Link className="button button-primary" href="/login">Masuk ke portal</Link>
+              <Link className="button button-primary" href="/login">Masuk ke aplikasi</Link>
               <a className="button button-secondary" href="#operasi-lapangan">Lihat dokumentasi lapangan</a>
             </div>
           </div>

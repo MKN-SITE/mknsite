@@ -1,9 +1,16 @@
 import Link from "next/link";
 import { PortalIcon } from "@/features/portal/components/portal-icons";
 import { userManagementLinks, type AdminView } from "../lib/navigation";
+import { useUsers } from "../hooks/use-users";
+import { useRoles } from "../hooks/use-roles";
+import { useMenus } from "../hooks/use-menus";
 import styles from "./admin-portal.module.css";
 
 export function AdminPortalHome() {
+  const { pagination: userPagination, loading: usersLoading } = useUsers({ pageSize: 1 });
+  const { roles, loading: rolesLoading } = useRoles();
+  const { menus, loading: menusLoading } = useMenus();
+
   return (
     <section aria-labelledby="admin-categories">
       <div className={styles.sectionHeading}>
@@ -14,18 +21,58 @@ export function AdminPortalHome() {
         <span className={styles.sectionHint}>Pilih kategori untuk mulai mengelola.</span>
       </div>
 
+      <div className={styles.summaryBar}>
+        <div className={styles.summaryItem}>
+          <div className={styles.summaryIcon}>
+            <PortalIcon name="users" size={22} />
+          </div>
+          <div className={styles.summaryText}>
+            <strong>Manajemen Akses</strong>
+            <span>
+              {usersLoading || rolesLoading
+                ? "Kelola akun pengguna, penetapan role, dan izin sistem RBAC"
+                : `${userPagination.total} Pengguna • ${roles.length} Role Terdaftar`}
+            </span>
+          </div>
+        </div>
+        <div className={styles.summaryDivider} aria-hidden="true" />
+        <div className={styles.summaryItem}>
+          <div className={`${styles.summaryIcon} ${styles.menuIconWrap}`}>
+            <PortalIcon name="folder-kanban" size={22} />
+          </div>
+          <div className={styles.summaryText}>
+            <strong>Modul Operasional</strong>
+            <span>
+              {menusLoading
+                ? "Tata letak modul dinamis & indikator lencana menu karyawan"
+                : `${menus.length} Modul Aktif Terintegrasi`}
+            </span>
+          </div>
+        </div>
+        <div className={styles.summaryDivider} aria-hidden="true" />
+        <div className={styles.summaryItem}>
+          <div className={`${styles.summaryIcon} ${styles.settingsIconWrap}`}>
+            <PortalIcon name="shield" size={22} />
+          </div>
+          <div className={styles.summaryText}>
+            <strong>Keamanan &amp; Audit</strong>
+            <span>Proteksi Superadministrator dan audit log sistem aktif</span>
+          </div>
+        </div>
+      </div>
+
       <div className={styles.categoryGrid}>
         {/* Category 1: User Management */}
-        <Link href="/admin/user-management/users" className={`${styles.category} ${styles.primaryCategory}`}>
+        <Link href="/admin/user-management/users" className={styles.category}>
           <div className={styles.cardTop}>
             <div className={styles.categoryIcon}>
-              <PortalIcon name="users" size={32} />
+              <PortalIcon name="users" size={26} />
             </div>
             <span className={styles.arrow} aria-hidden="true">↗</span>
           </div>
           <span className={styles.categoryName}>User Management</span>
           <span className={styles.categoryDescription}>
-            Kelola akun, peran, dan izin akses tim dalam satu ruang kerja.
+            Kelola akun pengguna, penetapan peran, dan matriks izin akses tim.
           </span>
           <div className={styles.categoryTags}>
             <span>Pengguna</span>
@@ -38,17 +85,17 @@ export function AdminPortalHome() {
           </div>
         </Link>
 
-        {/* Category 2: Menu Portal */}
+        {/* Category 2: Menu */}
         <Link href="/admin/menus" className={styles.category}>
           <div className={styles.cardTop}>
-            <div className={`${styles.categoryIcon} ${styles.menuIconWrap}`}>
-              <PortalIcon name="folder-kanban" size={32} />
+            <div className={styles.categoryIcon}>
+              <PortalIcon name="folder-kanban" size={26} />
             </div>
             <span className={styles.arrow} aria-hidden="true">↗</span>
           </div>
-          <span className={styles.categoryName}>Menu Portal</span>
+          <span className={styles.categoryName}>Menu</span>
           <span className={styles.categoryDescription}>
-            Atur modul yang tampil di portal karyawan.
+            Atur modul dinamis, tautan operasional, dan urutan navigasi karyawan.
           </span>
           <div className={styles.categoryTags}>
             <span>Modul</span>
@@ -56,7 +103,7 @@ export function AdminPortalHome() {
             <span>Lencana</span>
           </div>
           <div className={styles.categoryFooter}>
-            <span>Buka Menu Portal</span>
+            <span>Buka Menu</span>
             <span aria-hidden="true">→</span>
           </div>
         </Link>
@@ -64,14 +111,14 @@ export function AdminPortalHome() {
         {/* Category 3: Pengaturan */}
         <Link href="/admin/settings" className={styles.category}>
           <div className={styles.cardTop}>
-            <div className={`${styles.categoryIcon} ${styles.settingsIconWrap}`}>
-              <PortalIcon name="settings" size={32} />
+            <div className={styles.categoryIcon}>
+              <PortalIcon name="settings" size={26} />
             </div>
             <span className={styles.arrow} aria-hidden="true">↗</span>
           </div>
           <span className={styles.categoryName}>Pengaturan</span>
           <span className={styles.categoryDescription}>
-            Informasi akun dan sesi administrator.
+            Tinjau profil admin, hak akses aktif, dan konfigurasi keamanan sesi.
           </span>
           <div className={styles.categoryTags}>
             <span>Sesi</span>
@@ -109,6 +156,7 @@ export function UserManagementNav({ view }: { view: AdminView }) {
           <li key={link.view}>
             <Link
               href={link.href}
+              scroll={false}
               className={`${styles.moduleLink} ${view === link.view ? styles.activeLink : ""}`}
               aria-current={view === link.view ? "page" : undefined}
             >

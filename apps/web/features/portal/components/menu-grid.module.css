@@ -22,34 +22,36 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  max-width: 1240px;
+  max-width: 1840px;
+  width: calc(100% - 48px);
   margin: 0 auto;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  padding-bottom: 18px;
 }
 
 .brandWrap {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   text-decoration: none;
   color: inherit;
 }
 
 .brandLogo {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.12);
-  padding: 6px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  height: 46px;
+  width: auto;
+  flex-shrink: 0;
 }
 
-.brandLogo img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+.brandLogoImg {
+  height: 38px !important;
+  width: auto !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+  display: block;
 }
 
 .brandText {
@@ -107,6 +109,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .userName {
@@ -166,6 +175,12 @@
   color: var(--ink);
 }
 
+.dropdownUserDivision {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
 .dropdownUserRoles {
   font-size: 11px;
   color: var(--ink-soft);
@@ -193,8 +208,9 @@
 
 /* Header Welcome Banner */
 .welcomeBanner {
-  max-width: 1240px;
-  margin: 28px auto 0 auto;
+  max-width: 1840px;
+  width: calc(100% - 48px);
+  margin: 26px auto 0 auto;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -218,10 +234,10 @@
 /* Main Content Area (Elevated Overlap) */
 .mainContent {
   flex: 1;
-  max-width: 1240px;
-  width: 100%;
-  margin: -60px auto 48px auto;
-  padding: 0 24px;
+  max-width: 1840px;
+  width: calc(100% - 48px);
+  margin: -50px auto 48px auto;
+  padding: 0;
   position: relative;
   z-index: 10;
 }
@@ -229,10 +245,10 @@
 /* Elevated White Canvas Sheet */
 .canvasSheet {
   background: #ffffff;
-  border-radius: 28px;
+  border-radius: 24px;
   border: 1px solid rgba(210, 222, 230, 0.85);
-  box-shadow: 0 20px 50px -12px rgba(8, 48, 77, 0.08), 0 4px 16px rgba(8, 48, 77, 0.02);
-  padding: 48px 40px 56px 40px;
+  box-shadow: 0 20px 60px -15px rgba(8, 48, 77, 0.09), 0 0 0 1px rgba(210, 222, 230, 0.85);
+  padding: 44px 44px 52px 44px;
   transition: box-shadow 200ms ease;
 }
 
