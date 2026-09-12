@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import mknLogo from "@/public/assets/mkn-logo.webp";
+import mknLogoImg from "@/public/assets/Logo MKN.png";
 import { api, type PortalUser } from "@/lib/api";
 import { RealtimeStatus } from "@/components/realtime-status";
 import { PortalIcon } from "./portal-icons";
@@ -116,10 +116,11 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
           <Link href="/portal" className={styles.brandWrap}>
             <div className={styles.brandLogo}>
               <Image
-                src={mknLogo}
+                src={mknLogoImg}
                 alt="Logo PT Multi Kontrol Nusantara"
-                width={32}
-                height={32}
+                width={51}
+                height={38}
+                className={styles.brandLogoImg}
                 priority
               />
             </div>

@@ -8,7 +8,7 @@
 
 .table {
   width: 100%;
-  min-width: 760px;
+  min-width: 860px;
   border-collapse: collapse;
   text-align: left;
   font-size: var(--text-sm);
