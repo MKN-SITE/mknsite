@@ -9,6 +9,7 @@ import styles from "./portal-header.module.css";
 
 export type PortalHeaderProps = {
   homeHref: string;
+  homeLabel?: string;
   name: string;
   role: string;
   eyebrow: string;
@@ -17,16 +18,17 @@ export type PortalHeaderProps = {
   status?: ReactNode;
   onLogout: () => void;
   loggingOut?: boolean;
+  logoutLabel?: string;
 };
 
-export function PortalHeader({ homeHref, name, role, eyebrow, title, description, status, onLogout, loggingOut }: PortalHeaderProps) {
+export function PortalHeader({ homeHref, homeLabel = "MKN Site — beranda admin", name, role, eyebrow, title, description, status, onLogout, loggingOut, logoutLabel = "Keluar admin" }: PortalHeaderProps) {
   const [open, setOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   const panelId = useId();
   return (
     <header className={styles.header}>
       <div className={styles.top}>
-        <Link href={homeHref} className={styles.brand} aria-label="MKN Site — beranda admin">
+        <Link href={homeHref} className={styles.brand} aria-label={homeLabel}>
           <span className={styles.logo}><Image src={mknLogo} alt="" width={34} height={34} priority /></span>
           <span><strong>MKN Site</strong><small>PT Multi Kontrol Nusantara</small></span>
         </Link>
@@ -60,7 +62,7 @@ export function PortalHeader({ homeHref, name, role, eyebrow, title, description
                   <span>{role}</span>
                 </div>
                 <Button variant="danger" onClick={onLogout} loading={loggingOut} loadingText="Keluar...">
-                  Keluar admin
+                  {logoutLabel}
                 </Button>
               </div>
             )}

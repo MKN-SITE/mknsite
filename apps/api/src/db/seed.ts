@@ -1,4 +1,4 @@
-import { eq, like } from "drizzle-orm";
+import { and, eq, like } from "drizzle-orm";
 import { db, pool } from ".";
 import { authAccounts, authUsers, menus, permissions, rolePermissions, roles, userRoles, users } from "./schema";
 
@@ -14,6 +14,13 @@ const defaultMenus = [
 const permissionRows = [
   ["Lihat dashboard", "dashboard.view"], ["Lihat HR", "hr.view"], ["Kelola HR", "hr.manage"],
   ["Lihat OPS Telco", "ops_telco.view"], ["Kelola OPS Telco", "ops_telco.manage"],
+  ["Lihat penugasan job Telco", "ops_telco.job_assignment.view"],
+  ["Kelola jadwal oncall Telco", "ops_telco.schedule.manage"],
+  ["Lihat Form PTO Telco", "ops_telco.pto.view"],
+  ["Lihat jadwal oncall Telco", "ops_telco.schedule.view"],
+  ["Lihat auto report WAG Telco", "ops_telco.wag_report.view"],
+  ["Lihat estimasi dan quotation Telco", "ops_telco.estimate.view"],
+  ["Lihat dokumentasi pekerjaan Telco", "ops_telco.documentation.view"],
   ["Lihat OPS Workshop", "ops_workshop.view"], ["Kelola OPS Workshop", "ops_workshop.manage"],
   ["Lihat Project", "project.view"], ["Kelola Project", "project.manage"], ["Kelola sistem", "admin.manage"],
   ["Kelola keamanan sistem", "admin.security.manage"]
@@ -21,7 +28,15 @@ const permissionRows = [
 
 const roleRows = [
   ["HR", "hr", ["dashboard.view", "hr.view", "hr.manage"]],
-  ["OPS Telco", "ops-telco", ["dashboard.view", "ops_telco.view", "ops_telco.manage"]],
+  ["OPS Telco Teknisi", "ops-telco", [
+    "dashboard.view", "ops_telco.view", "ops_telco.schedule.view", "ops_telco.wag_report.view",
+    "ops_telco.estimate.view", "ops_telco.documentation.view"
+  ]],
+  ["OPS Telco Supervisor", "ops-telco-supervisor", [
+    "dashboard.view", "ops_telco.view", "ops_telco.manage", "ops_telco.job_assignment.view",
+    "ops_telco.schedule.manage", "ops_telco.pto.view", "ops_telco.schedule.view", "ops_telco.wag_report.view",
+    "ops_telco.estimate.view", "ops_telco.documentation.view"
+  ]],
   ["OPS Workshop", "ops-workshop", ["dashboard.view", "ops_workshop.view", "ops_workshop.manage"]],
   ["PRJ Project", "project", ["dashboard.view", "project.view", "project.manage"]],
   ["Manager", "manager", permissionRows.filter(([, slug]) => slug !== "admin.manage" && slug !== "admin.security.manage").map(([, slug]) => slug)],
@@ -48,6 +63,14 @@ async function seed() {
 
   const allPermissions = await db.select().from(permissions);
   const allRoles = await db.select().from(roles);
+  const technicianRole = allRoles.find((item) => item.slug === "ops-telco");
+  const legacyManagePermission = allPermissions.find((item) => item.slug === "ops_telco.manage");
+  if (technicianRole && legacyManagePermission) {
+    await db.delete(rolePermissions).where(and(
+      eq(rolePermissions.roleId, technicianRole.id),
+      eq(rolePermissions.permissionId, legacyManagePermission.id)
+    ));
+  }
   for (const [, roleSlug, grants] of roleRows) {
     const role = allRoles.find((item) => item.slug === roleSlug)!;
     for (const grant of grants) {
