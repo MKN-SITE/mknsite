@@ -122,7 +122,7 @@ export const hrForms = mysqlTable("hr_forms", {
   formNumber: varchar("form_number", { length: 80 }).notNull(),
   status: varchar("status", { length: 24 }).notNull().default("draft"),
   data: text("data").notNull(),
-  createdBy: int("created_by").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdBy: int("created_by").notNull().references(() => users.id, { onDelete: "restrict" }),
   duplicatedFromId: int("duplicated_from_id"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow()

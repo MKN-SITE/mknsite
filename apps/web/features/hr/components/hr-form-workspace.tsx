@@ -22,6 +22,7 @@ type Field = {
   type?: "text" | "date" | "time" | "number" | "textarea" | "select";
   options?: Array<{ value: string; label: string }>;
   wide?: boolean;
+  readOnly?: boolean;
 };
 
 const operationalFields: Field[] = [
@@ -31,7 +32,7 @@ const operationalFields: Field[] = [
   { key: "startTime", label: "Jam mulai", type: "time" },
   { key: "endTime", label: "Jam selesai", type: "time" },
   { key: "totalHours", label: "Total jam", type: "number" },
-  { key: "jobOrder", label: "Job Order No." },
+  { key: "jobOrder", label: "Job Order No. (otomatis)", readOnly: true },
   { key: "workOrder", label: "Work Order No." },
   { key: "equipment", label: "Equipment No." },
   { key: "location", label: "Lokasi pekerjaan", wide: true },
@@ -60,7 +61,10 @@ const cutiFields: Field[] = [
   { key: "phone", label: "Nomor telepon selama cuti" },
   { key: "handoverTo", label: "Tugas diserahkan kepada" },
   { key: "applicantSignatureName", label: "Nama pemohon untuk tanda tangan" },
-  { key: "submittedDate", label: "Tanggal diajukan", type: "date" },
+  { key: "submittedDate", label: "Tanggal diajukan", type: "date" }
+];
+
+const hrApprovalFields: Field[] = [
   { key: "hrCheckedBy", label: "Diperiksa HRD oleh" },
   { key: "hrCheckedDate", label: "Tanggal pemeriksaan HRD", type: "date" },
   { key: "approvedDays", label: "Cuti diberikan (hari)", type: "number" },
@@ -82,7 +86,7 @@ const hrBalanceFields: Field[] = [
   { key: "remainingPeriod", label: "Sisa hak — periode" }, { key: "remainingBalance", label: "Sisa hak — hak" }, { key: "remainingUsed", label: "Sisa hak — terpakai" }
 ];
 
-export function HrFormWorkspace({ type, userName }: { type: HrSection; userName: string }) {
+export function HrFormWorkspace({ type, userName, canManage }: { type: HrSection; userName: string; canManage: boolean }) {
   const [records, setRecords] = useState<HrRecord[]>([]);
   const [current, setCurrent] = useState<HrRecord | null>(null);
   const [values, setValues] = useState<Record<string, string>>({ employeeName: userName });
@@ -170,10 +174,10 @@ export function HrFormWorkspace({ type, userName }: { type: HrSection; userName:
           <div className={styles.formGrid}>
             {fields.map((field) => <FormField key={field.key} field={field} value={values[field.key] ?? ""} onChange={(value) => change(field.key, value)} />)}
           </div>
-          {type === "cuti" && (
+          {type === "cuti" && canManage && (
             <details className={styles.balancePanel}>
               <summary>Rincian perhitungan hak cuti oleh HRD</summary>
-              <div className={styles.formGrid}>{hrBalanceFields.map((field) => <FormField key={field.key} field={field} value={values[field.key] ?? ""} onChange={(value) => change(field.key, value)} />)}</div>
+              <div className={styles.formGrid}>{[...hrApprovalFields, ...hrBalanceFields].map((field) => <FormField key={field.key} field={field} value={values[field.key] ?? ""} onChange={(value) => change(field.key, value)} />)}</div>
             </details>
           )}
           {message && <p className={styles.message} role="status">{message}</p>}
@@ -204,5 +208,5 @@ function FormField({ field, value, onChange }: { field: Field; value: string; on
   const className = field.wide ? styles.wide : undefined;
   if (field.type === "textarea") return <label className={className}><span>{field.label}</span><textarea rows={3} value={value} onChange={(event) => onChange(event.target.value)} /></label>;
   if (field.type === "select") return <label className={className}><span>{field.label}</span><select value={value} onChange={(event) => onChange(event.target.value)}><option value="">Pilih jenis izin</option>{field.options?.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>;
-  return <label className={className}><span>{field.label}</span><input type={field.type ?? "text"} step={field.type === "number" ? "0.5" : undefined} value={value} onChange={(event) => onChange(event.target.value)} /></label>;
+  return <label className={className}><span>{field.label}</span><input type={field.type ?? "text"} step={field.type === "number" ? "0.5" : undefined} value={value} readOnly={field.readOnly} onChange={(event) => onChange(event.target.value)} /></label>;
 }

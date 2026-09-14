@@ -161,7 +161,7 @@ export function HrApp({ activeSection }: { activeSection?: HrSection }) {
                   <p>{selected.description} Isian tersimpan dan hasil unduh memakai PDF asli.</p>
                 </div>
               </div>
-              <HrFormWorkspace type={selected.id} userName={user.name} />
+              <HrFormWorkspace type={selected.id} userName={user.name} canManage={user.permissions.includes("hr.manage")} />
             </section>
           ) : (
             <>

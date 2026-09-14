@@ -9,6 +9,7 @@
 .formGrid label { display: grid; gap: 7px; color: #365568; font-size: 12px; font-weight: 750; }
 .wide { grid-column: 1 / -1; }
 .formGrid input, .formGrid textarea, .formGrid select { width: 100%; padding: 10px 11px; color: #102f42; background: #fbfdff; border: 1px solid #cbdbe5; border-radius: 9px; font: inherit; font-weight: 500; }
+.formGrid input[readonly] { color: #496574; background: #eef4f7; cursor: not-allowed; }
 .formGrid textarea { resize: vertical; line-height: 1.5; }
 .formGrid input:focus, .formGrid textarea:focus, .formGrid select:focus { outline: 3px solid rgba(14, 116, 184, .16); border-color: #2985bd; }
 .actions { justify-content: flex-start; flex-wrap: wrap; margin-top: 24px; padding-top: 20px; border-top: 1px solid #e3ebf0; }

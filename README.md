@@ -80,6 +80,17 @@ Ganti seluruh password seed sebelum memakai data produksi.
 - Keduanya HTTP-only dan Secure di produksi. Tidak ada JWT aplikasi untuk sesi login.
 - Permission dimuat ulang dari MySQL pada request, sehingga perubahan role berlaku tanpa menunggu token kedaluwarsa.
 - Endpoint `/workspace/:module` memeriksa permission di server.
+
+### Konfigurasi menu portal
+
+Menu utama portal dikelola melalui **Administrasi → Menu** dan tidak dibuat ulang oleh seed. Untuk modul pada branch HR/Telco, buat atau aktifkan entri berikut:
+
+| Judul | URL | Permission wajib |
+| --- | --- | --- |
+| HR | `/portal/hr` | `hr.view` |
+| OPS Telco | `/portal/ops-telco` | `ops_telco.view` |
+
+Submenu OPS Telco ditampilkan dari permission role pengguna. Role teknisi hanya menerima submenu teknisi, sedangkan role supervisor menerima submenu supervisor sekaligus submenu teknisi. Perubahan menu atau role tetap diperiksa kembali oleh API; menyembunyikan menu di antarmuka bukan pengganti otorisasi server.
 - Tabel `audit_logs` mencatat perubahan role/status lewat API admin.
 
 ## Auth dan RBAC
