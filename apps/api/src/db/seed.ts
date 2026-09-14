@@ -2,15 +2,6 @@ import { eq, like } from "drizzle-orm";
 import { db, pool } from ".";
 import { authAccounts, authUsers, divisions, menus, permissions, rolePermissions, roles, userRoles, users } from "./schema";
 
-const defaultMenus = [
-  { title: "Self-Service", icon: "user-circle", url: "/portal/self-service", requiredPermission: "dashboard.view", sortOrder: 1 },
-  { title: "HR", icon: "users", url: "/portal/hr", requiredPermission: "hr.view", sortOrder: 2 },
-  { title: "OPS Telco", icon: "radio-tower", url: "/portal/ops-telco", requiredPermission: "ops_telco.view", sortOrder: 3 },
-  { title: "OPS Workshop", icon: "wrench", url: "/portal/ops-workshop", requiredPermission: "ops_workshop.view", sortOrder: 4 },
-  { title: "Project", icon: "folder-kanban", url: "/portal/project", requiredPermission: "project.view", sortOrder: 5 }
-] as const;
-
-
 const permissionRows = [
   ["Lihat dashboard", "dashboard.view"], ["Lihat HR", "hr.view"], ["Kelola HR", "hr.manage"],
   ["Lihat OPS Telco", "ops_telco.view"], ["Kelola OPS Telco", "ops_telco.manage"],
@@ -30,11 +21,6 @@ const roleRows = [
 ] as const;
 
 const accounts = [
-  ["Ayu Prameswari", "hr@mknsite.online", "employee", "hr", "Human Resources"],
-  ["Rizky Mahendra", "telco@mknsite.online", "employee", "ops-telco", "Telekomunikasi"],
-  ["Fajar Nugraha", "workshop@mknsite.online", "employee", "ops-workshop", "Workshop"],
-  ["Nadia Kusuma", "project@mknsite.online", "employee", "project", "Project Management"],
-  ["Bima Santosa", "manager@mknsite.online", "employee", "manager", "Manajemen & Operasional"],
   ["System Administrator", "admin@mknsite.online", "admin", "administrator", "Teknologi Informasi"],
   ["Super Administrator", "superadmin@mknsite.online", "admin", "superadmin", "Direksi / Eksekutif"]
 ] as const;
@@ -42,6 +28,31 @@ const accounts = [
 async function seed() {
   // Bersihkan akun legacy berdomain @mknsite.id jika masih tertinggal
   await db.delete(users).where(like(users.email, "%@mknsite.id"));
+
+  // Bersihkan akun dummy/demo agar hanya tersisa admin & superadmin
+  const dummyEmails = [
+    "hr@mknsite.online",
+    "telco@mknsite.online",
+    "workshop@mknsite.online",
+    "project@mknsite.online",
+    "manager@mknsite.online"
+  ];
+  for (const email of dummyEmails) {
+    await db.delete(users).where(eq(users.email, email));
+  }
+
+  // Bersihkan menu dummy/demo agar menu bersih untuk uji coba real data
+  const dummyMenuUrls = [
+    "/portal/self-service",
+    "/portal/hr",
+    "/portal/ops-telco",
+    "/portal/ops-workshop",
+    "/portal/project",
+    "/portal/payroll"
+  ];
+  for (const url of dummyMenuUrls) {
+    await db.delete(menus).where(eq(menus.url, url));
+  }
 
   for (const [name, slug] of permissionRows) await db.insert(permissions).values({ name, slug }).onDuplicateKeyUpdate({ set: { name } });
   for (const [name, slug] of roleRows) await db.insert(roles).values({ name, slug }).onDuplicateKeyUpdate({ set: { name } });
@@ -56,7 +67,6 @@ async function seed() {
     }
   }
 
-  const passwordHash = await Bun.password.hash("demo12345", { algorithm: "argon2id" });
   const adminHash = await Bun.password.hash("admin12345", { algorithm: "argon2id" });
   const superadminHash = await Bun.password.hash("superadmin12345", { algorithm: "argon2id" });
   for (const [name, email, accountType, roleSlug, division] of accounts) {
@@ -74,7 +84,7 @@ async function seed() {
     }
 
     // Akun belum ada — buat baru
-    const loginHash = email === "superadmin@mknsite.online" ? superadminHash : accountType === "admin" ? adminHash : passwordHash;
+    const loginHash = email === "superadmin@mknsite.online" ? superadminHash : adminHash;
     await db.insert(users).values({ name, email, accountType, division, passwordHash: loginHash });
     const [account] = await db.select().from(users).where(eq(users.email, email)).limit(1);
     const role = allRoles.find((item) => item.slug === roleSlug)!;
@@ -86,25 +96,6 @@ async function seed() {
       id: crypto.randomUUID(), accountId: authUserId, providerId: "credential", userId: authUserId, password: loginHash
     });
     console.log(`  ✓ Akun ${email} berhasil dibuat.`);
-  }
-
-  // Seed default menus (idempoten)
-  const existingMenus = await db.select().from(menus);
-  for (const menu of defaultMenus) {
-    const found = existingMenus.find((m) => m.url === menu.url);
-    if (!found) {
-      await db.insert(menus).values({
-        title: menu.title,
-        icon: menu.icon,
-        url: menu.url,
-        requiredPermission: menu.requiredPermission,
-        sortOrder: menu.sortOrder,
-        isActive: 1
-      });
-      console.log(`  ✓ Menu ${menu.title} berhasil dibuat.`);
-    } else {
-      console.log(`  → Menu ${menu.title} (${menu.url}) sudah ada, dilewati.`);
-    }
   }
 
   // Seed default divisions (idempoten)

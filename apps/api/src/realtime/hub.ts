@@ -4,7 +4,10 @@ import { getAuthenticatedProfile } from "../auth/auth";
 export type RealtimeEvent =
   | { type: "access.updated" | "session.revoked"; message: string; occurredAt: string }
   | { type: "notification.created"; message: string; occurredAt: string }
-  | { type: "admin.users.updated"; userId: number; occurredAt: string };
+  | { type: "admin.users.updated"; userId: number; occurredAt: string }
+  | { type: "admin.divisions.updated"; divisionId?: number; occurredAt: string }
+  | { type: "admin.menus.updated"; occurredAt: string }
+  | { type: "admin.rbac.updated"; occurredAt: string };
 
 const subscribers = new Map<number, Set<(event: RealtimeEvent) => void>>();
 const adminSubscribers = new Set<(event: RealtimeEvent) => void>();
@@ -18,6 +21,31 @@ export function publishAdminUsersUpdated(userId: number) {
   const payload: RealtimeEvent = {
     type: "admin.users.updated",
     userId,
+    occurredAt: new Date().toISOString()
+  };
+  adminSubscribers.forEach((send) => send(payload));
+}
+
+export function publishAdminDivisionsUpdated(divisionId?: number) {
+  const payload: RealtimeEvent = {
+    type: "admin.divisions.updated",
+    divisionId,
+    occurredAt: new Date().toISOString()
+  };
+  adminSubscribers.forEach((send) => send(payload));
+}
+
+export function publishAdminMenusUpdated() {
+  const payload: RealtimeEvent = {
+    type: "admin.menus.updated",
+    occurredAt: new Date().toISOString()
+  };
+  adminSubscribers.forEach((send) => send(payload));
+}
+
+export function publishAdminRbacUpdated() {
+  const payload: RealtimeEvent = {
+    type: "admin.rbac.updated",
     occurredAt: new Date().toISOString()
   };
   adminSubscribers.forEach((send) => send(payload));

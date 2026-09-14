@@ -2,6 +2,9 @@ import { eq, sql } from "drizzle-orm";
 import { db } from "../db";
 import { auditLogs, divisions, users } from "../db/schema";
 import type { CreateDivisionDto, DivisionSummaryDto, UpdateDivisionDto } from "../schemas/division.dto";
+import { adminService } from "./admin.service";
+import type { UserSummaryDto } from "../schemas/admin.dto";
+import { publishAdminDivisionsUpdated } from "../realtime/hub";
 
 export class DivisionServiceError extends Error {
   code: string;
@@ -67,6 +70,30 @@ export class DivisionService {
     };
   }
 
+  async getDivisionMembers(
+    id: number,
+    options?: { search?: string }
+  ): Promise<{
+    division: DivisionSummaryDto;
+    members: UserSummaryDto[];
+    total: number;
+  }> {
+    const division = await this.getDivisionById(id);
+
+    const userResult = await adminService.getUsers({
+      division: division.name,
+      search: options?.search,
+      pageSize: 100
+    });
+
+    return {
+      division,
+      members: userResult.data,
+      total: userResult.pagination.total
+    };
+  }
+
+
   async createDivision(dto: CreateDivisionDto, actorId?: number, ipAddress?: string): Promise<DivisionSummaryDto> {
     const trimmedName = dto.name.trim();
 
@@ -97,6 +124,7 @@ export class DivisionService {
       });
     }
 
+    publishAdminDivisionsUpdated(newId);
     return this.getDivisionById(newId);
   }
 
@@ -155,6 +183,7 @@ export class DivisionService {
       });
     }
 
+    publishAdminDivisionsUpdated(id);
     return this.getDivisionById(id);
   }
 
@@ -190,6 +219,8 @@ export class DivisionService {
         ipAddress: ipAddress ?? null
       });
     }
+
+    publishAdminDivisionsUpdated(id);
   }
 }
 

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import mknLogoImg from "@/public/assets/Logo MKN.png";
-import { api, type PortalUser } from "@/lib/api";
+import { api, getAvatarUrl, type PortalUser } from "@/lib/api";
 import { RealtimeStatus } from "@/components/realtime-status";
 import { PortalIcon } from "./portal-icons";
 import styles from "./menu-grid.module.css";
@@ -33,6 +33,7 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
   const [error, setError] = useState<string | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
+  const [avatarImgError, setAvatarImgError] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const supportRef = useRef<HTMLDivElement>(null);
 
@@ -142,8 +143,13 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
               aria-label="Menu profil pengguna"
             >
               <div className={styles.avatarCircle} aria-hidden="true">
-                {user.avatarUrl ? (
-                  <img src={user.avatarUrl} alt="" className={styles.avatarImg} />
+                {user.avatarUrl && !avatarImgError ? (
+                  <img
+                    src={getAvatarUrl(user.avatarUrl)}
+                    alt=""
+                    className={styles.avatarImg}
+                    onError={() => setAvatarImgError(true)}
+                  />
                 ) : (
                   initial
                 )}

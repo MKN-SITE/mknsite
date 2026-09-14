@@ -7,6 +7,9 @@ export type RealtimeHandlers = {
   onAccessUpdated?: () => void;
   onSessionRevoked?: (message?: string) => void;
   onAdminUsersUpdated?: (userId: number) => void;
+  onAdminDivisionsUpdated?: (divisionId?: number) => void;
+  onAdminMenusUpdated?: () => void;
+  onAdminRbacUpdated?: () => void;
   onError?: (event: Event) => void;
 };
 
@@ -47,6 +50,21 @@ export function connectRealtime(
           handlers.onAdminUsersUpdated?.(data.userId);
         }
       } catch {}
+    });
+
+    stream.addEventListener("admin.divisions.updated", (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        handlers.onAdminDivisionsUpdated?.(data.divisionId);
+      } catch {}
+    });
+
+    stream.addEventListener("admin.menus.updated", () => {
+      handlers.onAdminMenusUpdated?.();
+    });
+
+    stream.addEventListener("admin.rbac.updated", () => {
+      handlers.onAdminRbacUpdated?.();
     });
   }
 

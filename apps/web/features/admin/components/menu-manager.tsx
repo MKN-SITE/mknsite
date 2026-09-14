@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useRef, useState, type FormEvent } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable, type Column } from "@/components/ui/data-table";
@@ -31,10 +31,30 @@ export function MenuManager() {
   const [badgeColor, setBadgeColor] = useState("orange");
   const [isActive, setIsActive] = useState(true);
 
+  // Enhanced Icon Picker states
+  const [iconTab, setIconTab] = useState<"preset" | "upload" | "custom">("preset");
+  const [iconSearch, setIconSearch] = useState("");
+  const [uploadingIcon, setUploadingIcon] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [fieldErrors, setFieldErrors] = useState<{ title?: string; url?: string }>({});
   const [apiError, setApiError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  // Filtered preset icons based on search keyword
+  const filteredPresetIcons = useMemo(() => {
+    const q = iconSearch.trim().toLowerCase();
+    if (!q) return PRESET_MENU_ICONS;
+    return PRESET_MENU_ICONS.filter(
+      (item) =>
+        item.name.toLowerCase().includes(q) ||
+        item.label.toLowerCase().includes(q) ||
+        item.keywords.toLowerCase().includes(q) ||
+        item.category.toLowerCase().includes(q)
+    );
+  }, [iconSearch]);
 
   // Extract unique permissions from roles
   const availablePermissions = useMemo(() => {
@@ -52,6 +72,9 @@ export function MenuManager() {
     setEditingMenu(null);
     setTitle("");
     setIcon("user-circle");
+    setIconTab("preset");
+    setIconSearch("");
+    setUploadError(null);
     setDescription("");
     setUrl("/portal/");
     setRequiredPermission("");
@@ -67,7 +90,17 @@ export function MenuManager() {
   const openEditModal = (menu: MenuSummaryDto) => {
     setEditingMenu(menu);
     setTitle(menu.title);
-    setIcon(menu.icon || "user-circle");
+    const menuIcon = menu.icon || "user-circle";
+    setIcon(menuIcon);
+    setIconSearch("");
+    setUploadError(null);
+    if (menuIcon.startsWith("/") || menuIcon.startsWith("http") || menuIcon.startsWith("data:image/")) {
+      setIconTab("upload");
+    } else if (menuIcon.startsWith("<svg")) {
+      setIconTab("custom");
+    } else {
+      setIconTab("preset");
+    }
     setDescription(menu.description || "");
     setUrl(menu.url || "");
     setRequiredPermission(menu.requiredPermission || "");
@@ -78,6 +111,35 @@ export function MenuManager() {
     setFieldErrors({});
     setApiError(null);
     setModalOpen(true);
+  };
+
+  const handleIconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadError(null);
+
+    if (file.size > 2 * 1024 * 1024) {
+      setUploadError("Ukuran file icon maksimal 2 MB.");
+      return;
+    }
+
+    setUploadingIcon(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await api<{ data: { iconUrl: string } }>("/admin/menus/upload-icon", {
+        method: "POST",
+        body: formData
+      });
+      if (res?.data?.iconUrl) {
+        setIcon(res.data.iconUrl);
+      }
+    } catch (err: any) {
+      setUploadError(err?.message || "Gagal mengunggah icon.");
+    } finally {
+      setUploadingIcon(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   const validate = (): boolean => {
@@ -114,9 +176,9 @@ export function MenuManager() {
       url: url.trim() || null,
       requiredPermission: requiredPermission.trim() || null,
       sortOrder: Number(sortOrder) || 0,
-      badgeCount: Number(badgeCount) || 0,
-      badgeColor: badgeColor || "orange",
-      isActive: isActive ? 1 : 0
+      badgeCount: 0,
+      badgeColor: "orange",
+      isActive: Boolean(isActive)
     };
 
     try {
@@ -337,6 +399,29 @@ export function MenuManager() {
             </div>
           )}
 
+          {/* Live Card Preview */}
+          <div className={styles.cardPreviewSection}>
+            <div className={styles.previewHeader}>
+              <span className={styles.previewTitle}>Live Preview Kartu Menu</span>
+              <span className={styles.previewHint}>Simulasi tampilan riil di portal karyawan</span>
+            </div>
+            <div className={styles.previewCardWrap}>
+              <div className={styles.previewCard}>
+                <div className={styles.previewIconWrapper}>
+                  <MenuIcon name={icon} size={42} />
+                </div>
+                <div className={styles.previewTitleRow}>
+                  <span className={styles.previewCardLabel}>
+                    {title.trim() || "Judul Menu Baru"}
+                  </span>
+                </div>
+                <span className={styles.previewCardDesc}>
+                  {description.trim() || "Deskripsi fungsi modul operasional akan tampil di sini..."}
+                </span>
+              </div>
+            </div>
+          </div>
+
           <div className={styles.formGrid2}>
             <div className={styles.fieldGroup}>
               <label className={styles.fieldLabel} htmlFor="menu-title">
@@ -392,30 +477,151 @@ export function MenuManager() {
             <span className={styles.fieldHint}>Keterangan fungsi modul (opsional)</span>
           </div>
 
-          {/* Icon Picker Grid */}
+          {/* Enhanced Icon Picker with Tabs */}
           <div className={styles.iconPickerWrap}>
             <div className={styles.headerRow}>
-              <span className={styles.fieldLabel}>Pilih Icon Visual</span>
+              <span className={styles.fieldLabel}>Icon Menu Visual</span>
               <div className={styles.selectedIconChip}>
-                Terpilih: <MenuIcon name={icon} size={16} /> <strong>{icon}</strong>
+                Terpilih: <MenuIcon name={icon} size={16} /> <strong>{icon.length > 25 ? `${icon.substring(0, 22)}...` : icon}</strong>
               </div>
             </div>
-            <div className={styles.iconGrid} role="radiogroup" aria-label="Preset Icon Visual">
-              {PRESET_MENU_ICONS.map((item) => (
-                <button
-                  key={item.name}
-                  type="button"
-                  role="radio"
-                  aria-checked={icon === item.name}
-                  className={`${styles.iconPickerItem} ${icon === item.name ? styles.iconPickerItemSelected : ""}`}
-                  onClick={() => setIcon(item.name)}
-                  title={item.label}
-                  aria-label={item.label}
-                >
-                  <MenuIcon name={item.name} size={20} />
-                </button>
-              ))}
+
+            <div className={styles.iconTabs} role="tablist">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={iconTab === "preset"}
+                className={`${styles.iconTabBtn} ${iconTab === "preset" ? styles.iconTabBtnActive : ""}`}
+                onClick={() => setIconTab("preset")}
+              >
+                Preset Icon ({PRESET_MENU_ICONS.length})
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={iconTab === "upload"}
+                className={`${styles.iconTabBtn} ${iconTab === "upload" ? styles.iconTabBtnActive : ""}`}
+                onClick={() => setIconTab("upload")}
+              >
+                Upload File (SVG / PNG / WebP)
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={iconTab === "custom"}
+                className={`${styles.iconTabBtn} ${iconTab === "custom" ? styles.iconTabBtnActive : ""}`}
+                onClick={() => setIconTab("custom")}
+              >
+                URL / Kode SVG
+              </button>
             </div>
+
+            {iconTab === "preset" && (
+              <>
+                <input
+                  type="text"
+                  className={styles.iconSearchInput}
+                  placeholder="Cari icon... (misal: tower, truk, helm, k3, wifi, database, kas, dokumen)"
+                  value={iconSearch}
+                  onChange={(e) => setIconSearch(e.target.value)}
+                />
+                <div className={styles.iconGrid} role="radiogroup" aria-label="Preset Icon Visual">
+                  {filteredPresetIcons.length === 0 ? (
+                    <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "12px", color: "var(--ink-soft)", fontSize: "12px" }}>
+                      Tidak ada icon yang cocok dengan &quot;{iconSearch}&quot;
+                    </div>
+                  ) : (
+                    filteredPresetIcons.map((item) => (
+                      <button
+                        key={item.name}
+                        type="button"
+                        role="radio"
+                        aria-checked={icon === item.name}
+                        className={`${styles.iconPickerItem} ${icon === item.name ? styles.iconPickerItemSelected : ""}`}
+                        onClick={() => setIcon(item.name)}
+                        title={`${item.label} (${item.category})`}
+                        aria-label={item.label}
+                      >
+                        <MenuIcon name={item.name} size={22} />
+                      </button>
+                    ))
+                  )}
+                </div>
+              </>
+            )}
+
+            {iconTab === "upload" && (
+              <div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".svg,image/svg+xml,.png,image/png,.webp,image/webp,.jpg,.jpeg,image/jpeg"
+                  style={{ display: "none" }}
+                  onChange={handleIconUpload}
+                />
+                {icon.startsWith("/uploads/icons/") || icon.startsWith("data:image/") ? (
+                  <div className={styles.uploadSuccess}>
+                    <div className={styles.uploadPreviewItem}>
+                      <div className={styles.uploadThumbnail}>
+                        <MenuIcon name={icon} size={32} />
+                      </div>
+                      <div className={styles.uploadMeta}>
+                        <span className={styles.uploadFileName}>Custom Icon Aktif</span>
+                        <span className={styles.uploadFileStatus}>Tersimpan di server dan siap tampil</span>
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingIcon}
+                      >
+                        {uploadingIcon ? "Mengunggah..." : "Ganti File"}
+                      </Button>
+                      <button
+                        type="button"
+                        className={styles.removeIconBtn}
+                        onClick={() => setIcon("user-circle")}
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className={styles.uploadDropzone}
+                    onClick={() => !uploadingIcon && fileInputRef.current?.click()}
+                  >
+                    <div className={styles.uploadDropzoneInner}>
+                      <MenuIcon name="camera" size={28} style={{ color: "var(--accent)" }} />
+                      <span className={styles.uploadDropzoneText}>
+                        {uploadingIcon ? "Sedang mengunggah file..." : "Klik untuk Pilih File Icon (SVG, PNG, WebP)"}
+                      </span>
+                      <span className={styles.uploadDropzoneSubtext}>
+                        Ukuran maksimal 2 MB. Disarankan rasio kotak (1:1) dengan latar transparan.
+                      </span>
+                    </div>
+                  </div>
+                )}
+                {uploadError && <p className={styles.fieldError}>{uploadError}</p>}
+              </div>
+            )}
+
+            {iconTab === "custom" && (
+              <div>
+                <textarea
+                  className={styles.customCodeTextarea}
+                  placeholder="Tempelkan URL gambar (https://...) atau kode SVG (<svg>...</svg>)"
+                  value={icon}
+                  onChange={(e) => setIcon(e.target.value)}
+                />
+                <span className={styles.fieldHint}>
+                  Mendukung URL web gambar atau tag SVG inline langsung.
+                </span>
+              </div>
+            )}
           </div>
 
           <div className={styles.formGrid2}>
@@ -459,40 +665,6 @@ export function MenuManager() {
             </div>
           </div>
 
-          <div className={styles.formGrid2}>
-            <div className={styles.fieldGroup}>
-              <label className={styles.fieldLabel} htmlFor="menu-badge-count">
-                Badge Notifikasi (Count)
-              </label>
-              <input
-                id="menu-badge-count"
-                type="number"
-                className={styles.inputControl}
-                value={badgeCount}
-                onChange={(e) => setBadgeCount(parseInt(e.target.value, 10) || 0)}
-                min={0}
-              />
-              <span className={styles.fieldHint}>Jumlah angka badge (0 = sembunyikan)</span>
-            </div>
-
-            <div className={styles.fieldGroup}>
-              <label className={styles.fieldLabel} htmlFor="menu-badge-color">
-                Warna Badge
-              </label>
-              <select
-                id="menu-badge-color"
-                className={styles.inputControl}
-                value={badgeColor}
-                onChange={(e) => setBadgeColor(e.target.value)}
-              >
-                <option value="orange">Orange (Default)</option>
-                <option value="blue">Blue</option>
-                <option value="red">Red</option>
-                <option value="green">Green</option>
-              </select>
-              <span className={styles.fieldHint}>Warna aksen indikator badge</span>
-            </div>
-          </div>
 
           <label className={styles.checkboxRow}>
             <input

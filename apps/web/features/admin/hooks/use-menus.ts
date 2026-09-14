@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api";
+import { connectRealtime } from "@/lib/sse";
 
 export type MenuSummaryDto = {
   id: number;
@@ -35,13 +36,12 @@ export function useMenus() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchMenus = useCallback(async (force = false) => {
-    if (!force && cachedMenus !== null) {
-      setMenus(cachedMenus);
-      setLoading(false);
-      return;
+    // Stale-while-revalidate: only show blocking loading skeleton if there is no cached data
+    if (cachedMenus === null || force) {
+      if (!cachedMenus) {
+        setLoading(true);
+      }
     }
-
-    setLoading(true);
     setError(null);
 
     try {
@@ -75,6 +75,17 @@ export function useMenus() {
 
   useEffect(() => {
     fetchMenus();
+
+    const disconnect = connectRealtime("admin", {
+      onAdminMenusUpdated: () => {
+        clearMenuCache();
+        fetchMenus(true);
+      }
+    });
+
+    return () => {
+      disconnect();
+    };
   }, [fetchMenus]);
 
   const toggleStatus = useCallback(
@@ -88,12 +99,14 @@ export function useMenus() {
       try {
         await api(`/admin/menus/${id}`, {
           method: "PATCH",
-          body: JSON.stringify({ isActive: nextActive })
+          body: JSON.stringify({ isActive: Boolean(nextActive) })
         });
-        await fetchMenus();
+        clearMenuCache();
+        await fetchMenus(true);
       } catch (err: any) {
         setError(err?.message ?? "Gagal mengubah status menu.");
-        await fetchMenus();
+        clearMenuCache();
+        await fetchMenus(true);
         throw err;
       }
     },
@@ -134,10 +147,12 @@ export function useMenus() {
             body: JSON.stringify({ sortOrder: newNeighborSort })
           })
         ]);
-        await fetchMenus();
+        clearMenuCache();
+        await fetchMenus(true);
       } catch (err: any) {
         setError(err?.message ?? "Gagal mengubah urutan menu.");
-        await fetchMenus();
+        clearMenuCache();
+        await fetchMenus(true);
         throw err;
       }
     },
@@ -150,7 +165,8 @@ export function useMenus() {
         await api(`/admin/menus/${id}`, {
           method: "DELETE"
         });
-        await fetchMenus();
+        clearMenuCache();
+        await fetchMenus(true);
       } catch (err: any) {
         setError(err?.message ?? "Gagal menghapus menu.");
         throw err;
@@ -163,7 +179,10 @@ export function useMenus() {
     menus,
     loading,
     error,
-    refresh: fetchMenus,
+    refresh: () => {
+      clearMenuCache();
+      return fetchMenus(true);
+    },
     toggleStatus,
     reorderMenu,
     deleteMenu

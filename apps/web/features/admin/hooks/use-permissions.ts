@@ -1,5 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api";
+import { connectRealtime } from "@/lib/sse";
+
+export type PermissionRoleRefDto = {
+  id: number;
+  name: string;
+  slug: string;
+};
+
+export type PermissionMenuRefDto = {
+  id: number;
+  title: string;
+  url: string | null;
+};
 
 export type PermissionSummaryDto = {
   id: number;
@@ -8,6 +21,8 @@ export type PermissionSummaryDto = {
   roleCount: number;
   menuCount: number;
   isSystem: boolean;
+  roles?: PermissionRoleRefDto[];
+  menus?: PermissionMenuRefDto[];
   createdAt: string;
 };
 
@@ -25,13 +40,11 @@ export function usePermissions() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchPermissions = useCallback(async (force = false) => {
-    if (!force && cachedPermissions !== null) {
-      setPermissions(cachedPermissions);
-      setLoading(false);
-      return;
+    if (cachedPermissions === null || force) {
+      if (!cachedPermissions) {
+        setLoading(true);
+      }
     }
-
-    setLoading(true);
     setError(null);
 
     try {
@@ -58,7 +71,24 @@ export function usePermissions() {
   }, []);
 
   useEffect(() => {
-    void fetchPermissions();
+    // Always fetch fresh data on mount (revalidate in background)
+    void fetchPermissions(true);
+
+    // Realtime live update: listen to rbac and user changes
+    const disconnect = connectRealtime("admin", {
+      onAdminRbacUpdated: () => {
+        clearPermissionCache();
+        void fetchPermissions(true);
+      },
+      onAdminUsersUpdated: () => {
+        clearPermissionCache();
+        void fetchPermissions(true);
+      }
+    });
+
+    return () => {
+      disconnect();
+    };
   }, [fetchPermissions]);
 
   return { permissions, loading, error, refresh: () => fetchPermissions(true) };

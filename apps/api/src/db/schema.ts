@@ -102,7 +102,7 @@ export const auditLogs = mysqlTable("audit_logs", {
 export const menus = mysqlTable("menus", {
   id: int("id").autoincrement().primaryKey(),
   title: varchar("title", { length: 100 }).notNull(),
-  icon: varchar("icon", { length: 100 }),
+  icon: text("icon"),
   description: varchar("description", { length: 255 }),
   url: varchar("url", { length: 500 }),
   requiredPermission: varchar("required_permission", { length: 140 }),

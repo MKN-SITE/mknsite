@@ -50,12 +50,12 @@ export const MenuDetailResponseSchema = t.Object({
 
 export const CreateMenuSchema = t.Object({
   title: t.String({ minLength: 1, maxLength: 100, description: "Judul menu (1-100 karakter)" }),
-  icon: t.Optional(t.Nullable(t.String({ maxLength: 100, description: "Nama icon (maks 100 karakter)" }))),
+  icon: t.Optional(t.Nullable(t.String({ maxLength: 5000, description: "Nama icon preset, URL gambar, atau kode SVG" }))),
   description: t.Optional(t.Nullable(t.String({ maxLength: 255, description: "Deskripsi menu (maks 255 karakter)" }))),
   url: t.Optional(t.Nullable(t.String({ maxLength: 500, description: "URL atau rute tujuan (maks 500 karakter)" }))),
   requiredPermission: t.Optional(t.Nullable(t.String({ maxLength: 140, description: "Slug permission yang disyaratkan (maks 140 karakter)" }))),
   sortOrder: t.Optional(t.Integer({ default: 0, description: "Urutan tampilan (default 0)" })),
-  isActive: t.Optional(t.Boolean({ default: true, description: "Status aktif (default true)" })),
+  isActive: t.Optional(t.Union([t.Boolean(), t.Numeric()], { default: true, description: "Status aktif (default true)" })),
   badgeCount: t.Optional(t.Integer({ default: 0, minimum: 0, description: "Jumlah notifikasi badge" })),
   badgeColor: t.Optional(t.String({ maxLength: 20, default: "orange", description: "Warna badge (maks 20 karakter)" }))
 });
@@ -64,12 +64,12 @@ export type CreateMenuDto = typeof CreateMenuSchema.static;
 
 export const UpdateMenuSchema = t.Object({
   title: t.Optional(t.String({ minLength: 1, maxLength: 100, description: "Judul menu (1-100 karakter)" })),
-  icon: t.Optional(t.Nullable(t.String({ maxLength: 100, description: "Nama icon (maks 100 karakter)" }))),
+  icon: t.Optional(t.Nullable(t.String({ maxLength: 5000, description: "Nama icon preset, URL gambar, atau kode SVG" }))),
   description: t.Optional(t.Nullable(t.String({ maxLength: 255, description: "Deskripsi menu (maks 255 karakter)" }))),
   url: t.Optional(t.Nullable(t.String({ maxLength: 500, description: "URL atau rute tujuan (maks 500 karakter)" }))),
   requiredPermission: t.Optional(t.Nullable(t.String({ maxLength: 140, description: "Slug permission yang disyaratkan" }))),
   sortOrder: t.Optional(t.Integer({ description: "Urutan tampilan" })),
-  isActive: t.Optional(t.Boolean({ description: "Status aktif" })),
+  isActive: t.Optional(t.Union([t.Boolean(), t.Numeric()], { description: "Status aktif" })),
   badgeCount: t.Optional(t.Integer({ minimum: 0, description: "Jumlah notifikasi badge" })),
   badgeColor: t.Optional(t.String({ maxLength: 20, description: "Warna badge" }))
 });

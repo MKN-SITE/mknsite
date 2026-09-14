@@ -1,6 +1,6 @@
 import { count, eq, inArray } from "drizzle-orm";
 import { db } from "../db";
-import { auditLogs, menus, permissions, rolePermissions, roles, userRoles } from "../db/schema";
+import { auditLogs, menus, permissions, rolePermissions, roles, userRoles, users } from "../db/schema";
 import type {
   CreatePermissionDto,
   CreateRoleDto,
@@ -9,7 +9,7 @@ import type {
   UpdatePermissionDto,
   UpdateRoleDto
 } from "../schemas/admin.dto";
-import { publishRealtimeEvent } from "../realtime/hub";
+import { publishAdminRbacUpdated, publishRealtimeEvent } from "../realtime/hub";
 
 type ServiceError = { error: { status: 400 | 403 | 404 | 409; code: string; message: string } };
 
@@ -31,49 +31,115 @@ function conflict(code: string, message: string): ServiceError {
 
 export class RbacService {
   async getRoles(): Promise<RoleSummaryDto[]> {
-    const [allRoles, grants, assignments] = await Promise.all([
+    const [allRoles, grants, assignments, userLinks] = await Promise.all([
       db.select({ id: roles.id, name: roles.name, slug: roles.slug }).from(roles).orderBy(roles.id),
-      db.select({ roleId: rolePermissions.roleId, permissionId: permissions.id, slug: permissions.slug })
-        .from(rolePermissions).innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id)).orderBy(permissions.id),
-      db.select({ roleId: userRoles.roleId, total: count() }).from(userRoles).groupBy(userRoles.roleId)
+      db.select({
+        roleId: rolePermissions.roleId,
+        permissionId: permissions.id,
+        slug: permissions.slug,
+        name: permissions.name
+      })
+        .from(rolePermissions)
+        .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
+        .orderBy(permissions.id),
+      db.select({ roleId: userRoles.roleId, total: count() }).from(userRoles).groupBy(userRoles.roleId),
+      db.select({
+        roleId: userRoles.roleId,
+        userId: users.id,
+        userName: users.name,
+        userEmail: users.email
+      })
+        .from(userRoles)
+        .innerJoin(users, eq(userRoles.userId, users.id))
+        .orderBy(users.name)
     ]);
-    const grantMap = new Map<number, Array<{ id: number; slug: string }>>();
+
+    const grantMap = new Map<number, Array<{ id: number; slug: string; name: string }>>();
     for (const grant of grants) {
       const list = grantMap.get(grant.roleId) ?? [];
-      list.push({ id: grant.permissionId, slug: grant.slug });
+      list.push({ id: grant.permissionId, slug: grant.slug, name: grant.name });
       grantMap.set(grant.roleId, list);
     }
+
+    const userMap = new Map<number, Array<{ id: number; name: string; email: string }>>();
+    for (const link of userLinks) {
+      const list = userMap.get(link.roleId) ?? [];
+      list.push({ id: link.userId, name: link.userName, email: link.userEmail });
+      userMap.set(link.roleId, list);
+    }
+
     const userCounts = new Map(assignments.map((row) => [row.roleId, Number(row.total)]));
+
     return allRoles.map((role) => {
       const roleGrants = grantMap.get(role.id) ?? [];
+      const roleUsers = userMap.get(role.id) ?? [];
       return {
         ...role,
         permissions: roleGrants.map((item) => item.slug),
+        permissionDetails: roleGrants.map((item) => ({ id: item.id, name: item.name, slug: item.slug })),
         permissionIds: roleGrants.map((item) => item.id),
         userCount: userCounts.get(role.id) ?? 0,
+        users: roleUsers,
         isSystem: PROTECTED_SYSTEM_ROLES.has(role.slug)
       };
     });
   }
 
   async getPermissions(): Promise<PermissionSummaryDto[]> {
-    const [rows, roleCounts, menuCounts] = await Promise.all([
+    const [rows, roleLinks, menuRows] = await Promise.all([
       db.select().from(permissions).orderBy(permissions.slug),
-      db.select({ permissionId: rolePermissions.permissionId, total: count() }).from(rolePermissions).groupBy(rolePermissions.permissionId),
-      db.select({ slug: menus.requiredPermission, total: count() }).from(menus).groupBy(menus.requiredPermission)
+      db.select({
+        permissionId: rolePermissions.permissionId,
+        roleId: roles.id,
+        roleName: roles.name,
+        roleSlug: roles.slug
+      })
+        .from(rolePermissions)
+        .innerJoin(roles, eq(rolePermissions.roleId, roles.id))
+        .orderBy(roles.id),
+      db.select({
+        id: menus.id,
+        title: menus.title,
+        url: menus.url,
+        requiredPermission: menus.requiredPermission
+      })
+        .from(menus)
+        .orderBy(menus.sortOrder)
     ]);
-    const rolesByPermission = new Map(roleCounts.map((row) => [row.permissionId, Number(row.total)]));
-    const menusBySlug = new Map(menuCounts.filter((row) => row.slug).map((row) => [row.slug!, Number(row.total)]));
-    return rows.map((permission) => ({
-      id: permission.id,
-      name: permission.name,
-      slug: permission.slug,
-      roleCount: rolesByPermission.get(permission.id) ?? 0,
-      menuCount: menusBySlug.get(permission.slug) ?? 0,
-      isSystem: PROTECTED_SYSTEM_PERMISSIONS.has(permission.slug),
-      createdAt: permission.createdAt.toISOString()
-    }));
+
+    const rolesByPermission = new Map<number, Array<{ id: number; name: string; slug: string }>>();
+    for (const link of roleLinks) {
+      const list = rolesByPermission.get(link.permissionId) ?? [];
+      list.push({ id: link.roleId, name: link.roleName, slug: link.roleSlug });
+      rolesByPermission.set(link.permissionId, list);
+    }
+
+    const menusByPermissionSlug = new Map<string, Array<{ id: number; title: string; url: string | null }>>();
+    for (const menu of menuRows) {
+      if (menu.requiredPermission) {
+        const list = menusByPermissionSlug.get(menu.requiredPermission) ?? [];
+        list.push({ id: menu.id, title: menu.title, url: menu.url });
+        menusByPermissionSlug.set(menu.requiredPermission, list);
+      }
+    }
+
+    return rows.map((permission) => {
+      const linkedRoles = rolesByPermission.get(permission.id) ?? [];
+      const linkedMenus = menusByPermissionSlug.get(permission.slug) ?? [];
+      return {
+        id: permission.id,
+        name: permission.name,
+        slug: permission.slug,
+        roleCount: linkedRoles.length,
+        menuCount: linkedMenus.length,
+        roles: linkedRoles,
+        menus: linkedMenus,
+        isSystem: PROTECTED_SYSTEM_PERMISSIONS.has(permission.slug),
+        createdAt: permission.createdAt.toISOString()
+      };
+    });
   }
+
 
   private async validatePermissions(permissionIds: number[]): Promise<ServiceError | null> {
     if (!permissionIds.length) return null;
@@ -118,6 +184,7 @@ export class RbacService {
       if (permissionIds.length) await tx.insert(rolePermissions).values(permissionIds.map((permissionId) => ({ roleId: newId, permissionId })));
       await tx.insert(auditLogs).values({ actorId, action: "rbac.role.created", resource: "role", resourceId: String(newId) });
     });
+    publishAdminRbacUpdated();
     return (await this.getRoles()).find((role) => role.id === newId)!;
   }
 
@@ -168,6 +235,7 @@ export class RbacService {
       await tx.insert(auditLogs).values({ actorId, action: "rbac.role.updated", resource: "role", resourceId: String(id) });
     });
     await this.notifyRoleUsers(id);
+    publishAdminRbacUpdated();
     return (await this.getRoles()).find((role) => role.id === id)!;
   }
 
@@ -189,6 +257,7 @@ export class RbacService {
       await tx.delete(roles).where(eq(roles.id, id));
       await tx.insert(auditLogs).values({ actorId, action: "rbac.role.deleted", resource: "role", resourceId: String(id) });
     });
+    publishAdminRbacUpdated();
     return { success: true };
   }
 
@@ -209,6 +278,7 @@ export class RbacService {
       newId = Number(inserted.insertId);
       await tx.insert(auditLogs).values({ actorId, action: "rbac.permission.created", resource: "permission", resourceId: String(newId) });
     });
+    publishAdminRbacUpdated();
     return (await this.getPermissions()).find((permission) => permission.id === newId)!;
   }
 
@@ -236,6 +306,7 @@ export class RbacService {
       await tx.insert(auditLogs).values({ actorId, action: "rbac.permission.updated", resource: "permission", resourceId: String(id) });
     });
     for (const roleId of new Set(roleRows.map((row) => row.roleId))) await this.notifyRoleUsers(roleId);
+    publishAdminRbacUpdated();
     return (await this.getPermissions()).find((permission) => permission.id === id)!;
   }
 
@@ -258,6 +329,7 @@ export class RbacService {
       await tx.delete(permissions).where(eq(permissions.id, id));
       await tx.insert(auditLogs).values({ actorId, action: "rbac.permission.deleted", resource: "permission", resourceId: String(id) });
     });
+    publishAdminRbacUpdated();
     return { success: true };
   }
 }

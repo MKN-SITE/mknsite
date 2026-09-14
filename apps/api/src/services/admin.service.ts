@@ -2,7 +2,7 @@ import { and, count, desc, eq, gt, inArray, like, ne, or } from "drizzle-orm";
 import { db } from "../db";
 import { auditLogs, authAccounts, authSessions, authUsers, permissions, rolePermissions, roles, userRoles, users } from "../db/schema";
 import { mapUserSummary, type RoleSummaryDto, type UpdateUserProfileDto, type UserListResponseDto, type UserSummaryDto } from "../schemas/admin.dto";
-import { publishAdminUsersUpdated, publishRealtimeEvent } from "../realtime/hub";
+import { publishAdminDivisionsUpdated, publishAdminRbacUpdated, publishAdminUsersUpdated, publishRealtimeEvent } from "../realtime/hub";
 import { rbacService } from "./rbac.service";
 
 export type GetUsersOptions = {
@@ -299,6 +299,7 @@ export class AdminService {
     });
 
     publishAdminUsersUpdated(targetId);
+    publishAdminRbacUpdated();
 
     return { success: true };
   }
@@ -501,15 +502,28 @@ export class AdminService {
     }
 
     const isCallerSuperadmin = callerPermissions.includes("admin.security.manage");
+    const isSelf = adminId === targetId;
 
-    if (targetUser.accountType === "admin" && !isCallerSuperadmin) {
-      return {
-        error: {
-          status: 403,
-          code: "ADMIN_PROFILE_FORBIDDEN",
-          message: "Profil akun administrator dilindungi dari modifikasi oleh administrator standar."
-        }
-      };
+    if (targetUser.accountType === "admin") {
+      const isModifyingCoreProfile = hasName || hasEmail || hasDivision;
+      if (isModifyingCoreProfile && !isCallerSuperadmin) {
+        return {
+          error: {
+            status: 403,
+            code: "ADMIN_PROFILE_FORBIDDEN",
+            message: "Profil akun administrator dilindungi dari modifikasi oleh administrator standar."
+          }
+        };
+      }
+      if (hasAvatarUrl && !isCallerSuperadmin && !isSelf) {
+        return {
+          error: {
+            status: 403,
+            code: "ADMIN_PROFILE_FORBIDDEN",
+            message: "Foto profil akun administrator lain hanya dapat diubah oleh pemilik akun atau Superadministrator."
+          }
+        };
+      }
     }
 
     const newEmail = hasEmail ? data.email!.trim().toLowerCase() : undefined;
@@ -636,6 +650,7 @@ export class AdminService {
       }
 
       publishAdminUsersUpdated(targetId);
+      publishAdminDivisionsUpdated();
 
       return { success: true, user: updatedUser };
     } catch (error: any) {
@@ -755,6 +770,8 @@ export class AdminService {
     });
 
     publishAdminUsersUpdated(targetId);
+    publishAdminDivisionsUpdated();
+    publishAdminRbacUpdated();
 
     return { success: true };
   }

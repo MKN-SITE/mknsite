@@ -25,6 +25,8 @@ services:
       DATABASE_URL: mysql://mknsite:mknsite-local-only@mysql:3306/mknsite
     ports:
       - "127.0.0.1:3001:3001"
+    volumes:
+      - ./apps/api/uploads:/app/apps/api/uploads
     depends_on:
       init:
         condition: service_completed_successfully
@@ -40,6 +42,7 @@ services:
     working_dir: /app/apps/web
     command: ["bun", "--bun", "next", "dev", "--hostname", "0.0.0.0", "--port", "3000"]
     environment:
+      INTERNAL_API_URL: http://api:3001
       NEXT_PUBLIC_API_URL: http://localhost:3001
       NEXT_TELEMETRY_DISABLED: "1"
     ports:

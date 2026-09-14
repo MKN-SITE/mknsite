@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, type FormEvent } from "react";
-import { api, ApiError } from "@/lib/api";
+import { api, ApiError, type PortalUser } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -9,14 +9,23 @@ import { FormField } from "@/components/ui/form-field";
 import { Modal } from "@/components/ui/modal";
 import { SearchBar } from "@/components/ui/search-bar";
 import { useDivisions, type DivisionSummaryDto } from "../hooks/use-divisions";
+import { DivisionMembersModal } from "./division-members-modal";
+import { clearAllAdminCaches } from "../utils/admin-cache";
 import styles from "./division-manager.module.css";
 
-export function DivisionManager({ canManage = true }: { canManage?: boolean }) {
+export function DivisionManager({
+  canManage = true,
+  currentAdmin
+}: {
+  canManage?: boolean;
+  currentAdmin?: PortalUser | null;
+}) {
   const { divisions, loading, error, refresh } = useDivisions();
 
   const [search, setSearch] = useState("");
   const [editor, setEditor] = useState<{ item?: DivisionSummaryDto } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DivisionSummaryDto | null>(null);
+  const [membersTarget, setMembersTarget] = useState<DivisionSummaryDto | null>(null);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -63,6 +72,7 @@ export function DivisionManager({ canManage = true }: { canManage?: boolean }) {
       }
 
       setEditor(null);
+      clearAllAdminCaches();
       await refresh();
     } catch (err: any) {
       setFormError(err instanceof ApiError ? err.message : "Gagal menyimpan data divisi.");
@@ -83,6 +93,7 @@ export function DivisionManager({ canManage = true }: { canManage?: boolean }) {
       });
       setNotice(`Divisi "${deleteTarget.name}" berhasil dihapus.`);
       setDeleteTarget(null);
+      clearAllAdminCaches();
       await refresh();
     } catch (err: any) {
       setFormError(err instanceof ApiError ? err.message : "Gagal menghapus divisi.");
@@ -181,9 +192,16 @@ export function DivisionManager({ canManage = true }: { canManage?: boolean }) {
                   <div>
                     <div className={styles.itemHead}>
                       <h4 className={styles.itemName}>{div.name}</h4>
-                      <Badge variant={div.userCount > 0 ? "accent" : "neutral"}>
-                        {div.userCount} anggota
-                      </Badge>
+                      <button
+                        type="button"
+                        className={styles.memberBadgeBtn}
+                        onClick={() => setMembersTarget(div)}
+                        title={`Lihat detail ${div.userCount} anggota divisi ${div.name}`}
+                      >
+                        <Badge variant={div.userCount > 0 ? "accent" : "neutral"}>
+                          {div.userCount} anggota
+                        </Badge>
+                      </button>
                     </div>
                     <p className={styles.itemDesc}>
                       {div.description || "Tidak ada keterangan deskripsi."}
@@ -194,36 +212,46 @@ export function DivisionManager({ canManage = true }: { canManage?: boolean }) {
                     <span style={{ fontSize: "11px", color: "var(--ink-soft)" }}>
                       ID: #{div.id}
                     </span>
-                    {canManage && (
-                      <div className={styles.actions}>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => {
-                            setFormError(null);
-                            setEditor({ item: div });
-                          }}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          disabled={div.userCount > 0}
-                          title={
-                            div.userCount > 0
-                              ? `Divisi masih memiliki ${div.userCount} anggota aktif`
-                              : "Hapus divisi ini"
-                          }
-                          onClick={() => {
-                            setFormError(null);
-                            setDeleteTarget(div);
-                          }}
-                        >
-                          Hapus
-                        </Button>
-                      </div>
-                    )}
+                    <div className={styles.actions}>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setMembersTarget(div)}
+                        title="Lihat daftar anggota divisi"
+                      >
+                        Anggota ({div.userCount})
+                      </Button>
+                      {canManage && (
+                        <>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => {
+                              setFormError(null);
+                              setEditor({ item: div });
+                            }}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={div.userCount > 0}
+                            title={
+                              div.userCount > 0
+                                ? `Divisi masih memiliki ${div.userCount} anggota aktif`
+                                : "Hapus divisi ini"
+                            }
+                            onClick={() => {
+                              setFormError(null);
+                              setDeleteTarget(div);
+                            }}
+                          >
+                            Hapus
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </article>
               ))}
@@ -324,6 +352,15 @@ export function DivisionManager({ canManage = true }: { canManage?: boolean }) {
           )}
         </div>
       </Modal>
+
+      {/* Modal Daftar Anggota Divisi */}
+      <DivisionMembersModal
+        open={Boolean(membersTarget)}
+        division={membersTarget}
+        currentAdmin={currentAdmin}
+        onClose={() => setMembersTarget(null)}
+        onUserUpdated={refresh}
+      />
     </section>
   );
 }

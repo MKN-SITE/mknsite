@@ -2,7 +2,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { db } from "../db";
 import { auditLogs, authAccounts, authUsers, permissions, rolePermissions, roles, userRoles, users } from "../db/schema";
 import { CreateUserDto, mapUserSummary, UserSummaryDto } from "../schemas/admin.dto";
-import { publishAdminUsersUpdated } from "../realtime/hub";
+import { publishAdminDivisionsUpdated, publishAdminRbacUpdated, publishAdminUsersUpdated } from "../realtime/hub";
 
 export type ProvisionResult =
   | { success: true; user: UserSummaryDto }
@@ -147,6 +147,8 @@ export class UserProvisioningService {
       });
 
       publishAdminUsersUpdated(createdUser.id);
+      publishAdminDivisionsUpdated();
+      publishAdminRbacUpdated();
 
       return { success: true, user: createdUser };
     } catch (error: any) {

@@ -122,4 +122,51 @@ describe("Division CRUD API", () => {
     expect(errBody.code).toBe("DIVISION_IN_USE");
     expect(errBody.message).toContain("masih digunakan");
   });
+
+  it("mengizinkan admin membaca detail divisi dan daftar anggota divisi", async () => {
+    const cookie = await loginAdmin();
+    const listRes = await req("/admin/divisions", cookie);
+    const body = (await listRes.json()) as { data: any[] };
+
+    // Cari divisi Teknologi Informasi yang punya minimal 1 pengguna
+    const itDiv = body.data.find((d) => d.name === "Teknologi Informasi");
+    expect(itDiv).toBeDefined();
+
+    // 1. GET /admin/divisions/:id
+    const detailRes = await req(`/admin/divisions/${itDiv.id}`, cookie);
+    expect(detailRes.status).toBe(200);
+    const detailBody = (await detailRes.json()) as { data: any };
+    expect(detailBody.data.id).toBe(itDiv.id);
+    expect(detailBody.data.name).toBe("Teknologi Informasi");
+
+    // 2. GET /admin/divisions/:id/members tanpa sesi -> 401
+    const unauthRes = await req(`/admin/divisions/${itDiv.id}/members`);
+    expect(unauthRes.status).toBe(401);
+
+    // 3. GET /admin/divisions/:id/members dengan sesi admin -> 200
+    const membersRes = await req(`/admin/divisions/${itDiv.id}/members`, cookie);
+    expect(membersRes.status).toBe(200);
+    const membersBody = (await membersRes.json()) as { data: any[]; division: any; total: number };
+    expect(Array.isArray(membersBody.data)).toBe(true);
+    expect(membersBody.division.id).toBe(itDiv.id);
+    expect(membersBody.total).toBeGreaterThanOrEqual(1);
+
+    // Verifikasi data anggota memiliki field penting
+    const member = membersBody.data.find((u) => u.email === "admin@mknsite.online");
+    expect(member).toBeDefined();
+    expect(member.name).toBe("System Administrator");
+    expect(Array.isArray(member.roles)).toBe(true);
+    expect(typeof member.isActive).toBe("boolean");
+
+    // 4. GET /admin/divisions/:id/members dengan search query
+    const searchRes = await req(`/admin/divisions/${itDiv.id}/members?search=System`, cookie);
+    expect(searchRes.status).toBe(200);
+    const searchBody = (await searchRes.json()) as { data: any[] };
+    expect(searchBody.data.some((u) => u.email === "admin@mknsite.online")).toBe(true);
+
+    // 5. GET /admin/divisions/999999/members -> 404
+    const notFoundRes = await req("/admin/divisions/999999/members", cookie);
+    expect(notFoundRes.status).toBe(404);
+  });
 });
+

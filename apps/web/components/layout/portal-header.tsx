@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useId, useRef, useState } from "react";
 import mknLogo from "@/public/assets/Logo MKN.png";
 import { Button } from "@/components/ui/button";
+import { getAvatarUrl } from "@/lib/api";
 import styles from "./portal-header.module.css";
 
 export type PortalHeaderProps = {
@@ -33,6 +34,7 @@ export function PortalHeader({
   loggingOut
 }: PortalHeaderProps) {
   const [open, setOpen] = useState(false);
+  const [avatarImgError, setAvatarImgError] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   const panelId = useId();
 
@@ -81,8 +83,13 @@ export function PortalHeader({
               onClick={() => setOpen(!open)}
             >
               <span className={styles.avatar} aria-hidden="true">
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt="" className={styles.avatarImg} />
+                {avatarUrl && !avatarImgError ? (
+                  <img
+                    src={getAvatarUrl(avatarUrl)}
+                    alt=""
+                    className={styles.avatarImg}
+                    onError={() => setAvatarImgError(true)}
+                  />
                 ) : (
                   name.charAt(0).toUpperCase()
                 )}

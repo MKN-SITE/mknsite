@@ -91,6 +91,27 @@
   gap: 12px;
 }
 
+.memberBadgeBtn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--radius-pill, 9999px);
+  transition: transform 120ms ease, opacity 120ms ease;
+  line-height: 1;
+}
+
+.memberBadgeBtn:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+.memberBadgeBtn:focus-visible {
+  outline: 2px solid var(--accent, #0879b8);
+  outline-offset: 2px;
+}
+
+
 .itemName {
   margin: 0 0 6px;
   color: var(--ink, #102334);
