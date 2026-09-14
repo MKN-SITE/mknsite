@@ -4,10 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { api, type PortalUser } from "@/lib/api";
+import { api, getAvatarUrl, type PortalUser } from "@/lib/api";
 import { useRoles, type RoleSummaryDto } from "../hooks/use-roles";
 import { useDivisions } from "../hooks/use-divisions";
 import type { UserSummaryDto } from "../hooks/use-users";
+import { clearAllAdminCaches } from "../utils/admin-cache";
 import styles from "./user-detail-modal.module.css";
 
 export type UserDetailModalProps = {
@@ -28,7 +29,7 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
   const [topError, setTopError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (currentAdmin !== undefined) {
+    if (currentAdmin) {
       setCallerAdmin(currentAdmin);
     } else if (open) {
       api<{ user: PortalUser }>("/auth/admin/me")
@@ -50,6 +51,8 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [avatarImgError, setAvatarImgError] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
 
   // Section 2: Roles edit states
   const [editingRoles, setEditingRoles] = useState(false);
@@ -87,6 +90,7 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
       setProfileError(null);
       setProfileSuccess(null);
       setAvatarError(null);
+      setAvatarImgError(false);
       setEditingRoles(false);
       setRolesError(null);
       setRolesSuccess(null);
@@ -146,6 +150,7 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
   const isProtectedFromCaller = isTargetSuperadmin && !isCallerSuperadmin;
   const isSelf = Boolean(callerAdmin?.id && currentUser?.id === callerAdmin.id);
   const canEditProfile = !isAdminAccount || (isCallerSuperadmin && !isProtectedFromCaller);
+  const canEditAvatar = isSelf || isCallerSuperadmin || (!isAdminAccount && !isProtectedFromCaller);
 
   if (!currentUser && !loadingUser) return null;
 
@@ -220,6 +225,7 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
       setCurrentUser(res.user);
       setEditingProfile(false);
       setProfileSuccess("Profil pengguna berhasil diperbarui.");
+      clearAllAdminCaches();
       onUpdated?.();
       setTimeout(() => setProfileSuccess(null), 3500);
     } catch (err: any) {
@@ -243,7 +249,7 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
       };
       img.onload = () => {
         const canvas = document.createElement("canvas");
-        const maxDim = 400;
+        const maxDim = 800;
         let width = img.width;
         let height = img.height;
         if (width > height) {
@@ -264,7 +270,7 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
         canvas.toBlob(
           (blob) => resolve(blob || file),
           "image/webp",
-          0.85
+          0.88
         );
       };
       img.onerror = () => resolve(file);
@@ -300,7 +306,10 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
         body: formData
       });
 
-      setCurrentUser((prev) => (prev ? { ...prev, avatarUrl: res.data.avatarUrl } : prev));
+      const nextAvatar = res.data?.avatarUrl ?? null;
+      setCurrentUser((prev) => (prev ? { ...prev, avatarUrl: nextAvatar } : prev));
+      setAvatarImgError(false);
+      clearAllAdminCaches();
       onUpdated?.();
     } catch (err: any) {
       setAvatarError(err?.message ?? "Gagal mengunggah foto profil.");
@@ -320,6 +329,8 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
         method: "DELETE"
       });
       setCurrentUser((prev) => (prev ? { ...prev, avatarUrl: null } : prev));
+      setAvatarImgError(false);
+      clearAllAdminCaches();
       onUpdated?.();
     } catch (err: any) {
       setAvatarError(err?.message ?? "Gagal menghapus foto profil.");
@@ -338,6 +349,7 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
       await api(`/admin/users/${currentUser.id}`, {
         method: "DELETE"
       });
+      clearAllAdminCaches();
       onClose();
       onUpdated?.();
     } catch (err: any) {
@@ -365,6 +377,7 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
       setCurrentUser(res.data);
       setEditingRoles(false);
       setRolesSuccess("Role pengguna berhasil diperbarui.");
+      clearAllAdminCaches();
       onUpdated?.();
     } catch (err: any) {
       setRolesError(err?.message ?? "Gagal memperbarui role.");
@@ -388,6 +401,7 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
 
       setCurrentUser((prev) => (prev ? { ...prev, isActive: nextStatus } : prev));
       setConfirmingStatus(false);
+      clearAllAdminCaches();
       onUpdated?.();
     } catch (err: any) {
       setStatusError(err?.message ?? "Gagal mengubah status pengguna.");
@@ -485,9 +499,49 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
           {/* User Profile Header Card */}
           <div className={styles.profileHeaderCard}>
             <div className={styles.avatarWrapper}>
-              <div className={styles.avatarContainer}>
-                {currentUser?.avatarUrl ? (
-                  <img src={currentUser.avatarUrl} alt="" className={styles.avatarImage} />
+              <div
+                className={`${styles.avatarContainer} ${
+                  currentUser?.avatarUrl && !avatarImgError ? styles.avatarContainerWithImg : ""
+                } ${currentUser?.avatarUrl && !avatarImgError ? styles.avatarContainerClickable : ""}`}
+                onClick={() => {
+                  if (currentUser?.avatarUrl && !avatarImgError) {
+                    setShowPhotoModal(true);
+                  }
+                }}
+                role={currentUser?.avatarUrl && !avatarImgError ? "button" : undefined}
+                tabIndex={currentUser?.avatarUrl && !avatarImgError ? 0 : undefined}
+                title={currentUser?.avatarUrl && !avatarImgError ? "Klik untuk melihat foto ukuran penuh" : undefined}
+                onKeyDown={(e) => {
+                  if ((e.key === "Enter" || e.key === " ") && currentUser?.avatarUrl && !avatarImgError) {
+                    e.preventDefault();
+                    setShowPhotoModal(true);
+                  }
+                }}
+              >
+                {currentUser?.avatarUrl && !avatarImgError ? (
+                  <>
+                    <img
+                      src={getAvatarUrl(currentUser.avatarUrl)}
+                      alt={currentUser.name}
+                      className={styles.avatarImage}
+                      onError={() => setAvatarImgError(true)}
+                    />
+                    <div className={styles.avatarOverlay} aria-hidden="true">
+                      <svg
+                        className={styles.avatarOverlayIcon}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      <span>Lihat</span>
+                    </div>
+                  </>
                 ) : (
                   currentUser?.name?.charAt(0).toUpperCase() || "?"
                 )}
@@ -531,35 +585,47 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
               </div>
 
               <div className={styles.avatarControls} style={{ marginTop: "6px" }}>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  style={{ display: "none" }}
-                  accept="image/png,image/jpeg,image/webp"
-                  onChange={handleUploadAvatar}
-                  disabled={uploadingAvatar}
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                  loading={uploadingAvatar}
-                  loadingText="Mengunggah..."
-                >
-                  {currentUser?.avatarUrl ? "Ganti Foto" : "Unggah Foto"}
-                </Button>
-                {currentUser?.avatarUrl && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleDeleteAvatar}
-                    disabled={uploadingAvatar}
-                  >
-                    Hapus Foto
-                  </Button>
+                {canEditAvatar && (
+                  <>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      style={{ display: "none" }}
+                      accept="image/png,image/jpeg,image/webp"
+                      onChange={handleUploadAvatar}
+                      disabled={uploadingAvatar}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      loading={uploadingAvatar}
+                      loadingText="Mengunggah..."
+                    >
+                      {currentUser?.avatarUrl ? "Ganti Foto" : "Unggah Foto"}
+                    </Button>
+                    {currentUser?.avatarUrl && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleDeleteAvatar}
+                        disabled={uploadingAvatar}
+                      >
+                        Hapus Foto
+                      </Button>
+                    )}
+                    <span className={styles.avatarHint}>Maks 5MB (WebP/JPG/PNG)</span>
+                  </>
                 )}
-                <span className={styles.avatarHint}>Maks 5MB (WebP/JPG/PNG)</span>
               </div>
+
+              {!canEditAvatar && (
+                <div style={{ marginTop: "4px" }}>
+                  <span className={styles.avatarHint}>
+                    Foto akun administrator lain hanya dapat dikelola oleh pemilik akun atau Superadministrator.
+                  </span>
+                </div>
+              )}
               {avatarError && (
                 <span className={styles.alertDanger} style={{ fontSize: "11px", padding: "4px 8px", borderRadius: "6px", width: "fit-content" }}>
                   {avatarError}
@@ -1029,6 +1095,41 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
           )}
         </section>
       </div>
+
+      {/* Lightbox Modal: Lihat Foto Penuh */}
+      {currentUser?.avatarUrl && !avatarImgError && (
+        <Modal
+          open={showPhotoModal}
+          onClose={() => setShowPhotoModal(false)}
+          title={`Foto Profil — ${currentUser.name}`}
+          size="md"
+          footer={
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+              <a
+                href={getAvatarUrl(currentUser.avatarUrl)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.openExternalLink}
+              >
+                Buka di Tab Baru ↗
+              </a>
+              <Button variant="secondary" size="md" onClick={() => setShowPhotoModal(false)}>
+                Tutup
+              </Button>
+            </div>
+          }
+        >
+          <div className={styles.photoPreviewBody}>
+            <div className={styles.photoPreviewContainer}>
+              <img
+                src={getAvatarUrl(currentUser.avatarUrl)}
+                alt={currentUser.name}
+                className={styles.photoPreviewImage}
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
     </Modal>
   );
 }

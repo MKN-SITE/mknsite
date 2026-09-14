@@ -1222,6 +1222,81 @@ describe("Admin API", () => {
     expect(delUserRes.status).toBe(200);
   });
 
+  it("mengizinkan administrator mengunggah dan menghapus avatar akunnya sendiri", async () => {
+    const adminLogin = await app.handle(
+      new Request("http://localhost/auth/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Origin: "http://localhost:3000" },
+        body: JSON.stringify({ email: "admin@mknsite.online", password: "admin12345" })
+      })
+    );
+    const adminCookie = adminLogin.headers.get("set-cookie") ?? "";
+    const meRes = await app.handle(new Request("http://localhost/auth/admin/me", { headers: { Cookie: adminCookie } }));
+    const myId = ((await meRes.json()) as any).user.id;
+
+    // Upload avatar sendiri
+    const uploadRes = await app.handle(
+      new Request(`http://localhost/admin/users/${myId}/avatar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
+        body: JSON.stringify({
+          dataUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+        })
+      })
+    );
+    expect(uploadRes.status).toBe(200);
+    const uploadBody = (await uploadRes.json()) as any;
+    expect(uploadBody.data.avatarUrl).toContain("/uploads/avatars/");
+
+    // Delete avatar sendiri
+    const delRes = await app.handle(
+      new Request(`http://localhost/admin/users/${myId}/avatar`, {
+        method: "DELETE",
+        headers: { Origin: "http://localhost:3000", Cookie: adminCookie }
+      })
+    );
+    expect(delRes.status).toBe(200);
+    const delBody = (await delRes.json()) as any;
+    expect(delBody.data.avatarUrl).toBeNull();
+  });
+
+  it("menolak administrator standar mengunggah avatar milik administrator lain (403)", async () => {
+    const adminLogin = await app.handle(
+      new Request("http://localhost/auth/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Origin: "http://localhost:3000" },
+        body: JSON.stringify({ email: "admin@mknsite.online", password: "admin12345" })
+      })
+    );
+    const adminCookie = adminLogin.headers.get("set-cookie") ?? "";
+
+    // Cari superadmin ID
+    const superadminLogin = await app.handle(
+      new Request("http://localhost/auth/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Origin: "http://localhost:3000" },
+        body: JSON.stringify({ email: "superadmin@mknsite.online", password: "superadmin12345" })
+      })
+    );
+    const superadminCookie = superadminLogin.headers.get("set-cookie") ?? "";
+    const superadminMeRes = await app.handle(new Request("http://localhost/auth/admin/me", { headers: { Cookie: superadminCookie } }));
+    const superadminId = ((await superadminMeRes.json()) as any).user.id;
+
+    // Standard admin mencoba upload avatar ke superadmin -> 403
+    const uploadRes = await app.handle(
+      new Request(`http://localhost/admin/users/${superadminId}/avatar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
+        body: JSON.stringify({
+          dataUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+        })
+      })
+    );
+    expect(uploadRes.status).toBe(403);
+    const body = (await uploadRes.json()) as any;
+    expect(body.code).toBe("ADMIN_PROFILE_FORBIDDEN");
+  });
+
   it("DELETE /admin/users/:id menolak penghapusan diri sendiri dan ID tidak ditemukan", async () => {
     const adminLogin = await app.handle(
       new Request("http://localhost/auth/admin/login", {

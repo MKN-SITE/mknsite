@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api";
+import { connectRealtime } from "@/lib/sse";
+import type { UserSummaryDto } from "./use-users";
 
 export type DivisionSummaryDto = {
   id: number;
@@ -14,8 +16,24 @@ export type DivisionListResponseDto = {
   data: DivisionSummaryDto[];
 };
 
+export type DivisionMembersResponseDto = {
+  data: UserSummaryDto[];
+  division: DivisionSummaryDto;
+  total: number;
+};
+
+export async function fetchDivisionMembers(divisionId: number, search?: string): Promise<DivisionMembersResponseDto> {
+  const query = search ? `?search=${encodeURIComponent(search)}` : "";
+  return api<DivisionMembersResponseDto>(`/admin/divisions/${divisionId}/members${query}`);
+}
+
 let cachedDivisions: DivisionSummaryDto[] | null = null;
 let inFlightRequest: Promise<DivisionSummaryDto[]> | null = null;
+
+export function clearDivisionCache() {
+  cachedDivisions = null;
+  inFlightRequest = null;
+}
 
 export function useDivisions() {
   const [divisions, setDivisions] = useState<DivisionSummaryDto[]>(() => cachedDivisions ?? []);
@@ -23,13 +41,12 @@ export function useDivisions() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchDivisions = useCallback(async (force = false) => {
-    if (!force && cachedDivisions !== null) {
-      setDivisions(cachedDivisions);
-      setLoading(false);
-      return;
+    // Stale-while-revalidate: only show blocking loading skeleton if there is no cached data
+    if (cachedDivisions === null || force) {
+      if (!cachedDivisions) {
+        setLoading(true);
+      }
     }
-
-    setLoading(true);
     setError(null);
 
     try {
@@ -56,7 +73,24 @@ export function useDivisions() {
   }, []);
 
   useEffect(() => {
-    fetchDivisions();
+    // Always fetch fresh data on mount (revalidate in background)
+    void fetchDivisions(true);
+
+    // Realtime live update: listen to user and division changes
+    const disconnect = connectRealtime("admin", {
+      onAdminUsersUpdated: () => {
+        clearDivisionCache();
+        void fetchDivisions(true);
+      },
+      onAdminDivisionsUpdated: () => {
+        clearDivisionCache();
+        void fetchDivisions(true);
+      }
+    });
+
+    return () => {
+      disconnect();
+    };
   }, [fetchDivisions]);
 
   const refresh = useCallback(() => fetchDivisions(true), [fetchDivisions]);

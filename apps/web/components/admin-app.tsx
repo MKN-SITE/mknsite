@@ -186,8 +186,12 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
                   </div>
                   {view === "users" && <UserList currentAdmin={admin} />}
                   {view === "divisions" && (
-                    <DivisionManager canManage={admin.permissions.includes("admin.manage")} />
+                    <DivisionManager
+                      canManage={admin.permissions.includes("admin.manage")}
+                      currentAdmin={admin}
+                    />
                   )}
+
                   {(view === "roles" || view === "permissions") && (
                     <RolePermissionViewer
                       key={view}

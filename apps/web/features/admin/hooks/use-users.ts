@@ -72,13 +72,6 @@ export function useUsers({
 
   const fetchUsers = useCallback(async (force = false) => {
     const cached = cachedUsersMap.get(cacheKey);
-    if (!force && cached) {
-      setData(cached.data);
-      setPagination(cached.pagination);
-      setLoading(false);
-      return;
-    }
-
     if (!cached) {
       setLoading(true);
     }
@@ -105,7 +98,7 @@ export function useUsers({
   }, [cacheKey, page, pageSize, search, status, accountType, division]);
 
   useEffect(() => {
-    fetchUsers();
+    void fetchUsers(true);
   }, [fetchUsers]);
 
   return {

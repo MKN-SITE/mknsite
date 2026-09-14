@@ -37,14 +37,40 @@ export type UserDetailResponseDto = {
   data: UserSummaryDto;
 };
 
+export type RolePermissionDetailDto = {
+  id: number;
+  name: string;
+  slug: string;
+};
+
+export type RoleUserRefDto = {
+  id: number;
+  name: string;
+  email: string;
+};
+
 export type RoleSummaryDto = {
   id: number;
   name: string;
   slug: string;
   permissions: string[];
+  permissionDetails?: RolePermissionDetailDto[];
   permissionIds: number[];
   userCount: number;
+  users?: RoleUserRefDto[];
   isSystem: boolean;
+};
+
+export type PermissionRoleRefDto = {
+  id: number;
+  name: string;
+  slug: string;
+};
+
+export type PermissionMenuRefDto = {
+  id: number;
+  title: string;
+  url: string | null;
 };
 
 export type PermissionSummaryDto = {
@@ -54,12 +80,19 @@ export type PermissionSummaryDto = {
   roleCount: number;
   menuCount: number;
   isSystem: boolean;
+  roles?: PermissionRoleRefDto[];
+  menus?: PermissionMenuRefDto[];
   createdAt: string;
 };
 
 export type RoleListResponseDto = {
   data: RoleSummaryDto[];
 };
+
+export type PermissionListResponseDto = {
+  data: PermissionSummaryDto[];
+};
+
 
 export const UserRoleSchema = t.Object({
   id: t.Integer({ description: "ID role" }),
@@ -98,19 +131,62 @@ export const UserDetailResponseSchema = t.Object({
   data: UserSummarySchema
 });
 
+export const RolePermissionDetailSchema = t.Object({
+  id: t.Integer({ description: "ID permission" }),
+  name: t.String({ description: "Nama tampilan permission" }),
+  slug: t.String({ description: "Slug permission" })
+});
+
+export const RoleUserRefSchema = t.Object({
+  id: t.Integer({ description: "ID pengguna" }),
+  name: t.String({ description: "Nama pengguna" }),
+  email: t.String({ description: "Email pengguna" })
+});
+
 export const RoleSummarySchema = t.Object({
   id: t.Integer({ description: "ID role" }),
   name: t.String({ description: "Nama role" }),
   slug: t.String({ description: "Slug role" }),
   permissions: t.Array(t.String(), { description: "Daftar slug izin akses (permissions) yang dimiliki role" }),
+  permissionDetails: t.Optional(t.Array(RolePermissionDetailSchema, { description: "Daftar objek detail izin yang dimiliki role" })),
   permissionIds: t.Array(t.Integer(), { description: "Daftar ID permission yang dimiliki role" }),
   userCount: t.Integer({ description: "Jumlah pengguna yang memakai role" }),
+  users: t.Optional(t.Array(RoleUserRefSchema, { description: "Daftar pengguna yang memiliki role ini" })),
   isSystem: t.Boolean({ description: "Role bawaan yang tidak dapat dihapus atau diubah slug-nya" })
 });
 
 export const RoleListResponseSchema = t.Object({
   data: t.Array(RoleSummarySchema, { description: "Daftar seluruh role beserta izin aksesnya" })
 });
+
+export const PermissionRoleRefSchema = t.Object({
+  id: t.Integer({ description: "ID role" }),
+  name: t.String({ description: "Nama role" }),
+  slug: t.String({ description: "Slug role" })
+});
+
+export const PermissionMenuRefSchema = t.Object({
+  id: t.Integer({ description: "ID menu" }),
+  title: t.String({ description: "Judul menu" }),
+  url: t.Optional(t.Nullable(t.String({ description: "URL route menu" })))
+});
+
+export const PermissionSummarySchema = t.Object({
+  id: t.Integer({ description: "ID permission" }),
+  name: t.String({ description: "Nama tampilan permission" }),
+  slug: t.String({ description: "Slug permission" }),
+  roleCount: t.Integer({ description: "Jumlah role yang menggunakan permission ini" }),
+  menuCount: t.Integer({ description: "Jumlah menu yang mensyaratkan permission ini" }),
+  isSystem: t.Boolean({ description: "Permission bawaan inti sistem yang dilindungi" }),
+  roles: t.Optional(t.Array(PermissionRoleRefSchema, { description: "Daftar role yang menggunakan permission ini" })),
+  menus: t.Optional(t.Array(PermissionMenuRefSchema, { description: "Daftar menu yang mensyaratkan permission ini" })),
+  createdAt: t.String({ description: "Waktu pembuatan dalam format ISO 8601" })
+});
+
+export const PermissionListResponseSchema = t.Object({
+  data: t.Array(PermissionSummarySchema, { description: "Daftar seluruh izin akses" })
+});
+
 
 const roleSlugSchema = t.String({
   minLength: 2,

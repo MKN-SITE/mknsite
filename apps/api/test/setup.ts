@@ -8,12 +8,7 @@ export { app };
 
 const OFFICIAL_EMAILS = [
   "admin@mknsite.online",
-  "superadmin@mknsite.online",
-  "hr@mknsite.online",
-  "telco@mknsite.online",
-  "workshop@mknsite.online",
-  "project@mknsite.online",
-  "manager@mknsite.online"
+  "superadmin@mknsite.online"
 ];
 
 export async function cleanTestUsers() {

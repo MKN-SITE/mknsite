@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { SearchBar } from "@/components/ui/search-bar";
 import { connectRealtime } from "@/lib/sse";
-import type { PortalUser } from "@/lib/api";
+import { getAvatarUrl, type PortalUser } from "@/lib/api";
 import { useUsers, type UserSummaryDto } from "../hooks/use-users";
 import { CreateUserModal } from "./create-user-modal";
 import { UserDetailModal } from "./user-detail-modal";
@@ -72,7 +72,14 @@ export function UserList({ currentAdmin }: { currentAdmin?: PortalUser | null } 
         <div className={styles.nameCell}>
           <span className={styles.avatar} aria-hidden="true" style={{ position: "relative" }}>
             {row.avatarUrl ? (
-              <img src={row.avatarUrl} alt="" className={styles.avatarImg} />
+              <img
+                src={getAvatarUrl(row.avatarUrl)}
+                alt=""
+                className={styles.avatarImg}
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
             ) : (
               row.name.charAt(0).toUpperCase()
             )}

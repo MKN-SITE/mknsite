@@ -36,6 +36,42 @@ export const divisionRoutes = new Elysia({ prefix: "/admin/divisions" })
       return status(500, { code: "INTERNAL_ERROR", message: err?.message ?? "Gagal memuat divisi." });
     }
   }, { detail: detail("getAdminDivisions", "Daftar divisi organisasi") })
+  .get("/:id", async ({ request, params, status }) => {
+    const auth = await authorizeAdmin(request);
+    if (!auth.success) return status(auth.failure.status, auth.failure.error);
+
+    try {
+      const data = await divisionService.getDivisionById(Number(params.id));
+      return { data };
+    } catch (err: any) {
+      if (err instanceof DivisionServiceError) {
+        return status(err.statusCode, { code: err.code, message: err.message });
+      }
+      return status(500, { code: "INTERNAL_ERROR", message: err?.message ?? "Gagal memuat detail divisi." });
+    }
+  }, { params: idParams, detail: detail("getAdminDivisionById", "Detail divisi organisasi") })
+  .get("/:id/members", async ({ request, params, query, status }) => {
+    const auth = await authorizeAdmin(request);
+    if (!auth.success) return status(auth.failure.status, auth.failure.error);
+
+    try {
+      const result = await divisionService.getDivisionMembers(Number(params.id), {
+        search: query?.search
+      });
+      return { data: result.members, division: result.division, total: result.total };
+    } catch (err: any) {
+      if (err instanceof DivisionServiceError) {
+        return status(err.statusCode, { code: err.code, message: err.message });
+      }
+      return status(500, { code: "INTERNAL_ERROR", message: err?.message ?? "Gagal memuat anggota divisi." });
+    }
+  }, {
+    params: idParams,
+    query: t.Optional(t.Object({
+      search: t.Optional(t.String({ maxLength: 100, description: "Pencarian nama atau email anggota" }))
+    })),
+    detail: detail("getAdminDivisionMembers", "Daftar anggota divisi organisasi")
+  })
   .post("/", async ({ request, body, status }) => {
     const auth = await authorizeAdmin(request);
     if (!auth.success) return status(auth.failure.status, auth.failure.error);
