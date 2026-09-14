@@ -6,6 +6,9 @@ export type RoleSummaryDto = {
   name: string;
   slug: string;
   permissions: string[];
+  permissionIds: number[];
+  userCount: number;
+  isSystem: boolean;
 };
 
 export type RoleListResponseDto = {
@@ -32,7 +35,7 @@ export function useRoles() {
 
     try {
       if (!inFlightRequest || force) {
-        inFlightRequest = api<RoleListResponseDto>("/admin/roles")
+        inFlightRequest = api<RoleListResponseDto>("/admin/rbac/roles")
           .then((res) => {
             cachedRoles = res.data;
             inFlightRequest = null;

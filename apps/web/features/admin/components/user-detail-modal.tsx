@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { api, type PortalUser } from "@/lib/api";
 import { useRoles, type RoleSummaryDto } from "../hooks/use-roles";
+import { useDivisions } from "../hooks/use-divisions";
 import type { UserSummaryDto } from "../hooks/use-users";
 import styles from "./user-detail-modal.module.css";
 
@@ -19,6 +20,7 @@ export type UserDetailModalProps = {
 
 export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }: UserDetailModalProps) {
   const { roles: allRoles, loading: loadingRoles } = useRoles();
+  const { divisions } = useDivisions();
 
   const [currentUser, setCurrentUser] = useState<UserSummaryDto | null>(user);
   const [callerAdmin, setCallerAdmin] = useState<PortalUser | null>(currentAdmin ?? null);
@@ -35,16 +37,19 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
     }
   }, [open, currentAdmin]);
 
-  // Section 1: Profil edit states
-  const [editingName, setEditingName] = useState(false);
-  const [tempName, setTempName] = useState("");
-  const [savingName, setSavingName] = useState(false);
-  const [nameError, setNameError] = useState<string | null>(null);
+  // Section 1: Unified Profile edit states
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [formName, setFormName] = useState("");
+  const [formEmail, setFormEmail] = useState("");
+  const [formDivision, setFormDivision] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [profileSuccess, setProfileSuccess] = useState<string | null>(null);
 
-  const [editingEmail, setEditingEmail] = useState(false);
-  const [tempEmail, setTempEmail] = useState("");
-  const [savingEmail, setSavingEmail] = useState(false);
-  const [emailError, setEmailError] = useState<string | null>(null);
+  // Avatar upload states
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
 
   // Section 2: Roles edit states
   const [editingRoles, setEditingRoles] = useState(false);
@@ -63,19 +68,25 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
   const [revokeSuccess, setRevokeSuccess] = useState<string | null>(null);
   const [revokeError, setRevokeError] = useState<string | null>(null);
 
+  // Section 3: Delete user states
+  const [confirmingDeleteUser, setConfirmingDeleteUser] = useState(false);
+  const [deletingUser, setDeletingUser] = useState(false);
+  const [deleteUserError, setDeleteUserError] = useState<string | null>(null);
+
   // Sync state when modal opens or user prop changes
   useEffect(() => {
     if (open && user) {
       setCurrentUser(user);
-      setTempName(user.name);
-      setTempEmail(user.email);
+      setFormName(user.name);
+      setFormEmail(user.email);
+      setFormDivision(user.division ?? "");
       setSelectedRoleIds(user.roles.map((r) => r.id));
 
       // Reset internal edit states
-      setEditingName(false);
-      setNameError(null);
-      setEditingEmail(false);
-      setEmailError(null);
+      setEditingProfile(false);
+      setProfileError(null);
+      setProfileSuccess(null);
+      setAvatarError(null);
       setEditingRoles(false);
       setRolesError(null);
       setRolesSuccess(null);
@@ -84,6 +95,8 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
       setConfirmingRevoke(false);
       setRevokeSuccess(null);
       setRevokeError(null);
+      setConfirmingDeleteUser(false);
+      setDeleteUserError(null);
       setTopError(null);
 
       // Fetch fresh detail from GET /admin/users/:id
@@ -91,8 +104,9 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
       api<{ data: UserSummaryDto }>(`/admin/users/${user.id}`)
         .then((res) => {
           setCurrentUser(res.data);
-          setTempName(res.data.name);
-          setTempEmail(res.data.email);
+          setFormName(res.data.name);
+          setFormEmail(res.data.email);
+          setFormDivision(res.data.division ?? "");
           setSelectedRoleIds(res.data.roles.map((r) => r.id));
         })
         .catch((err: any) => {
@@ -130,74 +144,206 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
   }, [currentUser, aggregatedPermissions]);
 
   const isProtectedFromCaller = isTargetSuperadmin && !isCallerSuperadmin;
+  const isSelf = Boolean(callerAdmin?.id && currentUser?.id === callerAdmin.id);
+  const canEditProfile = !isAdminAccount || (isCallerSuperadmin && !isProtectedFromCaller);
 
   if (!currentUser && !loadingUser) return null;
 
-  // Handle Save Name
-  const handleSaveName = async () => {
-    if (!currentUser) return;
-    const trimmed = tempName.trim();
-    if (!trimmed) {
-      setNameError("Nama tidak boleh kosong.");
+  // Unified Profile Edit Handlers
+  const handleStartEditProfile = () => {
+    setFormName(currentUser?.name ?? "");
+    setFormEmail(currentUser?.email ?? "");
+    setFormDivision(currentUser?.division ?? "");
+    setProfileError(null);
+    setProfileSuccess(null);
+    setEditingProfile(true);
+  };
+
+  const handleCancelEditProfile = () => {
+    setEditingProfile(false);
+    setProfileError(null);
+    setFormName(currentUser?.name ?? "");
+    setFormEmail(currentUser?.email ?? "");
+    setFormDivision(currentUser?.division ?? "");
+  };
+
+  const handleSaveProfile = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!currentUser || savingProfile) return;
+
+    const trimmedName = formName.trim();
+    const trimmedEmail = formEmail.trim().toLowerCase();
+    const trimmedDivision = formDivision.trim();
+
+    if (!trimmedName) {
+      setProfileError("Nama lengkap tidak boleh kosong.");
       return;
     }
-    if (trimmed.length > 160) {
-      setNameError("Nama maksimal 160 karakter.");
+    if (trimmedName.length > 160) {
+      setProfileError("Nama lengkap maksimal 160 karakter.");
       return;
     }
 
-    setSavingName(true);
-    setNameError(null);
+    if (!trimmedEmail) {
+      setProfileError("Alamat email tidak boleh kosong.");
+      return;
+    }
+    if (trimmedEmail.length > 191) {
+      setProfileError("Alamat email maksimal 191 karakter.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setProfileError("Format alamat email tidak valid.");
+      return;
+    }
+
+    setSavingProfile(true);
+    setProfileError(null);
+    setProfileSuccess(null);
+
     try {
-      const res = await api<{ data: UserSummaryDto }>(`/admin/users/${currentUser.id}`, {
+      const payload: Record<string, any> = {};
+      if (trimmedName !== currentUser.name) payload.name = trimmedName;
+      if (trimmedEmail !== currentUser.email) payload.email = trimmedEmail;
+      if (trimmedDivision !== (currentUser.division ?? "")) payload.division = trimmedDivision || null;
+
+      if (Object.keys(payload).length === 0) {
+        setEditingProfile(false);
+        return;
+      }
+
+      const res = await api<{ user: UserSummaryDto }>(`/admin/users/${currentUser.id}/profile`, {
         method: "PATCH",
-        body: JSON.stringify({ name: trimmed })
+        body: JSON.stringify(payload)
       });
-      setCurrentUser(res.data);
-      setEditingName(false);
+
+      setCurrentUser(res.user);
+      setEditingProfile(false);
+      setProfileSuccess("Profil pengguna berhasil diperbarui.");
       onUpdated?.();
+      setTimeout(() => setProfileSuccess(null), 3500);
     } catch (err: any) {
-      setNameError(err?.message ?? "Gagal menyimpan nama.");
+      if (err?.status === 409) {
+        setProfileError("Alamat email sudah digunakan oleh akun lain.");
+      } else {
+        setProfileError(err?.message ?? "Gagal memperbarui profil pengguna.");
+      }
     } finally {
-      setSavingName(false);
+      setSavingProfile(false);
     }
   };
 
-  // Handle Save Email
-  const handleSaveEmail = async () => {
-    if (!currentUser) return;
-    const trimmed = tempEmail.trim().toLowerCase();
-    if (!trimmed) {
-      setEmailError("Email tidak boleh kosong.");
-      return;
-    }
-    if (trimmed.length > 191) {
-      setEmailError("Email maksimal 191 karakter.");
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-      setEmailError("Format email tidak valid.");
+  // Helper compress image to WebP client-side
+  const compressImage = async (file: File): Promise<Blob> => {
+    return new Promise((resolve) => {
+      const img = document.createElement("img");
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        img.src = e.target?.result as string;
+      };
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const maxDim = 400;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => resolve(blob || file),
+          "image/webp",
+          0.85
+        );
+      };
+      img.onerror = () => resolve(file);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Handle Upload Avatar
+  const handleUploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !currentUser) return;
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setAvatarError("Format gambar harus berupa PNG, JPEG, atau WebP.");
       return;
     }
 
-    setSavingEmail(true);
-    setEmailError(null);
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError("Ukuran file gambar maksimal 5 MB.");
+      return;
+    }
+
+    setUploadingAvatar(true);
+    setAvatarError(null);
+
     try {
-      const res = await api<{ data: UserSummaryDto }>(`/admin/users/${currentUser.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ email: trimmed })
+      const compressedBlob = await compressImage(file);
+      const formData = new FormData();
+      formData.append("avatar", compressedBlob, "avatar.webp");
+
+      const res = await api<{ data: { avatarUrl: string } }>(`/admin/users/${currentUser.id}/avatar`, {
+        method: "POST",
+        body: formData
       });
-      setCurrentUser(res.data);
-      setEditingEmail(false);
+
+      setCurrentUser((prev) => (prev ? { ...prev, avatarUrl: res.data.avatarUrl } : prev));
       onUpdated?.();
     } catch (err: any) {
-      if (err?.status === 409) {
-        setEmailError("Email sudah digunakan oleh akun lain.");
-      } else {
-        setEmailError(err?.message ?? "Gagal menyimpan email.");
-      }
+      setAvatarError(err?.message ?? "Gagal mengunggah foto profil.");
     } finally {
-      setSavingEmail(false);
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  // Handle Delete Avatar
+  const handleDeleteAvatar = async () => {
+    if (!currentUser) return;
+    setUploadingAvatar(true);
+    setAvatarError(null);
+    try {
+      await api(`/admin/users/${currentUser.id}/avatar`, {
+        method: "DELETE"
+      });
+      setCurrentUser((prev) => (prev ? { ...prev, avatarUrl: null } : prev));
+      onUpdated?.();
+    } catch (err: any) {
+      setAvatarError(err?.message ?? "Gagal menghapus foto profil.");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  // Handle Delete User
+  const handleDeleteUser = async () => {
+    if (!currentUser) return;
+    setDeletingUser(true);
+    setDeleteUserError(null);
+
+    try {
+      await api(`/admin/users/${currentUser.id}`, {
+        method: "DELETE"
+      });
+      onClose();
+      onUpdated?.();
+    } catch (err: any) {
+      setDeleteUserError(err?.message ?? "Gagal menghapus akun pengguna.");
+    } finally {
+      setDeletingUser(false);
     }
   };
 
@@ -310,165 +456,255 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
         <section className={styles.section} aria-label="Informasi Profil">
           <div className={styles.sectionHeader}>
             <h3 className={styles.sectionTitle}>1. Informasi Profil</h3>
-            {isAdminAccount && (
-              <Badge variant="warning">Akun Administrator (Read-Only)</Badge>
-            )}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              {isAdminAccount && (
+                <Badge variant="warning">Akun Administrator</Badge>
+              )}
+              {canEditProfile && !editingProfile && !isProtectedFromCaller && (
+                <Button variant="secondary" size="sm" onClick={handleStartEditProfile}>
+                  Edit Profil
+                </Button>
+              )}
+            </div>
           </div>
 
-          {isAdminAccount && (
+          {isAdminAccount && !canEditProfile && (
             <div className={`${styles.alert} ${styles.alertInfo}`} role="note">
               <span>
-                Akun administrator memiliki proteksi sistem khusus. Nama dan email tidak dapat diubah melalui panel admin standar.
+                Akun administrator memiliki proteksi sistem khusus. Nama, email, dan divisi hanya dapat diubah oleh Superadministrator.
               </span>
             </div>
           )}
 
-          <div className={styles.infoGrid}>
-            {/* Field: Nama */}
-            <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Nama Lengkap</span>
-              {editingName ? (
-                <div className={styles.inlineEditForm}>
-                  <div className={styles.inlineInputRow}>
-                    <input
-                      type="text"
-                      className={styles.inlineInput}
-                      value={tempName}
-                      maxLength={160}
-                      onChange={(e) => setTempName(e.target.value)}
-                      disabled={savingName}
-                      autoFocus
-                    />
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={handleSaveName}
-                      loading={savingName}
-                      loadingText="Simpan"
-                    >
-                      Simpan
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setEditingName(false);
-                        setTempName(currentUser?.name ?? "");
-                        setNameError(null);
-                      }}
-                      disabled={savingName}
-                    >
-                      Batal
-                    </Button>
-                  </div>
-                  {nameError && (
-                    <span className={styles.alertDanger} style={{ fontSize: "11px", padding: "4px 8px", borderRadius: "6px" }}>
-                      {nameError}
-                    </span>
-                  )}
-                </div>
-              ) : (
-                <div className={styles.infoValueRow}>
-                  <strong className={styles.infoValue}>{currentUser?.name}</strong>
-                  {!isAdminAccount && (
-                    <Button variant="ghost" size="sm" onClick={() => setEditingName(true)}>
-                      Edit
-                    </Button>
-                  )}
-                </div>
-              )}
+          {profileSuccess && (
+            <div className={`${styles.alert} ${styles.alertSuccess}`} role="status">
+              <span>✓ {profileSuccess}</span>
+            </div>
+          )}
+
+          {/* User Profile Header Card */}
+          <div className={styles.profileHeaderCard}>
+            <div className={styles.avatarWrapper}>
+              <div className={styles.avatarContainer}>
+                {currentUser?.avatarUrl ? (
+                  <img src={currentUser.avatarUrl} alt="" className={styles.avatarImage} />
+                ) : (
+                  currentUser?.name?.charAt(0).toUpperCase() || "?"
+                )}
+              </div>
+              <span
+                className={`${styles.avatarStatusBadge} ${
+                  currentUser?.isOnline ? styles.avatarStatusOnline : styles.avatarStatusOffline
+                }`}
+                title={currentUser?.isOnline ? "Sedang Online (Sesi Aktif)" : "Sedang Offline"}
+              />
             </div>
 
-            {/* Field: Email */}
-            <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Alamat Email</span>
-              {editingEmail ? (
-                <div className={styles.inlineEditForm}>
-                  <div className={`${styles.alert} ${styles.alertWarning}`} style={{ padding: "6px 10px", fontSize: "11px" }}>
-                    <span>⚠️ Mengubah email akan mengeluarkan user dari semua sesi aktif.</span>
-                  </div>
-                  <div className={styles.inlineInputRow}>
-                    <input
-                      type="email"
-                      className={styles.inlineInput}
-                      value={tempEmail}
-                      maxLength={191}
-                      onChange={(e) => setTempEmail(e.target.value)}
-                      disabled={savingEmail}
-                      autoFocus
-                    />
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={handleSaveEmail}
-                      loading={savingEmail}
-                      loadingText="Simpan"
-                    >
-                      Simpan
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setEditingEmail(false);
-                        setTempEmail(currentUser?.email ?? "");
-                        setEmailError(null);
-                      }}
-                      disabled={savingEmail}
-                    >
-                      Batal
-                    </Button>
-                  </div>
-                  {emailError && (
-                    <span className={styles.alertDanger} style={{ fontSize: "11px", padding: "4px 8px", borderRadius: "6px" }}>
-                      {emailError}
-                    </span>
-                  )}
-                </div>
-              ) : (
-                <div className={styles.infoValueRow}>
-                  <span className={styles.infoValue}>{currentUser?.email}</span>
-                  {!isAdminAccount && (
-                    <Button variant="ghost" size="sm" onClick={() => setEditingEmail(true)}>
-                      Edit
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
+            <div className={styles.profileHeaderInfo}>
+              <div className={styles.profileNameRow}>
+                <h4 className={styles.profileName}>{currentUser?.name}</h4>
+                <span
+                  className={`${styles.onlineBadge} ${
+                    currentUser?.isOnline ? styles.onlineBadgeActive : styles.onlineBadgeInactive
+                  }`}
+                >
+                  <span
+                    className={`${styles.statusDot} ${
+                      currentUser?.isOnline ? styles.statusDotActive : styles.statusDotInactive
+                    }`}
+                  />
+                  {currentUser?.isOnline ? "Online" : "Offline"}
+                </span>
+              </div>
+              <span className={styles.profileEmail}>{currentUser?.email}</span>
 
-            {/* Field: Tipe Akun */}
-            <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Tipe Akun</span>
-              <div className={styles.infoValueRow}>
+              <div className={styles.profileBadgesRow}>
                 <Badge variant={currentUser?.accountType === "admin" ? "warning" : "neutral"}>
                   {currentUser?.accountType === "admin" ? "Administrator" : "Karyawan"}
                 </Badge>
-              </div>
-            </div>
-
-            {/* Field: Status */}
-            <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Status Keaktifan</span>
-              <div className={styles.infoValueRow}>
+                {currentUser?.division && (
+                  <Badge variant="neutral">{currentUser.division}</Badge>
+                )}
                 <Badge variant={currentUser?.isActive ? "success" : "danger"}>
-                  {currentUser?.isActive ? "Aktif" : "Nonaktif"}
+                  {currentUser?.isActive ? "Akun Aktif" : "Nonaktif"}
                 </Badge>
               </div>
-            </div>
 
-            {/* Field: Tanggal Dibuat */}
-            <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Tanggal Dibuat</span>
-              <span className={styles.infoValue}>{formatDate(currentUser?.createdAt)}</span>
-            </div>
-
-            {/* Field: Tanggal Diperbarui */}
-            <div className={styles.infoItem}>
-              <span className={styles.infoLabel}>Terakhir Diperbarui</span>
-              <span className={styles.infoValue}>{formatDate(currentUser?.updatedAt)}</span>
+              <div className={styles.avatarControls} style={{ marginTop: "6px" }}>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  style={{ display: "none" }}
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={handleUploadAvatar}
+                  disabled={uploadingAvatar}
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  loading={uploadingAvatar}
+                  loadingText="Mengunggah..."
+                >
+                  {currentUser?.avatarUrl ? "Ganti Foto" : "Unggah Foto"}
+                </Button>
+                {currentUser?.avatarUrl && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleDeleteAvatar}
+                    disabled={uploadingAvatar}
+                  >
+                    Hapus Foto
+                  </Button>
+                )}
+                <span className={styles.avatarHint}>Maks 5MB (WebP/JPG/PNG)</span>
+              </div>
+              {avatarError && (
+                <span className={styles.alertDanger} style={{ fontSize: "11px", padding: "4px 8px", borderRadius: "6px", width: "fit-content" }}>
+                  {avatarError}
+                </span>
+              )}
             </div>
           </div>
+
+          {editingProfile ? (
+            <form className={styles.editProfileForm} onSubmit={handleSaveProfile}>
+              <div className={styles.editFormGrid}>
+                <div className={styles.editFormField}>
+                  <label className={styles.formLabel} htmlFor="edit-user-name">
+                    Nama Lengkap <span style={{ color: "var(--danger, #a33f36)" }}>*</span>
+                  </label>
+                  <input
+                    id="edit-user-name"
+                    type="text"
+                    className={styles.formInput}
+                    value={formName}
+                    maxLength={160}
+                    required
+                    onChange={(e) => setFormName(e.target.value)}
+                    disabled={savingProfile}
+                    placeholder="cth. Budi Santoso"
+                    autoFocus
+                  />
+                </div>
+
+                <div className={styles.editFormField}>
+                  <label className={styles.formLabel} htmlFor="edit-user-division">
+                    Divisi / Departemen
+                  </label>
+                  <select
+                    id="edit-user-division"
+                    className={styles.selectInput}
+                    value={formDivision}
+                    onChange={(e) => setFormDivision(e.target.value)}
+                    disabled={savingProfile}
+                  >
+                    <option value="">-- Pilih atau Kosongkan Divisi --</option>
+                    {divisions.map((d) => (
+                      <option key={d.id} value={d.name}>
+                        {d.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className={`${styles.editFormField} ${styles.editFormFull}`}>
+                  <label className={styles.formLabel} htmlFor="edit-user-email">
+                    Alamat Email <span style={{ color: "var(--danger, #a33f36)" }}>*</span>
+                  </label>
+                  <input
+                    id="edit-user-email"
+                    type="email"
+                    className={styles.formInput}
+                    value={formEmail}
+                    maxLength={191}
+                    required
+                    onChange={(e) => setFormEmail(e.target.value)}
+                    disabled={savingProfile}
+                    placeholder="budi@mknsite.online"
+                  />
+                  <div className={styles.emailWarning}>
+                    <span>⚠️ <strong>Perhatian:</strong> Mengubah alamat email akan otomatis mengeluarkan pengguna dari seluruh sesi aktif demi keamanan akun.</span>
+                  </div>
+                </div>
+              </div>
+
+              {profileError && (
+                <div className={`${styles.alert} ${styles.alertDanger}`} role="alert">
+                  <span>{profileError}</span>
+                </div>
+              )}
+
+              <div className={styles.editActionsBar}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCancelEditProfile}
+                  disabled={savingProfile}
+                >
+                  Batal
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="sm"
+                  loading={savingProfile}
+                  loadingText="Menyimpan..."
+                >
+                  Simpan Perubahan
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <div className={styles.infoGrid}>
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Divisi / Departemen</span>
+                <span className={styles.infoValue}>
+                  {currentUser?.division || <span className={styles.emptyText}>Belum ditentukan</span>}
+                </span>
+              </div>
+
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Tipe Akun</span>
+                <span className={styles.infoValue}>
+                  {currentUser?.accountType === "admin" ? "Administrator" : "Karyawan"}
+                </span>
+              </div>
+
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Status Keaktifan</span>
+                <span className={styles.infoValue}>
+                  {currentUser?.isActive ? "Aktif" : "Nonaktif"}
+                </span>
+              </div>
+
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Status Sesi</span>
+                <span className={styles.infoValue}>
+                  {currentUser?.isOnline ? "Sedang Aktif (Online)" : "Tidak Aktif (Offline)"}
+                </span>
+              </div>
+
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Terakhir Login</span>
+                <span className={styles.infoValue}>
+                  {currentUser?.lastLoginAt ? formatDate(currentUser.lastLoginAt) : "Belum pernah login"}
+                </span>
+              </div>
+
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Tanggal Dibuat</span>
+                <span className={styles.infoValue}>{formatDate(currentUser?.createdAt)}</span>
+              </div>
+
+              <div className={styles.infoItem}>
+                <span className={styles.infoLabel}>Terakhir Diperbarui</span>
+                <span className={styles.infoValue}>{formatDate(currentUser?.updatedAt)}</span>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* SECTION 2: ROLE & PERMISSION */}
@@ -722,6 +958,70 @@ export function UserDetailModal({ open, user, currentAdmin, onClose, onUpdated }
                     }}
                   >
                     Cabut Semua Sesi
+                  </Button>
+                )}
+              </div>
+
+              {/* Action 3: Delete User */}
+              <div className={`${styles.actionCard} ${styles.actionCardDanger}`}>
+                <div>
+                  <span className={`${styles.actionTitle} ${styles.actionTitleDanger}`}>
+                    Hapus Akun Pengguna
+                  </span>
+                  <p className={styles.actionDesc}>
+                    Menghapus akun secara permanen beserta seluruh relasi role dan sesi aktif. Tindakan ini tidak dapat dibatalkan.
+                  </p>
+                </div>
+
+                {deleteUserError && (
+                  <div className={`${styles.alert} ${styles.alertDanger}`} style={{ padding: "6px 8px", fontSize: "11px" }}>
+                    <span>{deleteUserError}</span>
+                  </div>
+                )}
+
+                {isSelf ? (
+                  <span className={styles.emptyText} style={{ fontSize: "11px" }}>
+                    Anda tidak dapat menghapus akun Anda sendiri saat sedang aktif.
+                  </span>
+                ) : isTargetSuperadmin ? (
+                  <span className={styles.emptyText} style={{ fontSize: "11px" }}>
+                    Akun Superadministrator dilindungi sistem dan tidak dapat dihapus.
+                  </span>
+                ) : confirmingDeleteUser ? (
+                  <div className={styles.confirmBox}>
+                    <span style={{ color: "var(--danger)" }}>
+                      ⚠️ Hapus permanen akun <strong>{currentUser?.name}</strong> ({currentUser?.email})?
+                    </span>
+                    <div className={styles.confirmButtons}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setConfirmingDeleteUser(false)}
+                        disabled={deletingUser}
+                      >
+                        Batal
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={handleDeleteUser}
+                        loading={deletingUser}
+                        loadingText="Menghapus..."
+                      >
+                        Ya, Hapus Permanen
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => {
+                      setConfirmingDeleteUser(true);
+                      setDeleteUserError(null);
+                    }}
+                  >
+                    Hapus Pengguna
                   </Button>
                 )}
               </div>

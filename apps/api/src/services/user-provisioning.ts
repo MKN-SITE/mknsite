@@ -73,12 +73,14 @@ export class UserProvisioningService {
     // 4. Eksekusi transaksi atomik Drizzle (5 tabel sekaligus)
     try {
       const createdUser = await db.transaction(async (tx) => {
+        const division = data.division?.trim() || null;
         // Step 4.1: Insert tabel users (MKN)
         const [userInsert] = await tx.insert(users).values({
           name,
           email,
           passwordHash: hashedPassword,
           accountType: "employee",
+          division,
           isActive: 1
         });
         const mknUserId = Number(userInsert.insertId);

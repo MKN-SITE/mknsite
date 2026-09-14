@@ -208,7 +208,7 @@ export function MenuManager() {
     },
     {
       key: "menu",
-      header: "Menu Portal",
+      header: "Menu",
       render: (row: MenuSummaryDto) => (
         <div className={styles.menuCell}>
           <div className={styles.iconBox}>
@@ -284,12 +284,12 @@ export function MenuManager() {
   ];
 
   return (
-    <section className={styles.menuSection} aria-label="Manajemen Menu Portal">
+    <section className={styles.menuSection} aria-label="Manajemen Menu">
       <div className={styles.headerRow}>
         <div>
-          <h3 className={styles.sectionTitle}>Menu Portal Dinamis</h3>
+          <h3 className={styles.sectionTitle}>Menu Dinamis</h3>
           <p className={styles.sectionSubtitle}>
-            Atur navigasi portal karyawan, gerbang modul bisnis, dan izin akses role.
+            Atur navigasi karyawan, gerbang modul bisnis, dan izin akses role.
             {!loading && <span className={styles.totalBadge}> Total: {menus.length} Menu</span>}
           </p>
         </div>
@@ -313,8 +313,8 @@ export function MenuManager() {
         loading={loading}
         emptyState={
           <EmptyState
-            title="Belum ada menu portal"
-            description="Tambahkan menu portal pertama agar modul bisnis dapat diakses karyawan."
+            title="Belum ada menu"
+            description="Tambahkan menu pertama agar modul bisnis dapat diakses karyawan."
           />
         }
       />
@@ -323,7 +323,7 @@ export function MenuManager() {
       <Modal
         open={modalOpen}
         onClose={() => !submitting && setModalOpen(false)}
-        title={editingMenu ? "Edit Menu Portal" : "Tambah Menu Portal Baru"}
+        title={editingMenu ? "Edit Menu" : "Tambah Menu Baru"}
         size="lg"
       >
         <p className={styles.modalSubtitle}>
@@ -501,7 +501,7 @@ export function MenuManager() {
               checked={isActive}
               onChange={(e) => setIsActive(e.target.checked)}
             />
-            <span className={styles.checkboxLabel}>Aktifkan menu ini di portal karyawan</span>
+            <span className={styles.checkboxLabel}>Aktifkan menu ini untuk karyawan</span>
           </label>
 
           <div className={styles.modalFooter}>
@@ -524,13 +524,13 @@ export function MenuManager() {
       <Modal
         open={Boolean(deleteTarget)}
         onClose={() => !deleting && setDeleteTarget(null)}
-        title="Hapus Menu Portal"
+        title="Hapus Menu"
         size="sm"
       >
         <div className={styles.modalForm}>
           <p className={styles.deleteWarning}>
             Apakah Anda yakin ingin menghapus menu <strong>{deleteTarget?.title}</strong>? Menu ini
-            tidak akan lagi muncul pada portal karyawan. Tindakan ini dicatat dalam log audit.
+            tidak akan lagi muncul untuk karyawan. Tindakan ini dicatat dalam log audit.
           </p>
 
           <div className={styles.modalFooter}>

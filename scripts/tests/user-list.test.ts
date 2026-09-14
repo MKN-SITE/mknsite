@@ -9,7 +9,7 @@ import { UserList } from "../../apps/web/features/admin/components/user-list";
 describe("UserList component", () => {
   test("renders admin user management title and subtitle", () => {
     const html = renderToStaticMarkup(createElement(UserList));
-    expect(html).toContain("Pengguna Portal</h3>");
+    expect(html).toContain("Pengguna</h3>");
     expect(html).toContain("Kelola akun, status akses, dan role pengguna di sistem MKN.");
     expect(html).toContain("+ Tambah Pengguna</button>");
   });

@@ -6,10 +6,13 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 191 }).notNull(),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   accountType: varchar("account_type", { length: 24 }).notNull().default("employee"),
+  division: varchar("division", { length: 100 }),
+  avatarUrl: varchar("avatar_url", { length: 500 }),
   isActive: int("is_active").notNull().default(1),
+  lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow()
-}, (table) => [uniqueIndex("users_email_unique").on(table.email), index("users_account_type_idx").on(table.accountType)]);
+}, (table) => [uniqueIndex("users_email_unique").on(table.email), index("users_account_type_idx").on(table.accountType), index("users_division_idx").on(table.division)]);
 
 // Better Auth owns opaque database sessions. MKN account type and RBAC remain
 // in the existing users, roles, and permissions tables.
@@ -115,4 +118,12 @@ export const menus = mysqlTable("menus", {
   index("menus_is_active_idx").on(table.isActive),
   index("menus_required_permission_idx").on(table.requiredPermission)
 ]);
+
+export const divisions = mysqlTable("divisions", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: varchar("description", { length: 255 }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow()
+}, (table) => [uniqueIndex("divisions_name_unique").on(table.name)]);
 

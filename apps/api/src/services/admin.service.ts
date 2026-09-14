@@ -1,8 +1,9 @@
-import { and, count, desc, eq, inArray, like, ne, or } from "drizzle-orm";
+import { and, count, desc, eq, gt, inArray, like, ne, or } from "drizzle-orm";
 import { db } from "../db";
-import { auditLogs, authSessions, authUsers, permissions, rolePermissions, roles, userRoles, users } from "../db/schema";
+import { auditLogs, authAccounts, authSessions, authUsers, permissions, rolePermissions, roles, userRoles, users } from "../db/schema";
 import { mapUserSummary, type RoleSummaryDto, type UpdateUserProfileDto, type UserListResponseDto, type UserSummaryDto } from "../schemas/admin.dto";
 import { publishAdminUsersUpdated, publishRealtimeEvent } from "../realtime/hub";
+import { rbacService } from "./rbac.service";
 
 export type GetUsersOptions = {
   page?: number;
@@ -10,6 +11,7 @@ export type GetUsersOptions = {
   search?: string;
   status?: "all" | "active" | "inactive";
   accountType?: "all" | "employee" | "admin";
+  division?: string;
 };
 
 export class AdminService {
@@ -32,6 +34,10 @@ export class AdminService {
       conditions.push(eq(users.accountType, options.accountType));
     }
 
+    if (options.division && options.division !== "all") {
+      conditions.push(eq(users.division, options.division));
+    }
+
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
     const [totalRow] = await db.select({ total: count() }).from(users).where(whereClause);
@@ -51,7 +57,10 @@ export class AdminService {
         name: users.name,
         email: users.email,
         accountType: users.accountType,
+        division: users.division,
+        avatarUrl: users.avatarUrl,
         isActive: users.isActive,
+        lastLoginAt: users.lastLoginAt,
         createdAt: users.createdAt,
         updatedAt: users.updatedAt
       })
@@ -63,6 +72,7 @@ export class AdminService {
 
     const userIds = userRows.map((u) => u.id);
     const rolesMap = new Map<number, Array<{ id: number; name: string; slug: string }>>();
+    const onlineSet = new Set<number>();
 
     if (userIds.length > 0) {
       const userRoleRows = await db
@@ -82,9 +92,24 @@ export class AdminService {
         list.push({ id: row.id, name: row.name, slug: row.slug });
         rolesMap.set(row.userId, list);
       }
+
+      const activeSessions = await db
+        .select({ mknUserId: authUsers.mknUserId })
+        .from(authSessions)
+        .innerJoin(authUsers, eq(authSessions.userId, authUsers.id))
+        .where(
+          and(
+            inArray(authUsers.mknUserId, userIds),
+            gt(authSessions.expiresAt, new Date())
+          )
+        );
+
+      for (const s of activeSessions) {
+        if (s.mknUserId) onlineSet.add(s.mknUserId);
+      }
     }
 
-    const data = userRows.map((u) => mapUserSummary(u, rolesMap.get(u.id) ?? []));
+    const data = userRows.map((u) => mapUserSummary(u, rolesMap.get(u.id) ?? [], onlineSet.has(u.id)));
 
     return {
       data,
@@ -99,7 +124,10 @@ export class AdminService {
         name: users.name,
         email: users.email,
         accountType: users.accountType,
+        division: users.division,
+        avatarUrl: users.avatarUrl,
         isActive: users.isActive,
+        lastLoginAt: users.lastLoginAt,
         createdAt: users.createdAt,
         updatedAt: users.updatedAt
       })
@@ -108,6 +136,18 @@ export class AdminService {
       .limit(1);
 
     if (!user) return null;
+
+    const [activeSession] = await db
+      .select({ id: authSessions.id })
+      .from(authSessions)
+      .innerJoin(authUsers, eq(authSessions.userId, authUsers.id))
+      .where(
+        and(
+          eq(authUsers.mknUserId, targetId),
+          gt(authSessions.expiresAt, new Date())
+        )
+      )
+      .limit(1);
 
     const userRoleRows = await db
       .select({
@@ -120,37 +160,11 @@ export class AdminService {
       .where(eq(userRoles.userId, targetId))
       .orderBy(roles.id);
 
-    return mapUserSummary(user, userRoleRows);
+    return mapUserSummary(user, userRoleRows, Boolean(activeSession));
   }
 
   async getRoles(): Promise<RoleSummaryDto[]> {
-    const allRoles = await db
-      .select({ id: roles.id, name: roles.name, slug: roles.slug })
-      .from(roles)
-      .orderBy(roles.id);
-
-    const allGrants = await db
-      .select({
-        roleId: rolePermissions.roleId,
-        permission: permissions.slug
-      })
-      .from(rolePermissions)
-      .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
-      .orderBy(permissions.id);
-
-    const grantsMap = new Map<number, string[]>();
-    for (const grant of allGrants) {
-      const list = grantsMap.get(grant.roleId) ?? [];
-      list.push(grant.permission);
-      grantsMap.set(grant.roleId, list);
-    }
-
-    return allRoles.map((role) => ({
-      id: role.id,
-      name: role.name,
-      slug: role.slug,
-      permissions: grantsMap.get(role.id) ?? []
-    }));
+    return rbacService.getRoles();
   }
 
   async isUserSuperadmin(userId: number): Promise<boolean> {
@@ -433,7 +447,8 @@ export class AdminService {
     targetId: number,
     data: UpdateUserProfileDto,
     rawBody: Record<string, unknown>,
-    adminId: number
+    adminId: number,
+    callerPermissions: string[] = []
   ): Promise<UpdateProfileResult> {
     const forbiddenKeys = ["password", "passwordHash", "roleIds", "isActive", "accountType"];
     const foundForbidden = forbiddenKeys.find((key) => key in rawBody && rawBody[key] !== undefined);
@@ -449,12 +464,14 @@ export class AdminService {
 
     const hasName = typeof data.name === "string" && data.name.trim().length > 0;
     const hasEmail = typeof data.email === "string" && data.email.trim().length > 0;
-    if (!hasName && !hasEmail) {
+    const hasDivision = data.division !== undefined;
+    const hasAvatarUrl = data.avatarUrl !== undefined;
+    if (!hasName && !hasEmail && !hasDivision && !hasAvatarUrl) {
       return {
         error: {
           status: 400,
           code: "EMPTY_UPDATE",
-          message: "Setidaknya salah satu dari nama atau email harus diberikan."
+          message: "Setidaknya salah satu dari nama, email, divisi, atau avatar harus diberikan."
         }
       };
     }
@@ -465,6 +482,8 @@ export class AdminService {
         name: users.name,
         email: users.email,
         accountType: users.accountType,
+        division: users.division,
+        avatarUrl: users.avatarUrl,
         isActive: users.isActive
       })
       .from(users)
@@ -481,12 +500,14 @@ export class AdminService {
       };
     }
 
-    if (targetUser.accountType === "admin") {
+    const isCallerSuperadmin = callerPermissions.includes("admin.security.manage");
+
+    if (targetUser.accountType === "admin" && !isCallerSuperadmin) {
       return {
         error: {
           status: 403,
           code: "ADMIN_PROFILE_FORBIDDEN",
-          message: "Profil akun administrator tidak dapat diubah melalui endpoint ini."
+          message: "Profil akun administrator dilindungi dari modifikasi oleh administrator standar."
         }
       };
     }
@@ -529,12 +550,16 @@ export class AdminService {
     }
 
     const newName = hasName ? data.name!.trim() : undefined;
+    const newDivision = hasDivision ? (data.division ? data.division.trim() : null) : undefined;
+    const newAvatarUrl = hasAvatarUrl ? (data.avatarUrl ? data.avatarUrl.trim() : null) : undefined;
 
     try {
       const updatedUser = await db.transaction(async (tx) => {
-        const userUpdateValues: { name?: string; email?: string } = {};
+        const userUpdateValues: { name?: string; email?: string; division?: string | null; avatarUrl?: string | null } = {};
         if (newName !== undefined) userUpdateValues.name = newName;
         if (newEmail !== undefined) userUpdateValues.email = newEmail;
+        if (hasDivision) userUpdateValues.division = newDivision;
+        if (hasAvatarUrl) userUpdateValues.avatarUrl = newAvatarUrl;
 
         await tx.update(users).set(userUpdateValues).where(eq(users.id, targetId));
 
@@ -545,7 +570,12 @@ export class AdminService {
           .limit(1);
 
         if (authUser) {
-          await tx.update(authUsers).set(userUpdateValues).where(eq(authUsers.id, authUser.id));
+          const authUserUpdateValues: { name?: string; email?: string; image?: string | null } = {};
+          if (newName !== undefined) authUserUpdateValues.name = newName;
+          if (newEmail !== undefined) authUserUpdateValues.email = newEmail;
+          if (hasAvatarUrl) authUserUpdateValues.image = newAvatarUrl;
+
+          await tx.update(authUsers).set(authUserUpdateValues).where(eq(authUsers.id, authUser.id));
 
           if (emailChanged) {
             await tx.delete(authSessions).where(eq(authSessions.userId, authUser.id));
@@ -565,7 +595,10 @@ export class AdminService {
             name: users.name,
             email: users.email,
             accountType: users.accountType,
+            division: users.division,
+            avatarUrl: users.avatarUrl,
             isActive: users.isActive,
+            lastLoginAt: users.lastLoginAt,
             createdAt: users.createdAt,
             updatedAt: users.updatedAt
           })
@@ -580,7 +613,19 @@ export class AdminService {
           .where(eq(userRoles.userId, targetId))
           .orderBy(roles.id);
 
-        return mapUserSummary(freshUser, userRoleRows);
+        const [activeSession] = await tx
+          .select({ id: authSessions.id })
+          .from(authSessions)
+          .innerJoin(authUsers, eq(authSessions.userId, authUsers.id))
+          .where(
+            and(
+              eq(authUsers.mknUserId, targetId),
+              gt(authSessions.expiresAt, new Date())
+            )
+          )
+          .limit(1);
+
+        return mapUserSummary(freshUser, userRoleRows, Boolean(activeSession));
       });
 
       if (emailChanged) {
@@ -605,6 +650,113 @@ export class AdminService {
       }
       throw error;
     }
+  }
+
+  async deleteUser(
+    targetId: number,
+    adminId: number,
+    callerPermissions: string[] = []
+  ): Promise<{ success: boolean } | { error: { status: number; code: string; message: string } }> {
+    const [target] = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        accountType: users.accountType,
+        isActive: users.isActive
+      })
+      .from(users)
+      .where(eq(users.id, targetId))
+      .limit(1);
+
+    if (!target) {
+      return { error: { status: 404, code: "USER_NOT_FOUND", message: "Pengguna tidak ditemukan." } };
+    }
+
+    if (targetId === adminId) {
+      return {
+        error: {
+          status: 403,
+          code: "SELF_DELETION_FORBIDDEN",
+          message: "Administrator tidak dapat menghapus akun miliknya sendiri."
+        }
+      };
+    }
+
+    const isCallerSuperadmin = callerPermissions.includes("admin.security.manage");
+
+    // Proteksi akun Superadministrator: hanya sesama Superadministrator yang boleh menghapusnya
+    const targetIsSuperadmin = await this.isUserSuperadmin(targetId);
+    if (targetIsSuperadmin && !isCallerSuperadmin) {
+      return {
+        error: {
+          status: 403,
+          code: "SUPERADMIN_PROTECTED",
+          message: "Akun Superadministrator dilindungi dari penghapusan oleh administrator standar."
+        }
+      };
+    }
+
+    // Proteksi jika target adalah admin: pastikan bukan admin aktif terakhir dan hanya oleh superadmin
+    if (target.accountType === "admin") {
+      if (!isCallerSuperadmin) {
+        return {
+          error: {
+            status: 403,
+            code: "ADMIN_DELETE_FORBIDDEN",
+            message: "Penghapusan akun administrator memerlukan hak akses Superadministrator."
+          }
+        };
+      }
+
+      const [adminCount] = await db
+        .select({ total: count() })
+        .from(users)
+        .where(and(eq(users.accountType, "admin"), eq(users.isActive, 1)));
+
+      if (Number(adminCount?.total ?? 0) <= 1) {
+        return {
+          error: {
+            status: 403,
+            code: "LAST_ADMIN_PROTECTED",
+            message: "Tidak dapat menghapus administrator aktif terakhir."
+          }
+        };
+      }
+    }
+
+    await db.transaction(async (tx) => {
+      const [authUser] = await tx
+        .select({ id: authUsers.id })
+        .from(authUsers)
+        .where(eq(authUsers.mknUserId, targetId))
+        .limit(1);
+
+      if (authUser) {
+        await tx.delete(authSessions).where(eq(authSessions.userId, authUser.id));
+        await tx.delete(authAccounts).where(eq(authAccounts.userId, authUser.id));
+        await tx.delete(authUsers).where(eq(authUsers.id, authUser.id));
+      }
+
+      await tx.delete(userRoles).where(eq(userRoles.userId, targetId));
+      await tx.delete(users).where(eq(users.id, targetId));
+
+      await tx.insert(auditLogs).values({
+        actorId: adminId,
+        action: "user.deleted",
+        resource: "user",
+        resourceId: String(targetId)
+      });
+    });
+
+    publishRealtimeEvent(targetId, {
+      type: "session.revoked",
+      message: "Akun Anda telah dihapus oleh administrator."
+    });
+
+    publishAdminUsersUpdated(targetId);
+
+    return { success: true };
   }
 }
 

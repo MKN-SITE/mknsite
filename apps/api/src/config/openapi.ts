@@ -19,6 +19,7 @@ export const openApiTags = [
   { name: "Auth Admin", description: "Autentikasi dan sesi terisolasi administrator" },
   { name: "Workspace", description: "Data modul bisnis berbasis otorisasi RBAC" },
   { name: "Admin", description: "Operasi administratif dan manajemen pengguna" },
+  { name: "Admin RBAC", description: "Pengelolaan role dan izin oleh superadministrator" },
   { name: "Realtime", description: "Streaming event langsung Server-Sent Events (SSE)" },
   { name: "Menus", description: "Pengelolaan menu portal karyawan dan menu gerbang dinamis" }
 ];
@@ -222,7 +223,7 @@ export const openApiSchemas: Record<string, unknown> = {
         type: "array",
         items: {
           type: "object",
-          required: ["id", "name", "slug", "permissions"],
+          required: ["id", "name", "slug", "permissions", "permissionIds", "userCount", "isSystem"],
           properties: {
             id: { type: "integer", example: 1 },
             name: { type: "string", example: "HR" },
@@ -231,7 +232,10 @@ export const openApiSchemas: Record<string, unknown> = {
               type: "array",
               items: { type: "string" },
               example: ["dashboard.view", "hr.view", "hr.manage"]
-            }
+            },
+            permissionIds: { type: "array", items: { type: "integer" }, example: [1, 2, 3] },
+            userCount: { type: "integer", example: 2 },
+            isSystem: { type: "boolean", example: true }
           }
         }
       }

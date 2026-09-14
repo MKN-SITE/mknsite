@@ -32,7 +32,7 @@ export function LoginForm({ admin = false }: { admin?: boolean }) {
       <div className="field"><label htmlFor="email">Email</label><input id="email" name="email" type="email" autoComplete="username" placeholder="nama@mknsite.online" required /></div>
       <div className="field"><label htmlFor="password">Kata sandi</label><input id="password" name="password" type="password" autoComplete="current-password" placeholder="Masukkan kata sandi" required /></div>
       <p className="form-error" role="alert">{error}</p>
-      <button className="button button-primary" type="submit" disabled={loading}>{loading ? "Memeriksa..." : admin ? "Masuk ke Admin" : "Masuk ke portal"}</button>
+      <button className="button button-primary" type="submit" disabled={loading}>{loading ? "Memeriksa..." : admin ? "Masuk ke Admin" : "Masuk"}</button>
     </form>
   );
 }

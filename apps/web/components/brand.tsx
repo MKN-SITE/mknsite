@@ -1,14 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
-import mknLogo from "@/public/assets/mkn-logo.webp";
+import mknLogoImg from "@/public/assets/Logo MKN.png";
 
 export function Brand() {
   return (
     <Link className="brand" href="/">
       <div className="brand-logo-wrap">
         <Image
-          src={mknLogo}
+          src={mknLogoImg}
           alt="PT Multi Kontrol Nusantara"
+          width={51}
+          height={38}
           className="brand-logo-img"
           priority
         />

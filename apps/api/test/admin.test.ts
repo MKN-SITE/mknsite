@@ -1,8 +1,8 @@
-import { describe, expect, it } from "bun:test";
+import { afterAll, describe, expect, it } from "bun:test";
 import { eq } from "drizzle-orm";
 import { db } from "../src/db";
 import { authUsers, users } from "../src/db/schema";
-import { app } from "./setup";
+import { app, cleanTestUsers } from "./setup";
 
 describe("Admin API", () => {
   it("menolak mutasi admin tanpa sesi dengan HTTP 401 dan skema error standar", async () => {
@@ -1160,5 +1160,101 @@ describe("Admin API", () => {
     expect(notFoundRes.status).toBe(404);
     const body = (await notFoundRes.json()) as { code: string; message: string };
     expect(body.code).toBe("USER_NOT_FOUND");
+  });
+
+  it("berhasil mengunggah dan menghapus avatar profil pengguna", async () => {
+    const adminLogin = await app.handle(
+      new Request("http://localhost/auth/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Origin: "http://localhost:3000" },
+        body: JSON.stringify({ email: "admin@mknsite.online", password: "admin12345" })
+      })
+    );
+    const adminCookie = adminLogin.headers.get("set-cookie") ?? "";
+
+    // Buat employee sementara untuk uji avatar
+    const createRes = await app.handle(
+      new Request("http://localhost/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
+        body: JSON.stringify({
+          name: "Avatar Test User",
+          email: `avatar.${Date.now()}@mknsite.online`,
+          password: "password123456",
+          division: "Telekomunikasi"
+        })
+      })
+    );
+    const created = ((await createRes.json()) as any).data;
+
+    // Upload avatar via dataUrl
+    const uploadRes = await app.handle(
+      new Request(`http://localhost/admin/users/${created.id}/avatar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
+        body: JSON.stringify({
+          dataUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+        })
+      })
+    );
+    expect(uploadRes.status).toBe(200);
+    const uploadBody = (await uploadRes.json()) as any;
+    expect(uploadBody.data.avatarUrl).toContain("/uploads/avatars/");
+
+    // Delete avatar
+    const delAvatarRes = await app.handle(
+      new Request(`http://localhost/admin/users/${created.id}/avatar`, {
+        method: "DELETE",
+        headers: { Origin: "http://localhost:3000", Cookie: adminCookie }
+      })
+    );
+    expect(delAvatarRes.status).toBe(200);
+    const delBody = (await delAvatarRes.json()) as any;
+    expect(delBody.data.avatarUrl).toBeNull();
+
+    // Hapus user uji
+    const delUserRes = await app.handle(
+      new Request(`http://localhost/admin/users/${created.id}`, {
+        method: "DELETE",
+        headers: { Origin: "http://localhost:3000", Cookie: adminCookie }
+      })
+    );
+    expect(delUserRes.status).toBe(200);
+  });
+
+  it("DELETE /admin/users/:id menolak penghapusan diri sendiri dan ID tidak ditemukan", async () => {
+    const adminLogin = await app.handle(
+      new Request("http://localhost/auth/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Origin: "http://localhost:3000" },
+        body: JSON.stringify({ email: "admin@mknsite.online", password: "admin12345" })
+      })
+    );
+    const adminCookie = adminLogin.headers.get("set-cookie") ?? "";
+    const meRes = await app.handle(new Request("http://localhost/auth/admin/me", { headers: { Cookie: adminCookie } }));
+    const myId = ((await meRes.json()) as any).user.id;
+
+    // Coba hapus diri sendiri -> 403
+    const selfDelRes = await app.handle(
+      new Request(`http://localhost/admin/users/${myId}`, {
+        method: "DELETE",
+        headers: { Origin: "http://localhost:3000", Cookie: adminCookie }
+      })
+    );
+    expect(selfDelRes.status).toBe(403);
+    expect(((await selfDelRes.json()) as any).code).toBe("SELF_DELETION_FORBIDDEN");
+
+    // ID tidak ditemukan -> 404
+    const notFoundRes = await app.handle(
+      new Request("http://localhost/admin/users/99999", {
+        method: "DELETE",
+        headers: { Origin: "http://localhost:3000", Cookie: adminCookie }
+      })
+    );
+    expect(notFoundRes.status).toBe(404);
+  });
+
+  afterAll(async () => {
+    await cleanTestUsers();
   });
 });
