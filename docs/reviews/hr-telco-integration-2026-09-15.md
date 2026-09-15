@@ -4,7 +4,7 @@ Tanggal audit: 2026-09-15 16:10 WITA
 
 Platform: Codex; peran Frontend, Backend, DevOps, dan QA Agent
 
-Branch sumber: `codex/hr-telco-portal`
+Branch PR: `codex/hr-telco-main-integration` (fitur berasal dari `codex/hr-telco-portal`)
 
 Baseline main: `f019389`
 Lingkungan: Docker lokal terisolasi, Bun 1.4.0, MySQL 8.4, Next.js 16.3.4
