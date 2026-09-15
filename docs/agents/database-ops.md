@@ -39,17 +39,27 @@ Panduan ini menjelaskan cara memeriksa, membandingkan, dan memperbaiki state dat
 
 ## Migration History: `__drizzle_migrations`
 
-Drizzle menyimpan riwayat migrasi di tabel `__drizzle_migrations` (setara `__EFMigrationsHistory` di .NET).
+Drizzle menyimpan riwayat migrasi di tabel internal `__drizzle_migrations`.
 
-### Struktur Tabel
+### Struktur Tabel `__drizzle_migrations`
 
 | Kolom | Tipe | Keterangan |
 |-------|------|------------|
-| `id` | bigint unsigned | Primary key, auto increment |
-| `hash` | text | SHA-256 hash dari isi file SQL migrasi |
-| `created_at` | bigint | Timestamp (epoch ms) saat migrasi dijalankan |
+| `id` | bigint unsigned | Primary key, auto increment urutan eksekusi |
+| `hash` | text | SHA-256 hash dari berkas SQL migrasi |
+| `created_at` | bigint | Timestamp (epoch ms) saat migrasi dieksekusi |
 
-### Cara Cek Migration History
+### Cara Praktis Cek Status & Detail Fitur Migrasi
+
+Untuk melihat daftar seluruh migrasi lengkap dengan nama tag, status (`TERPASANG` / `PENDING`), waktu dijalankan, dan ringkasan fitur/perubahan skemanya, jalankan:
+
+```bash
+bun --cwd apps/api db:status
+```
+
+Perintah ini secara otomatis mencocokkan record di tabel `__drizzle_migrations` dengan metadata di `apps/api/drizzle/meta/_journal.json` dan memberikan output tabel yang jelas serta mendeteksi jika ada migrasi orphan.
+
+### Cara Cek Manual via SQL Query
 
 **Lokal:**
 ```bash
@@ -78,18 +88,6 @@ _journal.json entries: 4 (0000, 0001, 0002, 0003)
 __drizzle_migrations lokal: 3 → migrasi 0003 BELUM jalan di lokal
 __drizzle_migrations prod:  4 → semua migrasi sudah jalan di production
 ```
-
-### Drizzle Migration vs .NET EF Migration
-
-| Aspek | Drizzle | .NET EF Core |
-|-------|---------|-------------|
-| Tabel riwayat | `__drizzle_migrations` | `__EFMigrationsHistory` |
-| ID migrasi | SHA-256 hash | Nama migrasi (timestamp_nama) |
-| File migrasi | `drizzle/XXXX_nama.sql` (SQL murni) | `Migrations/Timestamp_Nama.cs` (C#) |
-| Journal | `drizzle/meta/_journal.json` | ModelSnapshot.cs |
-| Rollback | ❌ Tidak ada built-in rollback | ✅ Ada `Down()` method |
-| Generate | `bun run db:generate` | `dotnet ef migrations add` |
-| Apply | `bunx drizzle-kit migrate` | `dotnet ef database update` |
 
 > [!WARNING]
 > **Drizzle TIDAK memiliki fitur rollback otomatis.** Jika perlu rollback migrasi, harus manual: tulis SQL `DROP TABLE` / `ALTER TABLE DROP COLUMN` sendiri, lalu hapus row dari `__drizzle_migrations`.

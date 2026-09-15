@@ -41,17 +41,39 @@ async function seed() {
     await db.delete(users).where(eq(users.email, email));
   }
 
-  // Bersihkan menu dummy/demo agar menu bersih untuk uji coba real data
-  const dummyMenuUrls = [
+  // Bersihkan menu dummy/invalid agar hanya menu HR yang aktif
+  const staleMenuUrls = [
+    "/hr", // URL cacat warisan PR lama
+    "/finance",
     "/portal/self-service",
-    "/portal/hr",
     "/portal/ops-telco",
     "/portal/ops-workshop",
     "/portal/project",
     "/portal/payroll"
   ];
-  for (const url of dummyMenuUrls) {
+  for (const url of staleMenuUrls) {
     await db.delete(menus).where(eq(menus.url, url));
+  }
+
+  // Seed Menu HR secara idempoten
+  const hrMenuData = {
+    title: "HR",
+    icon: "users",
+    description: "Pengelolaan Absensi, Cuti, dan Data Karyawan",
+    url: "/portal/hr",
+    requiredPermission: "hr.view",
+    sortOrder: 1,
+    isActive: 1,
+    badgeCount: 0,
+    badgeColor: "orange"
+  };
+  const [existingHrMenu] = await db.select().from(menus).where(eq(menus.url, "/portal/hr")).limit(1);
+  if (!existingHrMenu) {
+    await db.insert(menus).values(hrMenuData);
+    console.log("  ✓ Menu HR (/portal/hr) berhasil dibuat.");
+  } else {
+    await db.update(menus).set(hrMenuData).where(eq(menus.id, existingHrMenu.id));
+    console.log("  ✓ Menu HR (/portal/hr) berhasil disinkronkan.");
   }
 
   for (const [name, slug] of permissionRows) await db.insert(permissions).values({ name, slug }).onDuplicateKeyUpdate({ set: { name } });

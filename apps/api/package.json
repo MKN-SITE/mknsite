@@ -10,7 +10,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:seed": "bun src/db/seed.ts"
+    "db:seed": "bun src/db/seed.ts",
+    "db:status": "bun scripts/db-status.ts"
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "^1.7.3",
