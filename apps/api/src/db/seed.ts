@@ -70,32 +70,49 @@ async function seed() {
   const adminHash = await Bun.password.hash("admin12345", { algorithm: "argon2id" });
   const superadminHash = await Bun.password.hash("superadmin12345", { algorithm: "argon2id" });
   for (const [name, email, accountType, roleSlug, division] of accounts) {
-    // Cek apakah akun sudah ada — jika sudah, JANGAN timpa password/data
+    const loginHash = email === "superadmin@mknsite.online" ? superadminHash : adminHash;
     const [existing] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    let accountId: number;
+
     if (existing) {
-      console.log(`  → Akun ${email} sudah ada (id=${existing.id}), dilewati.`);
+      console.log(`  → Akun ${email} sudah ada (id=${existing.id}), memastikan integritas auth...`);
+      accountId = existing.id;
       if (!existing.division) {
         await db.update(users).set({ division }).where(eq(users.id, existing.id));
       }
-      // Pastikan role tetap terpasang (idempoten, tanpa mengubah data akun)
-      const role = allRoles.find((item) => item.slug === roleSlug)!;
-      await db.insert(userRoles).values({ userId: existing.id, roleId: role.id }).onDuplicateKeyUpdate({ set: { roleId: role.id } });
-      continue;
+    } else {
+      await db.insert(users).values({ name, email, accountType, division, passwordHash: loginHash });
+      const [account] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+      accountId = account.id;
+      console.log(`  ✓ Akun ${email} berhasil dibuat di tabel users.`);
     }
 
-    // Akun belum ada — buat baru
-    const loginHash = email === "superadmin@mknsite.online" ? superadminHash : adminHash;
-    await db.insert(users).values({ name, email, accountType, division, passwordHash: loginHash });
-    const [account] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    // Pastikan role tetap terpasang
     const role = allRoles.find((item) => item.slug === roleSlug)!;
-    await db.insert(userRoles).values({ userId: account.id, roleId: role.id }).onDuplicateKeyUpdate({ set: { roleId: role.id } });
+    await db.insert(userRoles).values({ userId: accountId, roleId: role.id }).onDuplicateKeyUpdate({ set: { roleId: role.id } });
 
-    const authUserId = crypto.randomUUID();
-    await db.insert(authUsers).values({ id: authUserId, mknUserId: account.id, name, email, emailVerified: true });
-    await db.insert(authAccounts).values({
-      id: crypto.randomUUID(), accountId: authUserId, providerId: "credential", userId: authUserId, password: loginHash
-    });
-    console.log(`  ✓ Akun ${email} berhasil dibuat.`);
+    // Pastikan Better Auth auth_user & auth_account ada
+    const [existingAuthUser] = await db.select().from(authUsers).where(eq(authUsers.email, email)).limit(1);
+    let authUserId: string;
+
+    if (!existingAuthUser) {
+      authUserId = crypto.randomUUID();
+      await db.insert(authUsers).values({ id: authUserId, mknUserId: accountId, name, email, emailVerified: true });
+      console.log(`  ✓ Akun ${email} berhasil didaftarkan ke Better Auth (auth_user).`);
+    } else {
+      authUserId = existingAuthUser.id;
+      if (!existingAuthUser.mknUserId) {
+        await db.update(authUsers).set({ mknUserId: accountId }).where(eq(authUsers.id, authUserId));
+      }
+    }
+
+    const [existingAuthAccount] = await db.select().from(authAccounts).where(eq(authAccounts.userId, authUserId)).limit(1);
+    if (!existingAuthAccount) {
+      await db.insert(authAccounts).values({
+        id: crypto.randomUUID(), accountId: authUserId, providerId: "credential", userId: authUserId, password: loginHash
+      });
+      console.log(`  ✓ Kredensial ${email} berhasil didaftarkan ke Better Auth (auth_account).`);
+    }
   }
 
   // Seed default divisions (idempoten)
