@@ -3,9 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import mknLogoImg from "@/public/assets/Logo MKN.png";
+import mknLogoImg from "@/public/assets/mkn-logo-white-hd.png";
 import { api, getAvatarUrl, type PortalUser } from "@/lib/api";
-import { RealtimeStatus } from "@/components/realtime-status";
 import { PortalIcon } from "./portal-icons";
 import styles from "./menu-grid.module.css";
 
@@ -118,22 +117,20 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
             <div className={styles.brandLogo}>
               <Image
                 src={mknLogoImg}
-                alt="Logo PT Multi Kontrol Nusantara"
-                width={51}
-                height={38}
+                alt="Multi Kontrol Nusantara - A Bakrie Company"
+                width={200}
+                height={148}
                 className={styles.brandLogoImg}
                 priority
               />
             </div>
+            <span className={styles.brandDivider} aria-hidden="true" />
             <div className={styles.brandText}>
               <span className={styles.brandName}>MKN Site</span>
-              <span className={styles.brandSub}>PT Multi Kontrol Nusantara</span>
             </div>
           </Link>
 
           <div className={styles.headerRight} ref={dropdownRef}>
-            <RealtimeStatus loginPath="/login" />
-
             <button
               type="button"
               className={styles.userMenuTrigger}

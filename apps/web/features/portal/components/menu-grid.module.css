@@ -30,46 +30,53 @@
 }
 
 .brandWrap {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   text-decoration: none;
   color: inherit;
+  transition: opacity 150ms ease;
+}
+
+.brandWrap:hover {
+  opacity: 0.95;
 }
 
 .brandLogo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 46px;
-  width: auto;
   flex-shrink: 0;
+  height: 68px;
+  width: auto;
 }
 
 .brandLogoImg {
-  height: 38px !important;
+  height: 68px !important;
   width: auto !important;
-  max-width: 100% !important;
   object-fit: contain !important;
   display: block;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.22));
+}
+
+.brandDivider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
 }
 
 .brandText {
   display: flex;
-  flex-direction: column;
+  align-items: center;
 }
 
 .brandName {
-  font-size: 17px;
+  font-size: 24px;
   font-weight: 800;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: #ffffff;
-}
-
-.brandSub {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.75);
-  letter-spacing: 0.02em;
+  line-height: 1;
 }
 
 .headerRight {
@@ -289,6 +296,26 @@
 
   .header {
     padding: 20px 20px 80px 20px;
+  }
+
+  .brand {
+    gap: 12px;
+  }
+
+  .brandLogo {
+    height: 50px;
+  }
+
+  .brandLogoImg {
+    height: 50px !important;
+  }
+
+  .brandDivider {
+    height: 30px;
+  }
+
+  .brandName {
+    font-size: 20px;
   }
 
   .welcomeTitle {
