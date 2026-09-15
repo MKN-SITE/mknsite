@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useId, useRef, useState } from "react";
-import mknLogo from "@/public/assets/Logo MKN.png";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import mknLogo from "@/public/assets/mkn-logo-white-hd.png";
 import { Button } from "@/components/ui/button";
 import { getAvatarUrl } from "@/lib/api";
 import styles from "./portal-header.module.css";
@@ -19,6 +19,8 @@ export type PortalHeaderProps = {
   division?: string | null;
   onLogout: () => void;
   loggingOut?: boolean;
+  accountActions?: ReactNode;
+  logoutLabel?: string;
 };
 
 export function PortalHeader({
@@ -31,38 +33,51 @@ export function PortalHeader({
   avatarUrl,
   division,
   onLogout,
-  loggingOut
+  loggingOut,
+  accountActions,
+  logoutLabel = "Keluar Akun"
 }: PortalHeaderProps) {
   const [open, setOpen] = useState(false);
   const [avatarImgError, setAvatarImgError] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
+  const account = useRef<HTMLDivElement>(null);
   const panelId = useId();
+
+  useEffect(() => {
+    if (!open) return;
+    function closeOutside(event: PointerEvent) {
+      if (event.target instanceof Node && !account.current?.contains(event.target)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("pointerdown", closeOutside);
+    return () => document.removeEventListener("pointerdown", closeOutside);
+  }, [open]);
 
   return (
     <header className={styles.header}>
       <div className={styles.top}>
-        <Link href={homeHref} className={styles.brand} aria-label="MKN Site — Beranda Admin">
-          <span className={styles.logoBadge}>
+        <Link href={homeHref} className={styles.brand} aria-label="MKN Site">
+          <span className={styles.brandLogo}>
             <Image
               src={mknLogo}
-              alt="Logo Multi Kontrol Nusantara"
-              width={51}
-              height={38}
+              alt="Multi Kontrol Nusantara - A Bakrie Company"
+              width={200}
+              height={148}
               priority
-              className={styles.logoImg}
+              className={styles.brandLogoImg}
             />
           </span>
-          <div className={styles.brandIdentity}>
-            <div className={styles.brandTitleRow}>
-              <span className={styles.brandTitle}>MKN Site</span>
-              <span className={styles.brandBadge}>ADMIN</span>
-            </div>
-            <span className={styles.brandCompany}>PT Multi Kontrol Nusantara</span>
+          <span className={styles.brandDivider} aria-hidden="true" />
+          <div className={styles.brandText}>
+            <span className={styles.brandTitle}>MKN Site</span>
           </div>
         </Link>
 
         <div className={styles.accountArea}>
+          {accountActions}
           <div
+            ref={account}
             className={styles.account}
             onBlur={(event) => {
               if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
@@ -79,6 +94,7 @@ export function PortalHeader({
               type="button"
               className={styles.accountTrigger}
               aria-expanded={open}
+              aria-label={`Menu akun ${name}`}
               aria-controls={panelId}
               onClick={() => setOpen(!open)}
             >
@@ -118,7 +134,7 @@ export function PortalHeader({
                   <span>{role}</span>
                 </div>
                 <Button variant="danger" onClick={onLogout} loading={loggingOut} loadingText="Keluar...">
-                  Keluar admin
+                  {logoutLabel}
                 </Button>
               </div>
             )}

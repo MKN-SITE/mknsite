@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import mknLogoImg from "@/public/assets/Logo MKN.png";
+import mknLogoImg from "@/public/assets/mkn-logo-white-hd.png";
 
 export function Brand() {
   return (
@@ -9,8 +9,8 @@ export function Brand() {
         <Image
           src={mknLogoImg}
           alt="PT Multi Kontrol Nusantara"
-          width={51}
-          height={38}
+          width={160}
+          height={106}
           className="brand-logo-img"
           priority
         />

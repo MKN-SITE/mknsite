@@ -47,6 +47,14 @@ services:
       NEXT_TELEMETRY_DISABLED: "1"
     ports:
       - "127.0.0.1:3100:3000"
+    volumes:
+      # Share frontend source while keeping container dependencies and build cache isolated.
+      - ./apps/web/app:/app/apps/web/app:ro
+      - ./apps/web/components:/app/apps/web/components:ro
+      - ./apps/web/features:/app/apps/web/features:ro
+      - ./apps/web/lib:/app/apps/web/lib:ro
+      - ./apps/web/public:/app/apps/web/public:ro
+      - ./apps/web/styles:/app/apps/web/styles:ro
     depends_on:
       api:
         condition: service_healthy
