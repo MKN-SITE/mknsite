@@ -1,37 +1,44 @@
-import { eq, like } from "drizzle-orm";
+import { eq, inArray, like, ne, notInArray } from "drizzle-orm";
 import { db, pool } from ".";
 import { authAccounts, authUsers, divisions, menus, permissions, rolePermissions, roles, userRoles, users } from "./schema";
 
+// Izin sistem minimal: Dashboard, HR, dan Administrasi
 const permissionRows = [
-  ["Lihat dashboard", "dashboard.view"], ["Lihat HR", "hr.view"], ["Kelola HR", "hr.manage"],
-  ["Lihat OPS Telco", "ops_telco.view"], ["Kelola OPS Telco", "ops_telco.manage"],
-  ["Lihat OPS Workshop", "ops_workshop.view"], ["Kelola OPS Workshop", "ops_workshop.manage"],
-  ["Lihat Project", "project.view"], ["Kelola Project", "project.manage"], ["Kelola sistem", "admin.manage"],
+  ["Lihat dashboard", "dashboard.view"],
+  ["Lihat HR", "hr.view"],
+  ["Kelola HR", "hr.manage"],
+  ["Kelola sistem", "admin.manage"],
   ["Kelola keamanan sistem", "admin.security.manage"]
 ] as const;
 
+// Role sistem minimal: HR, Administrator, dan Superadministrator
 const roleRows = [
   ["HR", "hr", ["dashboard.view", "hr.view", "hr.manage"]],
-  ["OPS Telco", "ops-telco", ["dashboard.view", "ops_telco.view", "ops_telco.manage"]],
-  ["OPS Workshop", "ops-workshop", ["dashboard.view", "ops_workshop.view", "ops_workshop.manage"]],
-  ["PRJ Project", "project", ["dashboard.view", "project.view", "project.manage"]],
-  ["Manager", "manager", permissionRows.filter(([, slug]) => slug !== "admin.manage" && slug !== "admin.security.manage").map(([, slug]) => slug)],
   ["Administrator", "administrator", ["dashboard.view", "admin.manage"]],
   ["Superadministrator", "superadmin", ["dashboard.view", "admin.manage", "admin.security.manage"]]
 ] as const;
 
+// Akun kredensial utama sistem
 const accounts = [
   ["System Administrator", "admin@mknsite.online", "admin", "administrator", "Teknologi Informasi"],
   ["Super Administrator", "superadmin@mknsite.online", "admin", "superadmin", "Direksi / Eksekutif"]
 ] as const;
 
+// Divisi pokok perusahaan
+const defaultDivisions = [
+  ["Direksi / Eksekutif", "Dewan pimpinan eksekutif dan direksi perusahaan"],
+  ["Teknologi Informasi", "Infrastruktur IT, pengembangan sistem, dan keamanan siber"],
+  ["Human Resources", "Pengelolaan sumber daya manusia, kepersonaliaan, dan budaya kerja"]
+] as const;
+
 async function seed() {
-  // Bersihkan akun legacy berdomain @mknsite.id jika masih tertinggal
+  console.log("Memulai seeding minimal MKN Site (Admin, Superadmin & HR)...");
+
+  // 1. Bersihkan akun legacy berdomain @mknsite.id jika masih tertinggal
   await db.delete(users).where(like(users.email, "%@mknsite.id"));
 
-  // Bersihkan akun dummy/demo agar hanya tersisa admin & superadmin
+  // 2. Bersihkan akun dummy non-resmi agar hanya akun admin & superadmin yang ada
   const dummyEmails = [
-    "hr@mknsite.online",
     "telco@mknsite.online",
     "workshop@mknsite.online",
     "project@mknsite.online",
@@ -41,21 +48,10 @@ async function seed() {
     await db.delete(users).where(eq(users.email, email));
   }
 
-  // Bersihkan menu dummy/invalid agar hanya menu HR yang aktif
-  const staleMenuUrls = [
-    "/hr", // URL cacat warisan PR lama
-    "/finance",
-    "/portal/self-service",
-    "/portal/ops-telco",
-    "/portal/ops-workshop",
-    "/portal/project",
-    "/portal/payroll"
-  ];
-  for (const url of staleMenuUrls) {
-    await db.delete(menus).where(eq(menus.url, url));
-  }
+  // 3. Bersihkan seluruh menu selain menu HR (sisa menu diinput manual oleh admin)
+  await db.delete(menus).where(ne(menus.url, "/portal/hr"));
 
-  // Seed Menu HR secara idempoten
+  // 4. Seed Menu HR secara idempoten
   const hrMenuData = {
     title: "HR",
     icon: "users",
@@ -76,19 +72,34 @@ async function seed() {
     console.log("  ✓ Menu HR (/portal/hr) berhasil disinkronkan.");
   }
 
-  for (const [name, slug] of permissionRows) await db.insert(permissions).values({ name, slug }).onDuplicateKeyUpdate({ set: { name } });
-  for (const [name, slug] of roleRows) await db.insert(roles).values({ name, slug }).onDuplicateKeyUpdate({ set: { name } });
+  // 5. Bersihkan role dan permission yang tidak terpakai
+  const validRoleSlugs = roleRows.map(([, slug]) => slug);
+  await db.delete(roles).where(notInArray(roles.slug, validRoleSlugs));
+
+  const validPermissionSlugs = permissionRows.map(([, slug]) => slug);
+  await db.delete(permissions).where(notInArray(permissions.slug, validPermissionSlugs));
+
+  // 6. Sinkronkan permission & role yang diizinkan
+  for (const [name, slug] of permissionRows) {
+    await db.insert(permissions).values({ name, slug }).onDuplicateKeyUpdate({ set: { name } });
+  }
+  for (const [name, slug] of roleRows) {
+    await db.insert(roles).values({ name, slug }).onDuplicateKeyUpdate({ set: { name } });
+  }
 
   const allPermissions = await db.select().from(permissions);
   const allRoles = await db.select().from(roles);
   for (const [, roleSlug, grants] of roleRows) {
-    const role = allRoles.find((item) => item.slug === roleSlug)!;
+    const role = allRoles.find((item) => item.slug === roleSlug);
+    if (!role) continue;
     for (const grant of grants) {
-      const permission = allPermissions.find((item) => item.slug === grant)!;
+      const permission = allPermissions.find((item) => item.slug === grant);
+      if (!permission) continue;
       await db.insert(rolePermissions).values({ roleId: role.id, permissionId: permission.id }).onDuplicateKeyUpdate({ set: { roleId: role.id } });
     }
   }
 
+  // 7. Seed akun admin & superadmin
   const adminHash = await Bun.password.hash("admin12345", { algorithm: "argon2id" });
   const superadminHash = await Bun.password.hash("superadmin12345", { algorithm: "argon2id" });
   for (const [name, email, accountType, roleSlug, division] of accounts) {
@@ -110,8 +121,10 @@ async function seed() {
     }
 
     // Pastikan role tetap terpasang
-    const role = allRoles.find((item) => item.slug === roleSlug)!;
-    await db.insert(userRoles).values({ userId: accountId, roleId: role.id }).onDuplicateKeyUpdate({ set: { roleId: role.id } });
+    const role = allRoles.find((item) => item.slug === roleSlug);
+    if (role) {
+      await db.insert(userRoles).values({ userId: accountId, roleId: role.id }).onDuplicateKeyUpdate({ set: { roleId: role.id } });
+    }
 
     // Pastikan Better Auth auth_user & auth_account ada
     const [existingAuthUser] = await db.select().from(authUsers).where(eq(authUsers.email, email)).limit(1);
@@ -137,26 +150,13 @@ async function seed() {
     }
   }
 
-  // Seed default divisions (idempoten)
-  const defaultDivisions = [
-    ["Direksi / Eksekutif", "Dewan pimpinan eksekutif dan direksi perusahaan"],
-    ["Teknologi Informasi", "Infrastruktur IT, pengembangan sistem, dan keamanan siber"],
-    ["Human Resources", "Pengelolaan sumber daya manusia, kepersonaliaan, dan budaya kerja"],
-    ["Telekomunikasi", "Operasional jaringan, infrastruktur telco, dan pemeliharaan site"],
-    ["Workshop", "Bengkel fabrikasi, perbaikan mekanik, dan peralatan lapangan"],
-    ["Project Management", "Manajemen proyek lapangan, timeline kerja, dan koordinasi site"],
-    ["Manajemen & Operasional", "Manajemen umum, kepengawasan, dan operasional harian"],
-    ["Keuangan & Akuntansi", "Manajemen keuangan, kas, faktur, dan akuntansi bisnis"],
-    ["Logistik & Pengadaan", "Pengadaan barang, logistik material, dan manajemen aset"]
-  ] as const;
-
+  // 8. Seed default divisions pokok (idempoten)
   for (const [name, description] of defaultDivisions) {
     await db.insert(divisions).values({ name, description }).onDuplicateKeyUpdate({ set: { description } });
   }
 
-  console.log("Seed MKN Site selesai.");
+  console.log("Seed MKN Site minimal selesai.");
   await pool.end();
-
 }
 
 seed().catch(async (error) => { console.error(error); await pool.end(); process.exit(1); });
