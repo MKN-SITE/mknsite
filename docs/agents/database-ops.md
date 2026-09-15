@@ -92,6 +92,21 @@ __drizzle_migrations prod:  4 → semua migrasi sudah jalan di production
 > [!WARNING]
 > **Drizzle TIDAK memiliki fitur rollback otomatis.** Jika perlu rollback migrasi, harus manual: tulis SQL `DROP TABLE` / `ALTER TABLE DROP COLUMN` sendiri, lalu hapus row dari `__drizzle_migrations`.
 
+## Patokan Otomasi Registrasi Menu Dinamis (Standar Wajib Opsi B)
+
+Sistem MKN Site menggunakan navigasi modul portal berbasis tabel `menus` di database.
+Agar modul baru yang dikembangkan di frontend langsung aktif dan muncul di portal tanpa mengandalkan input manual admin di production, tim MKN Site menetapkan **Opsi B (Otomasi via seed.ts)** sebagai standar baku proyek:
+
+### Prinsip Kerja Otomasi Menu:
+1. **Satu Kesatuan PR**: Setiap developer/agen yang membuat halaman modul baru (misal: `apps/web/app/portal/ops-telco/page.tsx`) **wajib** mendaftarkan permission, role, dan menu di `apps/api/src/db/seed.ts` pada PR yang sama.
+2. **Zero Human Error**: Menghindari salah ketik URL (misal typo `/telco` yang berujung 404) atau kelupaan mengisi `requiredPermission` di panel admin.
+3. **Eksekusi Otomatis Coolify**: Saat PR di-merge ke `main`, container backend Coolify di production mengeksekusi startup script:
+   ```dockerfile
+   CMD ["sh", "-c", "bunx drizzle-kit migrate && bun src/db/seed.ts && bun src/index.ts"]
+   ```
+   Eksekusi `seed.ts` secara otomatis memasukkan menu ke database production secara idempoten.
+4. **Dilarang Bergantung pada Input Manual**: QA dilarang meloloskan PR rute portal baru jika menunya tidak terdaftar di `seed.ts`.
+
 ## Aturan Penting: Git Revert ≠ Database Revert
 
 > [!CAUTION]

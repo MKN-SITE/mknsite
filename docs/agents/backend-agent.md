@@ -40,11 +40,15 @@ Setiap fitur baru yang mengubah atau menambah tabel, kolom, relasi, tipe data, a
    ```bash
    bun --cwd apps/api db:migrate
    ```
-5. **Update Seed jika Perlu**: Jika fitur membutuhkan master data, permission, atau role baru, perbarui `apps/api/src/db/seed.ts` secara idempoten (`onDuplicateKeyUpdate` atau pengecekan `existing`).
-6. **Sertakan dalam Commit/PR**: Seluruh berkas baru di `apps/api/drizzle/` **wajib** di-commit dan di-push ke branch Git bersamaan dengan kode fitur.
+5. **Wajib Registrasi Menu & RBAC di Seed (Patokan Otomasi QA - Opsi B)**: Setiap fitur atau modul baru yang memiliki tampilan di portal karyawan WAJIB mendaftarkan:
+   - Izin (`permissions`) dan peran (`roles`) terkait.
+   - Kartu menu navigasi di tabel `menus` melalui `apps/api/src/db/seed.ts` secara idempoten.
+   - **Dilarang** meminta admin menginput menu secara manual di production; seed otomatis memastikan modul langsung aktif saat deployment Coolify selesai.
+6. **Sertakan dalam Satu Commit/PR**: Seluruh berkas baru di `apps/api/drizzle/`, perubahan `seed.ts`, dan rute frontend **wajib** disatukan dalam branch Git dan PR yang sama.
 7. **Larangan Keras**:
    - DILARANG hanya mengubah `schema.ts` tanpa menjalankan `db:generate`.
-   - DILARANG menggunakan `bun run db:push` untuk produksi, karena `db:push` memotong proses pembuatan berkas migrasi SQL sehingga server produksi (Coolify) tidak akan menerapkan perubahan tersebut.
+   - DILARANG menggunakan `bun run db:push` untuk produksi.
+   - DILARANG membuat modul baru tanpa mendaftarkan menunya di `seed.ts`.
 
 Untuk panduan lengkap operasi database (cek migration history, perbandingan lokal vs production, prosedur revert/rollback database, pembersihan data orphan), lihat [database-ops.md](database-ops.md).
 

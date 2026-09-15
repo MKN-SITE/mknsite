@@ -21,6 +21,19 @@ Rencana uji, test otomatis yang relevan, laporan temuan, dan verifikasi ulang. D
 - Gunakan akun/data uji dan pulihkan perubahan data uji setelah selesai.
 - Periksa konfigurasi perintah sebelum menjalankan seed, rebuild, atau restart di lingkungan bersama.
 
+## Standar Otomasi Rilis Modul & Menu Dinamis (Patokan Wajib QA)
+
+Setiap penambahan atau pembaruan modul bisnis (misal: HR, OPS Telco, OPS Workshop, Project, dll) **WAJIB menggunakan pola otomasi seed dalam PR yang sama (Opsi B)**:
+1. **Aturan Satu PR**: Kode halaman frontend (`apps/web/app/portal/<modul>`), skema backend/migrasi (`apps/api/drizzle/`), dan registrasi menu di seed (`apps/api/src/db/seed.ts`) harus berada dalam **satu PR yang utuh**.
+2. **Dilarang Bergantung pada Input Manual**: QA dilarang meloloskan PR fitur jika menunya tidak didaftarkan di `seed.ts`. Mengandalkan input manual di production berisiko tinggi (typo URL, lupa permission, atau modul tidak muncul di portal).
+3. **Idempotensi Seed**: Registrasi menu di `seed.ts` harus idempoten (menggunakan pengecekan `existing` atau `onDuplicateKeyUpdate`) sehingga aman dijalankan berulang kali saat redeploy di Coolify.
+4. **Matriks Pengujian Rilis Modul**:
+   - [ ] Halaman modul dan submenunya dapat diakses tanpa error 404/500.
+   - [ ] Seed lokal (`bun run db:seed`) berhasil mendaftarkan menu ke tabel `menus`.
+   - [ ] Menu muncul secara dinamis di `/portal` dengan label, ikon, deskripsi, dan link yang benar.
+   - [ ] Karyawan dengan role yang sesuai dapat mengakses modul.
+   - [ ] Karyawan tanpa permission yang sesuai otomatis tidak melihat menu dan ditolak jika mengakses URL langsung.
+
 ## Status dan tingkat keparahan
 
 Status skenario: **PASS**, **FAIL**, **BLOCKED** (prasyarat gagal), atau **NOT RUN**. Jangan menggabungkan belum diuji dengan lulus.
