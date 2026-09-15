@@ -25,6 +25,27 @@ Utama: apps/api, schema/migrasi Drizzle, test API, dan dokumentasi kontrak. Koor
 - Dokumentasikan keterbatasan event hub satu instance dan kebutuhan broker bila skala berubah.
 - Jangan membocorkan stack trace, secret, atau detail database dalam error publik.
 
+## Prosedur Wajib Migrasi Database Drizzle (Fitur Baru & Perubahan Skema)
+
+Setiap fitur baru yang mengubah atau menambah tabel, kolom, relasi, tipe data, atau indeks WAJIB mengikuti alur berikut:
+
+1. **Ubah Skema**: Ubah definisi tabel di `apps/api/src/db/schema.ts`.
+2. **Generate Berkas Migrasi SQL**: Jalankan perintah berikut dari root repo:
+   ```bash
+   bun --cwd apps/api db:generate
+   ```
+   Perintah ini menghasilkan berkas SQL baru di `apps/api/drizzle/xxxx_nama_migrasi.sql` dan memperbarui `apps/api/drizzle/meta/_journal.json`.
+3. **Review Berkas SQL**: Periksa isi berkas `.sql` yang dihasilkan untuk memastikan sintaks DDL (`CREATE TABLE`, `ALTER TABLE`, `ADD COLUMN`, `CREATE INDEX`) sudah benar dan tidak ada operasi destruktif yang tidak disengaja.
+4. **Uji di Lokal**: Jalankan migrasi lokal:
+   ```bash
+   bun --cwd apps/api db:migrate
+   ```
+5. **Update Seed jika Perlu**: Jika fitur membutuhkan master data, permission, atau role baru, perbarui `apps/api/src/db/seed.ts` secara idempoten (`onDuplicateKeyUpdate` atau pengecekan `existing`).
+6. **Sertakan dalam Commit/PR**: Seluruh berkas baru di `apps/api/drizzle/` **wajib** di-commit dan di-push ke branch Git bersamaan dengan kode fitur.
+7. **Larangan Keras**:
+   - DILARANG hanya mengubah `schema.ts` tanpa menjalankan `db:generate`.
+   - DILARANG menggunakan `bun run db:push` untuk produksi, karena `db:push` memotong proses pembuatan berkas migrasi SQL sehingga server produksi (Coolify) tidak akan menerapkan perubahan tersebut.
+
 ## Kontrak yang harus diserahkan
 
 ```text
