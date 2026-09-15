@@ -65,12 +65,12 @@ DOCS_PROVIDER=swagger-ui
 - **`ENABLE_SWAGGER`**: Secara default bernilai `false` pada production. Set ke `"true"` hanya jika dideploy pada staging.
 - **`DOCS_PROVIDER`**: Renderer dokumentasi interaktif: `"swagger-ui"` (default) atau `"scalar"`.
 
-### Migrasi Database Otomatis
+### Migrasi Database & Seeding Otomatis
 
-Dockerfile menjalankan `bunx drizzle-kit migrate` sebelum memulai API server pada setiap container startup. Migrasi bersifat idempoten — jika tidak ada migrasi baru, langkah ini langsung selesai tanpa perubahan. Data existing tidak tersentuh.
+Dockerfile menjalankan `bunx drizzle-kit migrate` untuk menerapkan migrasi skema SQL dan `bun src/db/seed.ts` untuk memastikan akun admin, superadmin, dan master data penting selalu terinisialisasi sebelum memulai API server pada setiap container startup. Seluruh proses ini bersifat idempoten — data existing tidak tersentuh atau ditimpa.
 
 ```dockerfile
-CMD ["sh", "-c", "bunx drizzle-kit migrate && bun src/index.ts"]
+CMD ["sh", "-c", "bunx drizzle-kit migrate && bun src/db/seed.ts && bun src/index.ts"]
 ```
 
 Tempatkan MySQL sebagai database Coolify pada private network yang sama. Jangan publikasikan port 3306 ke internet.
