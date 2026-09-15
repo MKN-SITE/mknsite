@@ -1,6 +1,6 @@
 import { and, count, desc, eq, gt, inArray, like, ne, or } from "drizzle-orm";
 import { db } from "../db";
-import { auditLogs, authAccounts, authSessions, authUsers, permissions, rolePermissions, roles, userRoles, users } from "../db/schema";
+import { auditLogs, authAccounts, authSessions, authUsers, hrForms, permissions, rolePermissions, roles, userRoles, users } from "../db/schema";
 import { mapUserSummary, type RoleSummaryDto, type UpdateUserProfileDto, type UserListResponseDto, type UserSummaryDto } from "../schemas/admin.dto";
 import { publishAdminDivisionsUpdated, publishAdminRbacUpdated, publishAdminUsersUpdated, publishRealtimeEvent } from "../realtime/hub";
 import { rbacService } from "./rbac.service";
@@ -672,6 +672,8 @@ export class AdminService {
     adminId: number,
     callerPermissions: string[] = []
   ): Promise<{ success: boolean } | { error: { status: number; code: string; message: string } }> {
+    const [ownedForm] = await db.select({ id: hrForms.id }).from(hrForms).where(eq(hrForms.createdBy, targetId)).limit(1);
+    if (ownedForm) return { error: { status: 409, code: "USER_HAS_HR_FORMS", message: "Pengguna memiliki riwayat formulir HR. Nonaktifkan akun agar riwayat tetap tersimpan." } };
     const [target] = await db
       .select({
         id: users.id,

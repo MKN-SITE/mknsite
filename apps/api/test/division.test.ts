@@ -169,4 +169,3 @@ describe("Division CRUD API", () => {
     expect(notFoundRes.status).toBe(404);
   });
 });
-

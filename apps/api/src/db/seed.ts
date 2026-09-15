@@ -1,10 +1,17 @@
-import { eq, like } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { db, pool } from ".";
-import { authAccounts, authUsers, divisions, menus, permissions, rolePermissions, roles, userRoles, users } from "./schema";
+import { authAccounts, authUsers, divisions, permissions, rolePermissions, roles, userRoles, users } from "./schema";
 
 const permissionRows = [
   ["Lihat dashboard", "dashboard.view"], ["Lihat HR", "hr.view"], ["Kelola HR", "hr.manage"],
   ["Lihat OPS Telco", "ops_telco.view"], ["Kelola OPS Telco", "ops_telco.manage"],
+  ["Lihat penugasan job Telco", "ops_telco.job_assignment.view"],
+  ["Kelola jadwal oncall Telco", "ops_telco.schedule.manage"],
+  ["Lihat Form PTO Telco", "ops_telco.pto.view"],
+  ["Lihat jadwal oncall Telco", "ops_telco.schedule.view"],
+  ["Lihat auto report WAG Telco", "ops_telco.wag_report.view"],
+  ["Lihat estimasi dan quotation Telco", "ops_telco.estimate.view"],
+  ["Lihat dokumentasi pekerjaan Telco", "ops_telco.documentation.view"],
   ["Lihat OPS Workshop", "ops_workshop.view"], ["Kelola OPS Workshop", "ops_workshop.manage"],
   ["Lihat Project", "project.view"], ["Kelola Project", "project.manage"], ["Kelola sistem", "admin.manage"],
   ["Kelola keamanan sistem", "admin.security.manage"]
@@ -12,7 +19,15 @@ const permissionRows = [
 
 const roleRows = [
   ["HR", "hr", ["dashboard.view", "hr.view", "hr.manage"]],
-  ["OPS Telco", "ops-telco", ["dashboard.view", "ops_telco.view", "ops_telco.manage"]],
+  ["OPS Telco Teknisi", "ops-telco", [
+    "dashboard.view", "ops_telco.view", "ops_telco.schedule.view", "ops_telco.wag_report.view",
+    "ops_telco.estimate.view", "ops_telco.documentation.view"
+  ]],
+  ["OPS Telco Supervisor", "ops-telco-supervisor", [
+    "dashboard.view", "ops_telco.view", "ops_telco.manage", "ops_telco.job_assignment.view",
+    "ops_telco.schedule.manage", "ops_telco.pto.view", "ops_telco.schedule.view", "ops_telco.wag_report.view",
+    "ops_telco.estimate.view", "ops_telco.documentation.view"
+  ]],
   ["OPS Workshop", "ops-workshop", ["dashboard.view", "ops_workshop.view", "ops_workshop.manage"]],
   ["PRJ Project", "project", ["dashboard.view", "project.view", "project.manage"]],
   ["Manager", "manager", permissionRows.filter(([, slug]) => slug !== "admin.manage" && slug !== "admin.security.manage").map(([, slug]) => slug)],
@@ -26,40 +41,16 @@ const accounts = [
 ] as const;
 
 async function seed() {
-  // Bersihkan akun legacy berdomain @mknsite.id jika masih tertinggal
-  await db.delete(users).where(like(users.email, "%@mknsite.id"));
-
-  // Bersihkan akun dummy/demo agar hanya tersisa admin & superadmin
-  const dummyEmails = [
-    "hr@mknsite.online",
-    "telco@mknsite.online",
-    "workshop@mknsite.online",
-    "project@mknsite.online",
-    "manager@mknsite.online"
-  ];
-  for (const email of dummyEmails) {
-    await db.delete(users).where(eq(users.email, email));
-  }
-
-  // Bersihkan menu dummy/demo agar menu bersih untuk uji coba real data
-  const dummyMenuUrls = [
-    "/portal/self-service",
-    "/portal/hr",
-    "/portal/ops-telco",
-    "/portal/ops-workshop",
-    "/portal/project",
-    "/portal/payroll"
-  ];
-  for (const url of dummyMenuUrls) {
-    await db.delete(menus).where(eq(menus.url, url));
-  }
-
-  for (const [name, slug] of permissionRows) await db.insert(permissions).values({ name, slug }).onDuplicateKeyUpdate({ set: { name } });
-  for (const [name, slug] of roleRows) await db.insert(roles).values({ name, slug }).onDuplicateKeyUpdate({ set: { name } });
+  const production = process.env.NODE_ENV === "production";
+  // Seed is additive. Existing accounts, menu configuration and RBAC stay owned by Administrasi.
+  const existingRoles = new Set((await db.select().from(roles)).map((role) => role.slug));
+  for (const [name, slug] of permissionRows) await db.insert(permissions).ignore().values({ name, slug });
+  for (const [name, slug] of roleRows) await db.insert(roles).ignore().values({ name, slug });
 
   const allPermissions = await db.select().from(permissions);
   const allRoles = await db.select().from(roles);
   for (const [, roleSlug, grants] of roleRows) {
+    if (existingRoles.has(roleSlug)) continue;
     const role = allRoles.find((item) => item.slug === roleSlug)!;
     for (const grant of grants) {
       const permission = allPermissions.find((item) => item.slug === grant)!;
@@ -67,52 +58,35 @@ async function seed() {
     }
   }
 
-  const adminHash = await Bun.password.hash("admin12345", { algorithm: "argon2id" });
-  const superadminHash = await Bun.password.hash("superadmin12345", { algorithm: "argon2id" });
   for (const [name, email, accountType, roleSlug, division] of accounts) {
-    const loginHash = email === "superadmin@mknsite.online" ? superadminHash : adminHash;
-    const [existing] = await db.select().from(users).where(eq(users.email, email)).limit(1);
-    let accountId: number;
-
-    if (existing) {
-      console.log(`  → Akun ${email} sudah ada (id=${existing.id}), memastikan integritas auth...`);
-      accountId = existing.id;
-      if (!existing.division) {
-        await db.update(users).set({ division }).where(eq(users.id, existing.id));
+    await db.transaction(async (tx) => {
+      const [existing] = await tx.select().from(users).where(eq(users.email, email)).limit(1).for("update");
+      if (!existing && production) return; // No sample passwords or new users in production.
+      if (existing && existing.accountType !== "admin") throw new Error("Email bootstrap sudah digunakan akun non-admin. Periksa konfigurasi.");
+      let account = existing;
+      if (!account) {
+        const passwordHash = await Bun.password.hash(email === "superadmin@mknsite.online" ? "superadmin12345" : "admin12345", { algorithm: "argon2id" });
+        const [created] = await tx.insert(users).values({ name, email, accountType, division, passwordHash }).$returningId();
+        [account] = await tx.select().from(users).where(eq(users.id, created.id));
+        const role = allRoles.find((item) => item.slug === roleSlug)!;
+        await tx.insert(userRoles).values({ userId: account.id, roleId: role.id });
       }
-    } else {
-      await db.insert(users).values({ name, email, accountType, division, passwordHash: loginHash });
-      const [account] = await db.select().from(users).where(eq(users.email, email)).limit(1);
-      accountId = account.id;
-      console.log(`  ✓ Akun ${email} berhasil dibuat di tabel users.`);
-    }
 
-    // Pastikan role tetap terpasang
-    const role = allRoles.find((item) => item.slug === roleSlug)!;
-    await db.insert(userRoles).values({ userId: accountId, roleId: role.id }).onDuplicateKeyUpdate({ set: { roleId: role.id } });
-
-    // Pastikan Better Auth auth_user & auth_account ada
-    const [existingAuthUser] = await db.select().from(authUsers).where(eq(authUsers.email, email)).limit(1);
-    let authUserId: string;
-
-    if (!existingAuthUser) {
-      authUserId = crypto.randomUUID();
-      await db.insert(authUsers).values({ id: authUserId, mknUserId: accountId, name, email, emailVerified: true });
-      console.log(`  ✓ Akun ${email} berhasil didaftarkan ke Better Auth (auth_user).`);
-    } else {
-      authUserId = existingAuthUser.id;
-      if (!existingAuthUser.mknUserId) {
-        await db.update(authUsers).set({ mknUserId: accountId }).where(eq(authUsers.id, authUserId));
+      // Repair missing Better Auth records with the account's current hash, never a demo hash.
+      const identities = await tx.select().from(authUsers).where(or(eq(authUsers.mknUserId, account.id), eq(authUsers.email, account.email)));
+      if (identities.length > 1) throw new Error("Relasi Better Auth ambigu; periksa akun bootstrap.");
+      let identity = identities[0];
+      if (identity && (identity.email !== account.email || (identity.mknUserId !== null && identity.mknUserId !== account.id))) throw new Error("Relasi Better Auth tidak cocok; periksa akun bootstrap.");
+      if (!identity) {
+        const id = crypto.randomUUID();
+        await tx.insert(authUsers).values({ id, mknUserId: account.id, name: account.name, email: account.email, emailVerified: true });
+        [identity] = await tx.select().from(authUsers).where(eq(authUsers.id, id));
+      } else if (identity.mknUserId === null) {
+        await tx.update(authUsers).set({ mknUserId: account.id }).where(eq(authUsers.id, identity.id));
       }
-    }
-
-    const [existingAuthAccount] = await db.select().from(authAccounts).where(eq(authAccounts.userId, authUserId)).limit(1);
-    if (!existingAuthAccount) {
-      await db.insert(authAccounts).values({
-        id: crypto.randomUUID(), accountId: authUserId, providerId: "credential", userId: authUserId, password: loginHash
-      });
-      console.log(`  ✓ Kredensial ${email} berhasil didaftarkan ke Better Auth (auth_account).`);
-    }
+      const [credential] = await tx.select().from(authAccounts).where(and(eq(authAccounts.userId, identity.id), eq(authAccounts.providerId, "credential"))).limit(1);
+      if (!credential) await tx.insert(authAccounts).values({ id: crypto.randomUUID(), accountId: identity.id, providerId: "credential", userId: identity.id, password: account.passwordHash });
+    });
   }
 
   // Seed default divisions (idempoten)
@@ -129,7 +103,7 @@ async function seed() {
   ] as const;
 
   for (const [name, description] of defaultDivisions) {
-    await db.insert(divisions).values({ name, description }).onDuplicateKeyUpdate({ set: { description } });
+    await db.insert(divisions).ignore().values({ name, description });
   }
 
   console.log("Seed MKN Site selesai.");

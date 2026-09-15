@@ -29,7 +29,7 @@ describe("Admin portal navigation", () => {
   test("permissions screen exposes a searchable catalog and keeps mutations restricted", () => {
     const html = renderToStaticMarkup(createElement(RolePermissionViewer, { view: "permissions" }));
     expect(html).toContain("Katalog izin sistem");
-    expect(html).toContain("Cari nama atau slug izin");
+    expect(html).toContain("Cari nama, slug izin, role terkait, atau menu");
     expect(html).toContain("Mode baca");
     expect(html).not.toContain("+ Tambah Izin");
     expect(html).not.toContain("Matriks akses RBAC");

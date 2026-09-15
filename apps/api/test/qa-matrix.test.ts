@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { app, createServer } from "../src/index";
+import { app, createServer } from "./setup";
 import { db } from "../src/db";
 import { authUsers, users } from "../src/db/schema";
 import { eq } from "drizzle-orm";
