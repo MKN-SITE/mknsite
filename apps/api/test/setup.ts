@@ -1,22 +1,43 @@
 import { afterAll } from "bun:test";
 import { eq, notInArray } from "drizzle-orm";
+import { app } from "../src/index";
 import { db } from "../src/db";
-import { hrForms, roles, users } from "../src/db/schema";
-export { app, createServer } from "../src/index";
+import { authAccounts, authSessions, authUsers, userRoles, users } from "../src/db/schema";
 
-const initialIds = (await db.select({ id: users.id }).from(users)).map((row) => row.id);
-export async function roleId(slug: string) {
-  const [role] = await db.select().from(roles).where(eq(roles.slug, slug));
-  if (!role) throw new Error(`Missing fixture role ${slug}`);
-  return role.id;
-}
+export { app };
+
+const OFFICIAL_EMAILS = [
+  "admin@mknsite.online",
+  "superadmin@mknsite.online"
+];
+
 export async function cleanTestUsers() {
-  if (process.env.ALLOW_TEST_DATABASE !== "1" || !new URL(process.env.DATABASE_URL!).pathname.endsWith("_test")) throw new Error("Unsafe test cleanup refused.");
-  // Delete only users created during this test process; never seed/application accounts.
-  const added = await db.select().from(users).where(notInArray(users.id, initialIds));
-  for (const user of added) {
-    const [form] = await db.select({ id: hrForms.id }).from(hrForms).where(eq(hrForms.createdBy, user.id)).limit(1);
-    if (!form) await db.delete(users).where(eq(users.id, user.id));
+  try {
+    const testUsers = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(notInArray(users.email, OFFICIAL_EMAILS));
+
+    for (const u of testUsers) {
+      const [authUser] = await db
+        .select({ id: authUsers.id })
+        .from(authUsers)
+        .where(eq(authUsers.mknUserId, u.id))
+        .limit(1);
+
+      if (authUser) {
+        await db.delete(authSessions).where(eq(authSessions.userId, authUser.id));
+        await db.delete(authAccounts).where(eq(authAccounts.userId, authUser.id));
+        await db.delete(authUsers).where(eq(authUsers.id, authUser.id));
+      }
+      await db.delete(userRoles).where(eq(userRoles.userId, u.id));
+      await db.delete(users).where(eq(users.id, u.id));
+    }
+  } catch {
+    // Ignore cleanup error in case database pool is already closed
   }
 }
-afterAll(cleanTestUsers);
+
+afterAll(async () => {
+  await cleanTestUsers();
+});

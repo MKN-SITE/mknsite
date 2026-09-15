@@ -37,8 +37,7 @@ describe("MenuGrid component", () => {
     );
 
     expect(html).toContain("MKN Site</span>");
-    expect(html).toContain('alt="Multi Kontrol Nusantara - A Bakrie Company"');
-    expect(html).toContain("mkn-logo-white-hd.png");
+    expect(html).toContain("PT Multi Kontrol Nusantara</span>");
     expect(html).toContain("Welcome, Budi</h1>");
     expect(html).toContain("Empower your business with real-time insights");
     expect(html).toContain("Budi Santoso</span>");

@@ -44,3 +44,4 @@ export type DivisionMembersResponseDto = {
   division: DivisionSummaryDto;
   total: number;
 };
+

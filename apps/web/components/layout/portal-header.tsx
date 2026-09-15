@@ -10,9 +10,6 @@ import styles from "./portal-header.module.css";
 
 export type PortalHeaderProps = {
   homeHref: string;
-  homeLabel?: string;
-  status?: ReactNode;
-  contextLabel?: string;
   name: string;
   role: string;
   eyebrow: string;
@@ -28,8 +25,6 @@ export type PortalHeaderProps = {
 
 export function PortalHeader({
   homeHref,
-  homeLabel = "MKN Site",
-  status,
   name,
   role,
   eyebrow,
@@ -62,7 +57,7 @@ export function PortalHeader({
   return (
     <header className={styles.header}>
       <div className={styles.top}>
-        <Link href={homeHref} className={styles.brand} aria-label={homeLabel}>
+        <Link href={homeHref} className={styles.brand} aria-label="MKN Site">
           <span className={styles.brandLogo}>
             <Image
               src={mknLogo}
@@ -80,7 +75,6 @@ export function PortalHeader({
         </Link>
 
         <div className={styles.accountArea}>
-          {status}
           {accountActions}
           <div
             ref={account}

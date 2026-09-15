@@ -11,6 +11,5 @@ dist
 *.log
 .DS_Store
 scratch/
-tmp/
 uploads/
 apps/api/uploads/

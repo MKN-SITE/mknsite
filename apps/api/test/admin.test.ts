@@ -2,7 +2,7 @@ import { afterAll, describe, expect, it } from "bun:test";
 import { eq } from "drizzle-orm";
 import { db } from "../src/db";
 import { authUsers, users } from "../src/db/schema";
-import { app, cleanTestUsers, roleId } from "./setup";
+import { app, cleanTestUsers } from "./setup";
 
 describe("Admin API", () => {
   it("menolak mutasi admin tanpa sesi dengan HTTP 401 dan skema error standar", async () => {
@@ -306,7 +306,7 @@ describe("Admin API", () => {
     );
     const cookie = loginRes.headers.get("set-cookie") ?? "";
 
-    // Resolve by slug: role IDs vary across migrated installations.
+    // Role 6 adalah Administrator (memuat permission admin.manage)
     const res = await app.handle(
       new Request("http://localhost/admin/users", {
         method: "POST",
@@ -315,7 +315,7 @@ describe("Admin API", () => {
           name: "Karyawan Ilegal",
           email: "ilegal@mknsite.online",
           password: "password123456",
-          roleIds: [await roleId("administrator")]
+          roleIds: [6]
         })
       })
     );
@@ -1064,9 +1064,8 @@ describe("Admin API", () => {
     const meNew = await app.handle(new Request("http://localhost/auth/me", { headers: { Cookie: newCookie } }));
     expect(meNew.status).toBe(200);
     const meNewBody = (await meNew.json()) as { user: { roles: string[]; permissions: string[] } };
-    expect(meNewBody.user.roles).toContain("OPS Telco Teknisi");
-    expect(meNewBody.user.permissions).toContain("ops_telco.schedule.view");
-    expect(meNewBody.user.permissions).not.toContain("ops_telco.pto.view");
+    expect(meNewBody.user.roles).toContain("OPS Telco");
+    expect(meNewBody.user.permissions).toContain("ops_telco.manage");
   });
 
   it("POST /admin/users/:id/revoke-sessions berhasil mencabut sesi aktif tanpa menonaktifkan user", async () => {

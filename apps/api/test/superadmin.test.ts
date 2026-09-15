@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { app, roleId } from "./setup";
+import { app } from "./setup";
 import { authorizeSuperadmin } from "../src/guards/admin.guard";
 
 describe("Superadmin RBAC & Guard Suite (Fase 1 Superadmin)", () => {
@@ -153,7 +153,7 @@ describe("Superadmin RBAC & Guard Suite (Fase 1 Superadmin)", () => {
       new Request(`http://localhost/admin/users/${superadminId}/roles`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
-        body: JSON.stringify({ roleIds: [await roleId("administrator")] })
+        body: JSON.stringify({ roleIds: [6] }) // role administrator biasa
       })
     );
     expect(rolePatchRes.status).toBe(403);

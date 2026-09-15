@@ -4,6 +4,3 @@
 **/.env.*
 **/*.tsbuildinfo
 .git
-tmp
-uploads
-apps/api/uploads
