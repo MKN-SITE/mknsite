@@ -46,6 +46,8 @@ Setiap fitur baru yang mengubah atau menambah tabel, kolom, relasi, tipe data, a
    - DILARANG hanya mengubah `schema.ts` tanpa menjalankan `db:generate`.
    - DILARANG menggunakan `bun run db:push` untuk produksi, karena `db:push` memotong proses pembuatan berkas migrasi SQL sehingga server produksi (Coolify) tidak akan menerapkan perubahan tersebut.
 
+Untuk panduan lengkap operasi database (cek migration history, perbandingan lokal vs production, prosedur revert/rollback database, pembersihan data orphan), lihat [database-ops.md](database-ops.md).
+
 ## Kontrak yang harus diserahkan
 
 ```text

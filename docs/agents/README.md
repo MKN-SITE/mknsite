@@ -17,7 +17,7 @@ Nama Enterprise FMS pada dokumen awal berasal dari contoh pencatatan sebelumnya.
 | [QA Agent](qa-agent.md) | Pengujian berbasis risiko dan laporan bukti | Test, laporan QA |
 | [Agent-log](agent-log.md) | Riwayat pengembangan yang akurat | docs/CHANGELOG.md |
 
-Semua peran wajib membaca [standar kerja bersama](working-agreement.md). Lihat [contoh penggunaan](examples.md) untuk prompt siap salin, tugas lintas peran, dan format laporan.
+Semua peran wajib membaca [standar kerja bersama](working-agreement.md) dan [panduan operasi database](database-ops.md). Lihat [contoh penggunaan](examples.md) untuk prompt siap salin, tugas lintas peran, dan format laporan.
 
 ## Cara menjalankan
 
