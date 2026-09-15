@@ -15,9 +15,15 @@ export const config = {
       ...rawAppOrigins,
       "https://mknsite.online",
       "https://www.mknsite.online",
-      ...(isProduction ? [] : ["http://localhost:3000", "http://127.0.0.1:3000"])
+      ...(isProduction ? [] : [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3100",
+        "http://127.0.0.1:3100"
+      ])
     ])
   ],
+
   apiOrigin: process.env.BETTER_AUTH_URL ?? `http://localhost:${process.env.PORT ?? 3001}`,
   databaseUrl: process.env.DATABASE_URL ?? "mysql://mknsite:mknsite-local-only@localhost:3306/mknsite",
   isProduction,

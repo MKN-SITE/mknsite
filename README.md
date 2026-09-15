@@ -43,15 +43,15 @@ Verifikasi lingkungan tim:
 bun scripts/verify-docker.mjs
 ```
 
-Script ini menguji halaman web, health check API, login MySQL, izin HR, penolakan akses lintas modul, serta isolasi sesi admin dan karyawan.
+Script ini menguji halaman web, health check API, login MySQL, izin HR, penolakan akses lintas modul, serta isolasi sesi admin dan karyawan. Buat akun karyawan uji dengan role HR melalui Administrasi, lalu isi `VERIFY_EMPLOYEE_EMAIL` dan `VERIFY_EMPLOYEE_PASSWORD`. Kredensial admin dapat diatur lewat `VERIFY_ADMIN_EMAIL` / `VERIFY_ADMIN_PASSWORD`.
 
 ## Menjalankan lokal tanpa container aplikasi
 
 1. Salin `.env.example` menjadi `apps/api/.env`. Untuk frontend, isi `apps/web/.env.local` dengan NEXT_PUBLIC_API_URL dari contoh.
 2. Jalankan MySQL dengan `docker compose up -d mysql`.
 3. Pasang dependency dengan `bun install`.
-4. Buat dan jalankan migrasi dengan `bun run db:generate` lalu `bun run db:migrate`.
-5. Isi akun demo dengan `bun run db:seed`.
+4. Jalankan migrasi tersimpan dengan `bun run db:migrate`. `db:generate` hanya diperlukan saat pengembang mengubah schema.
+5. Buat akun administrator development dengan `bun run db:seed`.
 6. Jalankan API menggunakan `bun run dev:api`.
 7. Di terminal lain, jalankan frontend menggunakan `bun run dev:web`.
 
@@ -59,19 +59,13 @@ Frontend tersedia di `http://localhost:3000` dan API di `http://localhost:3001`.
 
 ## Akun seed
  
-Semua akun karyawan memakai password `demo12345`:
-
-- `manager@mknsite.online`
-- `hr@mknsite.online`
-- `telco@mknsite.online`
-- `workshop@mknsite.online`
-- `project@mknsite.online`
+Seed development hanya membuat administrator. Buat karyawan dan tetapkan role lewat Administrasi. Akun contoh karyawan `hr`, `telco`, `workshop`, `project`, `manager`, dan `supervisor` hanya dibuat oleh fixture pada database test terpisah.
 
 Akun administrator dan superadministrator:
 - Administrator memakai `admin@mknsite.online` dengan password `admin12345`.
 - Super Administrator memakai `superadmin@mknsite.online` dengan password `superadmin12345`.
 
-Ganti seluruh password seed sebelum memakai data produksi.
+Seed tidak menghapus akun/menu, tidak menimpa password, dan tidak memasang ulang grant pada role yang sudah dikonfigurasi. Akun lama tetap dipertahankan. `db:seed` ditolak jika `NODE_ENV=production`; provisioning administrator produksi harus mengikuti prosedur tim tanpa password contoh.
 
 ## Model keamanan
 
@@ -92,6 +86,18 @@ Menu utama portal dikelola melalui **Administrasi → Menu** dan tidak dibuat ul
 
 Submenu OPS Telco ditampilkan dari permission role pengguna. Role teknisi hanya menerima submenu teknisi, sedangkan role supervisor menerima submenu supervisor sekaligus submenu teknisi. Perubahan menu atau role tetap diperiksa kembali oleh API; menyembunyikan menu di antarmuka bukan pengganti otorisasi server.
 - Tabel `audit_logs` mencatat perubahan role/status lewat API admin.
+
+### Formulir HR dan submenu Telco
+
+Form Oncall, Overtime, dan Cuti menyimpan draf serta menghasilkan PDF dari master asli di `form-templates/hr`. Nomor `OC/OT/CT-tahun-ID` dibuat server secara atomik; nomor dapat memiliki celah setelah transaksi dibatalkan. Riwayat menampilkan 100 formulir terbaru.
+
+Karyawan dengan `hr.view` mengakses formulir sendiri. Role dengan `hr.manage` mengelola semua formulir HR. Alurnya: **Draf → Diajukan → Disetujui / Ditolak / Ditangguhkan**. Pengajuan dikunci bagi karyawan. HR dapat membukanya kembali sebagai draf, yang menghapus keputusan dan perhitungan HR sebelumnya. Semua mutasi mencatat aktor dalam `audit_logs`. Akun pemilik riwayat HR hanya dapat dinonaktifkan; penghapusan ditolak untuk menjaga arsip.
+
+Duplikasi membuat draf bernomor baru dan menyalin rincian pekerjaan; identitas karyawan, nama tanda tangan, dan keputusan HR harus diisi ulang. Pemilik salinan adalah akun pembuat salinan, bukan otomatis akun teknisi yang namanya diketik. Penugasan lintas akun merupakan tahap berikutnya.
+
+PDF mempertahankan halaman master, logo, kotak, dan teks baku. Isian memakai Helvetica 8–10 pt (angka tabel cuti 7,5 pt); bukan tanda tangan elektronik. Isian terlalu panjang dan karakter yang tidak didukung font (misalnya emoji) ditolak sebelum disimpan agar tidak terpotong saat dicetak. Gunakan ukuran kertas **Letter, 100% / Actual size**. File Excel masih menjadi referensi; perhitungan payroll dan saldo cuti otomatis belum diterapkan.
+
+Tujuh submenu Telco saat ini merupakan halaman awal dengan pemeriksaan izin. Alur penugasan, PTO, jadwal, kirim WAG, quotation, dan dokumentasi pekerjaan belum diimplementasikan. Akses setiap submenu mensyaratkan `ops_telco.view` **dan** permission submenu. Menu utama tetap dibuat/diaktifkan melalui Administrasi.
 
 ## Auth dan RBAC
 
@@ -146,11 +152,23 @@ GET /realtime/events?context=admin
 Backend MKN Site dilengkapi dengan pengujian otomatis komprehensif mencakup 14 skenario matriks penerimaan QA (Docs lokal & production, isolasi logout ganda, validasi input & malformed JSON, atomisitas rollback transaksi, dan audit sanitasi kredensial):
 
 ```sh
-# Menjalankan seluruh 54 unit & integration test (646 assertions)
+# Hanya database test disposable yang sudah dimigrasikan:
+# DATABASE_URL harus berakhir /nama_test dan ALLOW_TEST_DATABASE=1.
+# Fixture otomatis dibuat oleh test preload; jangan memakai database aplikasi.
 bun --cwd apps/api test
 
 # Menjalankan pemeriksaan statis TypeScript di seluruh workspace
 bun run check
+
+# Tes komponen frontend
+bun test scripts/tests
+
+# Uji migrasi fresh / legacy / db:push pada server MySQL test disposable
+# Memerlukan kredensial test yang boleh membuat database sementara.
+bun --cwd apps/api scripts/verify-hr-migrations.ts
+
+# Contoh PDF berisi data fiktif untuk review cetak (output tmp/pdfs)
+bun --cwd apps/api scripts/preview-hr-pdfs.ts
 ```
 
 Lihat [deployment.md](docs/deployment.md) untuk topologi produksi, Cloudflare DNS, Vercel, Coolify, CI/CD pipeline, dan alur migrasi database.

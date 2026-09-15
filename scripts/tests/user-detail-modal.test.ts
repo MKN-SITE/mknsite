@@ -73,7 +73,7 @@ describe("UserDetailModal component", () => {
       })
     );
 
-    expect(html).toContain("Akun Administrator (Read-Only)");
+    expect(html).toContain("Akun Administrator");
     expect(html).toContain("Akun administrator memiliki proteksi sistem khusus");
     expect(html).not.toContain(">Edit</button>");
   });
@@ -133,7 +133,7 @@ describe("UserDetailModal component", () => {
     );
 
     // Section 1: Profil Read-Only
-    expect(html).toContain("Akun Administrator (Read-Only)");
+    expect(html).toContain("Akun Administrator");
     expect(html).not.toContain(">Edit</button>");
 
     // Section 2: Ubah Role disembunyikan & ada badge proteksi

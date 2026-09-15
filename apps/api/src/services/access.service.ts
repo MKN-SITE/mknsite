@@ -9,6 +9,8 @@ export async function getProfile(userId: number) {
       name: users.name,
       email: users.email,
       accountType: users.accountType,
+      division: users.division,
+      avatarUrl: users.avatarUrl,
       isActive: users.isActive
     })
     .from(users)
@@ -30,6 +32,8 @@ export async function getProfile(userId: number) {
     name: account.name,
     email: account.email,
     actorType: account.accountType === "admin" ? ("admin" as const) : ("user" as const),
+    division: account.division ?? null,
+    avatarUrl: account.avatarUrl ?? null,
     roles: [...new Set(grants.map((grant) => grant.role))],
     permissions: [...new Set(grants.map((grant) => grant.permission))]
   };

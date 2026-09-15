@@ -24,10 +24,17 @@ export const workspaceRoutes = new Elysia({ prefix: "/workspace" })
     if (!profile) return status(401, { message: "Sesi karyawan tidak valid." });
     const permission = opsTelcoSectionPermission[params.section];
     if (!permission) return status(404, { message: "Submenu OPS Telco tidak ditemukan." });
-    if (!profile.permissions.includes(permission)) return status(403, { message: "Anda tidak memiliki izin untuk submenu ini." });
+    if (!profile.permissions.includes("ops_telco.view") || !profile.permissions.includes(permission)) return status(403, { message: "Anda tidak memiliki izin untuk submenu ini." });
     return { module: "ops-telco", section: params.section, permission, items: [] };
   }, {
-    params: t.Object({ section: t.String() })
+    params: t.Object({ section: t.String() }),
+    detail: {
+      summary: "Akses submenu OPS Telco",
+      description: "Memerlukan sesi karyawan, ops_telco.view, dan izin khusus submenu. Data pekerjaan belum tersedia pada tahap ini.",
+      tags: ["Workspace"],
+      operationId: "getOpsTelcoSection",
+      security: [{ employeeSession: [] }]
+    }
   })
   .get("/:module", async ({ params, request, status }) => {
     const profile = await getAuthenticatedProfile(request.headers, "employee");

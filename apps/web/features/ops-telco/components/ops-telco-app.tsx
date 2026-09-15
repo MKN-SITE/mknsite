@@ -84,6 +84,9 @@ export function OpsTelcoApp({ activeSection }: { activeSection?: OpsTelcoSection
     <div className={styles.shell}>
       <PortalHeader
         homeHref="/portal"
+        contextLabel="KARYAWAN"
+        avatarUrl={user.avatarUrl}
+        division={user.division}
         homeLabel="MKN Site — kembali ke portal karyawan"
         name={user.name}
         role={user.roles.join(", ")}

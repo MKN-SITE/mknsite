@@ -2,7 +2,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { db } from "../db";
 import { auditLogs, authAccounts, authUsers, permissions, rolePermissions, roles, userRoles, users } from "../db/schema";
 import { CreateUserDto, mapUserSummary, UserSummaryDto } from "../schemas/admin.dto";
-import { publishAdminUsersUpdated } from "../realtime/hub";
+import { publishAdminDivisionsUpdated, publishAdminRbacUpdated, publishAdminUsersUpdated } from "../realtime/hub";
 
 export type ProvisionResult =
   | { success: true; user: UserSummaryDto }
@@ -73,12 +73,14 @@ export class UserProvisioningService {
     // 4. Eksekusi transaksi atomik Drizzle (5 tabel sekaligus)
     try {
       const createdUser = await db.transaction(async (tx) => {
+        const division = data.division?.trim() || null;
         // Step 4.1: Insert tabel users (MKN)
         const [userInsert] = await tx.insert(users).values({
           name,
           email,
           passwordHash: hashedPassword,
           accountType: "employee",
+          division,
           isActive: 1
         });
         const mknUserId = Number(userInsert.insertId);
@@ -145,6 +147,8 @@ export class UserProvisioningService {
       });
 
       publishAdminUsersUpdated(createdUser.id);
+      publishAdminDivisionsUpdated();
+      publishAdminRbacUpdated();
 
       return { success: true, user: createdUser };
     } catch (error: any) {

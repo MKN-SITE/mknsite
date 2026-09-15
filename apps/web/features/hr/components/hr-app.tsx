@@ -134,6 +134,9 @@ export function HrApp({ activeSection }: { activeSection?: HrSection }) {
     <div className={styles.shell}>
       <PortalHeader
         homeHref="/portal"
+        contextLabel="KARYAWAN"
+        avatarUrl={user.avatarUrl}
+        division={user.division}
         homeLabel="MKN Site — kembali ke portal karyawan"
         name={user.name}
         role={user.roles.join(", ")}
@@ -161,7 +164,7 @@ export function HrApp({ activeSection }: { activeSection?: HrSection }) {
                   <p>{selected.description} Isian tersimpan dan hasil unduh memakai PDF asli.</p>
                 </div>
               </div>
-              <HrFormWorkspace type={selected.id} userName={user.name} canManage={user.permissions.includes("hr.manage")} />
+              <HrFormWorkspace key={selected.id} type={selected.id} userName={user.name} canManage={user.permissions.includes("hr.manage")} />
             </section>
           ) : (
             <>

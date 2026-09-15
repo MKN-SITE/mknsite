@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useId, useRef, useState, type ReactNode } from "react";
-import mknLogo from "@/public/assets/mkn-logo.webp";
+import mknLogo from "@/public/assets/Logo MKN.png";
 import { Button } from "@/components/ui/button";
+import { getAvatarUrl } from "@/lib/api";
 import styles from "./portal-header.module.css";
 
 export type PortalHeaderProps = {
@@ -16,29 +17,92 @@ export type PortalHeaderProps = {
   title: string;
   description: string;
   status?: ReactNode;
+  contextLabel?: string;
+  avatarUrl?: string | null;
+  division?: string | null;
   onLogout: () => void;
   loggingOut?: boolean;
   logoutLabel?: string;
 };
 
-export function PortalHeader({ homeHref, homeLabel = "MKN Site — beranda admin", name, role, eyebrow, title, description, status, onLogout, loggingOut, logoutLabel = "Keluar admin" }: PortalHeaderProps) {
+export function PortalHeader({
+  homeHref,
+  homeLabel = "MKN Site — beranda admin",
+  logoutLabel = "Keluar admin",
+  contextLabel = "ADMIN",
+  status,
+  name,
+  role,
+  eyebrow,
+  title,
+  description,
+  avatarUrl,
+  division,
+  onLogout,
+  loggingOut
+}: PortalHeaderProps) {
   const [open, setOpen] = useState(false);
+  const [avatarImgError, setAvatarImgError] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   const panelId = useId();
+
   return (
     <header className={styles.header}>
       <div className={styles.top}>
         <Link href={homeHref} className={styles.brand} aria-label={homeLabel}>
-          <span className={styles.logo}><Image src={mknLogo} alt="" width={34} height={34} priority /></span>
-          <span><strong>MKN Site</strong><small>PT Multi Kontrol Nusantara</small></span>
+          <span className={styles.logoBadge}>
+            <Image
+              src={mknLogo}
+              alt="Logo Multi Kontrol Nusantara"
+              width={51}
+              height={38}
+              priority
+              className={styles.logoImg}
+            />
+          </span>
+          <div className={styles.brandIdentity}>
+            <div className={styles.brandTitleRow}>
+              <span className={styles.brandTitle}>MKN Site</span>
+              <span className={styles.brandBadge}>{contextLabel}</span>
+            </div>
+            <span className={styles.brandCompany}>PT Multi Kontrol Nusantara</span>
+          </div>
         </Link>
+
         <div className={styles.accountArea}>
-          <span className={styles.status}>{status}</span>
-          <div className={styles.account}
-            onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}
-            onKeyDown={(event) => { if (event.key === "Escape") { setOpen(false); trigger.current?.focus(); } }}>
-            <button ref={trigger} type="button" className={styles.accountTrigger} aria-expanded={open} aria-controls={panelId} onClick={() => setOpen(!open)}>
-              <span className={styles.avatar} aria-hidden="true">{name.charAt(0).toUpperCase()}</span>
+          {status && <span>{status}</span>}
+          <div
+            className={styles.account}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                setOpen(false);
+                trigger.current?.focus();
+              }
+            }}
+          >
+            <button
+              ref={trigger}
+              type="button"
+              className={styles.accountTrigger}
+              aria-expanded={open}
+              aria-controls={panelId}
+              onClick={() => setOpen(!open)}
+            >
+              <span className={styles.avatar} aria-hidden="true">
+                {avatarUrl && !avatarImgError ? (
+                  <img
+                    src={getAvatarUrl(avatarUrl)}
+                    alt=""
+                    className={styles.avatarImg}
+                    onError={() => setAvatarImgError(true)}
+                  />
+                ) : (
+                  name.charAt(0).toUpperCase()
+                )}
+              </span>
               <span className={styles.accountName}>{name}</span>
               <svg
                 width="14"
@@ -59,6 +123,7 @@ export function PortalHeader({ homeHref, homeLabel = "MKN Site — beranda admin
               <div className={styles.dropdown} id={panelId}>
                 <div className={styles.dropdownInfo}>
                   <strong>{name}</strong>
+                  {division && <span className={styles.dropdownDivision}>{division}</span>}
                   <span>{role}</span>
                 </div>
                 <Button variant="danger" onClick={onLogout} loading={loggingOut} loadingText="Keluar...">
@@ -69,9 +134,11 @@ export function PortalHeader({ homeHref, homeLabel = "MKN Site — beranda admin
           </div>
         </div>
       </div>
+
       <div className={styles.intro}>
         <p className={styles.eyebrow}>{eyebrow}</p>
-        <h1>{title}</h1><p className={styles.description}>{description}</p>
+        <h1>{title}</h1>
+        <p className={styles.description}>{description}</p>
       </div>
     </header>
   );

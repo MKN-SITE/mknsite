@@ -12,7 +12,7 @@ CREATE TABLE `hr_forms` (
 	CONSTRAINT `hr_forms_number_unique` UNIQUE(`form_number`)
 );
 --> statement-breakpoint
-ALTER TABLE `hr_forms` ADD CONSTRAINT `hr_forms_created_by_users_id_fk` FOREIGN KEY (`created_by`) REFERENCES `users`(`id`) ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `hr_forms` ADD CONSTRAINT `hr_forms_created_by_users_id_fk` FOREIGN KEY (`created_by`) REFERENCES `users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX `hr_forms_type_idx` ON `hr_forms` (`form_type`);--> statement-breakpoint
 CREATE INDEX `hr_forms_created_by_idx` ON `hr_forms` (`created_by`);--> statement-breakpoint
 CREATE INDEX `hr_forms_created_at_idx` ON `hr_forms` (`created_at`);

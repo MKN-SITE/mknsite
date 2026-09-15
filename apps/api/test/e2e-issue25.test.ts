@@ -1,8 +1,8 @@
-import { describe, expect, it } from "bun:test";
+import { afterAll, describe, expect, it } from "bun:test";
 import { and, eq } from "drizzle-orm";
 import { db } from "../src/db";
 import { auditLogs, menus, users } from "../src/db/schema";
-import { app } from "./setup";
+import { app, cleanTestUsers } from "./setup";
 
 describe("QA Matrix End-to-End Suite — Issue #25", () => {
   // ==========================================
@@ -535,5 +535,9 @@ describe("QA Matrix End-to-End Suite — Issue #25", () => {
       const [deletedRow] = await db.select().from(menus).where(eq(menus.id, menuId)).limit(1);
       expect(deletedRow).toBeUndefined();
     });
+  });
+
+  afterAll(async () => {
+    await cleanTestUsers();
   });
 });

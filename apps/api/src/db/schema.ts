@@ -1,4 +1,4 @@
-import { boolean, index, int, mysqlTable, primaryKey, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
+import { boolean, foreignKey, index, int, mysqlTable, primaryKey, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
@@ -6,10 +6,13 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 191 }).notNull(),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   accountType: varchar("account_type", { length: 24 }).notNull().default("employee"),
+  division: varchar("division", { length: 100 }),
+  avatarUrl: varchar("avatar_url", { length: 500 }),
   isActive: int("is_active").notNull().default(1),
+  lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow()
-}, (table) => [uniqueIndex("users_email_unique").on(table.email), index("users_account_type_idx").on(table.accountType)]);
+}, (table) => [uniqueIndex("users_email_unique").on(table.email), index("users_account_type_idx").on(table.accountType), index("users_division_idx").on(table.division)]);
 
 // Better Auth owns opaque database sessions. MKN account type and RBAC remain
 // in the existing users, roles, and permissions tables.
@@ -99,7 +102,7 @@ export const auditLogs = mysqlTable("audit_logs", {
 export const menus = mysqlTable("menus", {
   id: int("id").autoincrement().primaryKey(),
   title: varchar("title", { length: 100 }).notNull(),
-  icon: varchar("icon", { length: 100 }),
+  icon: text("icon"),
   description: varchar("description", { length: 255 }),
   url: varchar("url", { length: 500 }),
   requiredPermission: varchar("required_permission", { length: 140 }),
@@ -122,14 +125,23 @@ export const hrForms = mysqlTable("hr_forms", {
   formNumber: varchar("form_number", { length: 80 }).notNull(),
   status: varchar("status", { length: 24 }).notNull().default("draft"),
   data: text("data").notNull(),
-  createdBy: int("created_by").notNull().references(() => users.id, { onDelete: "restrict" }),
+  createdBy: int("created_by").notNull(),
   duplicatedFromId: int("duplicated_from_id"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow()
 }, (table) => [
   uniqueIndex("hr_forms_number_unique").on(table.formNumber),
+  foreignKey({ name: "hr_forms_owner_users_fk", columns: [table.createdBy], foreignColumns: [users.id] }).onDelete("restrict"),
   index("hr_forms_type_idx").on(table.formType),
   index("hr_forms_created_by_idx").on(table.createdBy),
   index("hr_forms_created_at_idx").on(table.createdAt)
 ]);
+
+export const divisions = mysqlTable("divisions", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: varchar("description", { length: 255 }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow()
+}, (table) => [uniqueIndex("divisions_name_unique").on(table.name)]);
 

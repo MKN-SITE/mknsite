@@ -1,4 +1,7 @@
 import { Elysia, t } from "elysia";
+import { eq } from "drizzle-orm";
+import { db } from "../db";
+import { users } from "../db/schema";
 import { adminAuth, employeeAuth, findMknAccount, getAuthenticatedProfile } from "../auth/auth";
 import { config } from "../config/env";
 
@@ -19,7 +22,11 @@ async function signIn(request: Request, body: { email: string; password: string 
   if (!account) return status(401, { message: type === "admin" ? "Kredensial administrator tidak sesuai." : "Email atau kata sandi tidak sesuai." });
   const auth = type === "admin" ? adminAuth : employeeAuth;
   const endpoint = type === "admin" ? "/api/auth/admin/sign-in/email" : "/api/auth/employee/sign-in/email";
-  return auth.handler(authRequest(request, endpoint, { ...body, rememberMe: true }));
+  const res = await auth.handler(authRequest(request, endpoint, { ...body, rememberMe: true }));
+  if (res.ok) {
+    await db.update(users).set({ lastLoginAt: new Date() }).where(eq(users.id, account.id));
+  }
+  return res;
 }
 
 async function signOut(request: Request, type: "employee" | "admin") {

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api";
+import { connectRealtime } from "@/lib/sse";
 
 export type MenuSummaryDto = {
   id: number;
@@ -21,25 +22,50 @@ export type MenuListResponseDto = {
   data: MenuSummaryDto[];
 };
 
+let cachedMenus: MenuSummaryDto[] | null = null;
+let inFlightMenus: Promise<MenuSummaryDto[]> | null = null;
+
+export function clearMenuCache() {
+  cachedMenus = null;
+  inFlightMenus = null;
+}
+
 export function useMenus() {
-  const [menus, setMenus] = useState<MenuSummaryDto[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [menus, setMenus] = useState<MenuSummaryDto[]>(() => cachedMenus ?? []);
+  const [loading, setLoading] = useState<boolean>(() => cachedMenus === null);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchMenus = useCallback(async () => {
-    setLoading(true);
+  const fetchMenus = useCallback(async (force = false) => {
+    // Stale-while-revalidate: only show blocking loading skeleton if there is no cached data
+    if (cachedMenus === null || force) {
+      if (!cachedMenus) {
+        setLoading(true);
+      }
+    }
     setError(null);
 
     try {
-      const res = await api<MenuListResponseDto>("/admin/menus");
-      // Sort by sortOrder ASC, then id ASC
-      const sorted = [...res.data].sort((a, b) => {
-        if (a.sortOrder !== b.sortOrder) {
-          return a.sortOrder - b.sortOrder;
-        }
-        return a.id - b.id;
-      });
-      setMenus(sorted);
+      if (!inFlightMenus || force) {
+        inFlightMenus = api<MenuListResponseDto>("/admin/menus")
+          .then((res) => {
+            const sorted = [...res.data].sort((a, b) => {
+              if (a.sortOrder !== b.sortOrder) {
+                return a.sortOrder - b.sortOrder;
+              }
+              return a.id - b.id;
+            });
+            cachedMenus = sorted;
+            inFlightMenus = null;
+            return sorted;
+          })
+          .catch((err) => {
+            inFlightMenus = null;
+            throw err;
+          });
+      }
+
+      const data = await inFlightMenus;
+      setMenus(data);
     } catch (err: any) {
       setError(err?.message ?? "Gagal memuat daftar menu.");
     } finally {
@@ -49,6 +75,17 @@ export function useMenus() {
 
   useEffect(() => {
     fetchMenus();
+
+    const disconnect = connectRealtime("admin", {
+      onAdminMenusUpdated: () => {
+        clearMenuCache();
+        fetchMenus(true);
+      }
+    });
+
+    return () => {
+      disconnect();
+    };
   }, [fetchMenus]);
 
   const toggleStatus = useCallback(
@@ -62,12 +99,14 @@ export function useMenus() {
       try {
         await api(`/admin/menus/${id}`, {
           method: "PATCH",
-          body: JSON.stringify({ isActive: nextActive })
+          body: JSON.stringify({ isActive: Boolean(nextActive) })
         });
-        await fetchMenus();
+        clearMenuCache();
+        await fetchMenus(true);
       } catch (err: any) {
         setError(err?.message ?? "Gagal mengubah status menu.");
-        await fetchMenus();
+        clearMenuCache();
+        await fetchMenus(true);
         throw err;
       }
     },
@@ -108,10 +147,12 @@ export function useMenus() {
             body: JSON.stringify({ sortOrder: newNeighborSort })
           })
         ]);
-        await fetchMenus();
+        clearMenuCache();
+        await fetchMenus(true);
       } catch (err: any) {
         setError(err?.message ?? "Gagal mengubah urutan menu.");
-        await fetchMenus();
+        clearMenuCache();
+        await fetchMenus(true);
         throw err;
       }
     },
@@ -124,7 +165,8 @@ export function useMenus() {
         await api(`/admin/menus/${id}`, {
           method: "DELETE"
         });
-        await fetchMenus();
+        clearMenuCache();
+        await fetchMenus(true);
       } catch (err: any) {
         setError(err?.message ?? "Gagal menghapus menu.");
         throw err;
@@ -137,7 +179,10 @@ export function useMenus() {
     menus,
     loading,
     error,
-    refresh: fetchMenus,
+    refresh: () => {
+      clearMenuCache();
+      return fetchMenus(true);
+    },
     toggleStatus,
     reorderMenu,
     deleteMenu

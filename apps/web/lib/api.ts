@@ -5,6 +5,8 @@ export type PortalUser = {
   name: string;
   email: string;
   actorType: "user" | "admin";
+  division?: string | null;
+  avatarUrl?: string | null;
   roles: string[];
   permissions: string[];
 };
@@ -22,15 +24,25 @@ export class ApiError extends Error {
 }
 
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
+  const isFormData = typeof FormData !== "undefined" && init?.body instanceof FormData;
+  const defaultHeaders: Record<string, string> = isFormData ? {} : { "Content-Type": "application/json" };
   const response = await fetch(`${API_URL}${path}`, {
     ...init,
     credentials: "include",
-    headers: { "Content-Type": "application/json", ...init?.headers }
+    headers: { ...defaultHeaders, ...init?.headers }
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     throw new ApiError(data.message ?? "Permintaan tidak dapat diproses.", response.status, data);
   }
   return data as T;
+}
+
+export function getAvatarUrl(url?: string | null): string {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
+    return url;
+  }
+  return `${API_URL}${url.startsWith("/") ? "" : "/"}${url}`;
 }
 

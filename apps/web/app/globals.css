@@ -21,13 +21,11 @@ button { cursor: pointer; }
 .skip-link:focus { top: 16px; }
 
 .brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font-weight: 800; letter-spacing: -0.03em; }
-.brand-logo-wrap { display: flex; align-items: center; justify-content: center; height: 42px; width: auto; flex-shrink: 0; }
-.brand-logo-img { height: 40px; width: auto; max-width: 60px; object-fit: contain; }
-.public-nav .brand-logo-img { filter: brightness(0); }
+.brand-logo-wrap { display: inline-flex; align-items: center; justify-content: center; height: 42px; width: auto; flex-shrink: 0; }
+.brand-logo-img { height: 32px !important; width: auto !important; max-width: 100% !important; object-fit: contain !important; display: block; }
 .brand-text-col { display: flex; flex-direction: column; line-height: 1.15; }
 .brand-title { font-size: 17px; font-weight: 850; letter-spacing: -0.03em; color: var(--ink); }
 .brand-company { font-size: 11px; font-weight: 600; color: var(--accent); letter-spacing: 0.02em; }
-.auth-aside .brand-logo-img, .sidebar .brand-logo-img { filter: brightness(0) invert(1); }
 .auth-aside .brand-title, .sidebar .brand-title { color: white; }
 .auth-aside .brand-company, .sidebar .brand-company { color: #9bc5b8; }
 .public-nav { height: 72px; display: flex; align-items: center; justify-content: space-between; max-width: 1240px; margin: auto; padding: 0 28px; }

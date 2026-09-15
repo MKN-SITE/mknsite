@@ -91,6 +91,9 @@ export function HrFormWorkspace({ type, userName, canManage }: { type: HrSection
   const [current, setCurrent] = useState<HrRecord | null>(null);
   const [values, setValues] = useState<Record<string, string>>({ employeeName: userName });
   const [busy, setBusy] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const locked = Boolean(current && current.status !== "draft" && !(canManage && current.status === "submitted"));
+  const statusLabels: Record<string, string> = { draft: "Draf", submitted: "Diajukan", approved: "Disetujui", rejected: "Ditolak", deferred: "Ditangguhkan" };
   const [message, setMessage] = useState<string | null>(null);
   const fields = useMemo(() => type === "cuti" ? cutiFields : operationalFields.filter((field) => type === "oncall" || !["customerRequestBy", "totalHours"].includes(field.key)), [type]);
 
@@ -99,14 +102,30 @@ export function HrFormWorkspace({ type, userName, canManage }: { type: HrSection
     setRecords(result.data);
   }
 
-  useEffect(() => { loadRecords().catch(() => setMessage("Riwayat formulir belum dapat dimuat.")); }, [type]);
+  useEffect(() => {
+    const controller = new AbortController();
+    api<{ data: HrRecord[] }>(`/hr/forms?type=${type}`, { signal: controller.signal })
+      .then((result) => setRecords(result.data))
+      .catch(() => { if (!controller.signal.aborted) setMessage("Riwayat formulir belum dapat dimuat."); });
+    return () => controller.abort();
+  }, [type]);
+
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ""; };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
 
   function change(key: string, value: string) {
+    if (busy || locked) return;
+    setDirty(true);
     setValues((existing) => ({ ...existing, [key]: value }));
     setMessage(null);
   }
 
   function newForm() {
+    if (busy || dirty) return;
     setCurrent(null);
     setValues({ employeeName: userName });
     setMessage("Formulir baru siap diisi.");
@@ -114,38 +133,50 @@ export function HrFormWorkspace({ type, userName, canManage }: { type: HrSection
 
   async function save(event: FormEvent) {
     event.preventDefault();
+    await persist();
+  }
+
+  async function persist(nextStatus?: string) {
+    if (busy || (locked && nextStatus !== "draft")) return;
     setBusy(true);
     try {
       const result = current
-        ? await api<{ data: HrRecord }>(`/hr/forms/${current.id}`, { method: "PATCH", body: JSON.stringify({ data: values }) })
+        ? await api<{ data: HrRecord }>(`/hr/forms/${current.id}`, { method: "PATCH", body: JSON.stringify({ data: values, status: nextStatus }) })
         : await api<{ data: HrRecord }>("/hr/forms", { method: "POST", body: JSON.stringify({ formType: type, data: values }) });
       setCurrent(result.data);
       setValues(result.data.data);
+      setDirty(false);
       setMessage(`Tersimpan sebagai ${result.data.formNumber}.`);
-      await loadRecords();
-    } catch {
-      setMessage("Formulir gagal disimpan. Periksa isian dan coba lagi.");
+      await loadRecords().catch(() => setMessage("Formulir tersimpan. Riwayat belum dapat diperbarui; muat ulang halaman bila diperlukan."));
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Formulir gagal disimpan. Periksa isian dan coba lagi.");
     } finally { setBusy(false); }
   }
 
   async function duplicate() {
-    if (!current) return;
+    if (!current || busy || dirty) return;
     setBusy(true);
     try {
       const result = await api<{ data: HrRecord }>(`/hr/forms/${current.id}/duplicate`, { method: "POST" });
       setCurrent(result.data);
       setValues(result.data.data);
-      setMessage(`Salinan dibuat sebagai ${result.data.formNumber}. Isi nama teknisi lalu simpan.`);
-      await loadRecords();
+      setDirty(false);
+      setMessage(`Salinan dibuat sebagai ${result.data.formNumber}. Lengkapi identitas karyawan lalu simpan.`);
+      await loadRecords().catch(() => setMessage("Salinan tersimpan; riwayat belum dapat diperbarui."));
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Salinan belum dapat dibuat. Coba lagi.");
     } finally { setBusy(false); }
   }
 
   async function downloadPdf() {
-    if (!current) return;
+    if (!current || busy || dirty) return;
     setBusy(true);
     try {
       const response = await fetch(`${API_URL}/hr/forms/${current.id}/pdf`, { credentials: "include" });
-      if (!response.ok) throw new Error("PDF gagal dibuat");
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.message ?? "PDF belum dapat dibuat. Coba lagi.");
+      }
       const url = URL.createObjectURL(await response.blob());
       const anchor = document.createElement("a");
       anchor.href = url;
@@ -153,11 +184,12 @@ export function HrFormWorkspace({ type, userName, canManage }: { type: HrSection
       anchor.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       setMessage("PDF berhasil dibuat dari template asli.");
-    } catch { setMessage("PDF belum dapat dibuat. Simpan formulir lalu coba lagi."); }
+    } catch (error) { setMessage(error instanceof Error ? error.message : "PDF belum dapat dibuat."); }
     finally { setBusy(false); }
   }
 
   function selectRecord(record: HrRecord) {
+    if (busy || dirty) return;
     setCurrent(record);
     setValues(record.data);
     setMessage(null);
@@ -168,9 +200,13 @@ export function HrFormWorkspace({ type, userName, canManage }: { type: HrSection
       <section className={styles.editor}>
         <div className={styles.toolbar}>
           <div><p className={styles.eyebrow}>Formulir digital</p><h2>{current?.formNumber ?? "Formulir baru"}</h2></div>
-          <button type="button" className={styles.secondaryButton} onClick={newForm}>+ Form baru</button>
+          <button type="button" className={styles.secondaryButton} onClick={newForm} disabled={busy || dirty}>+ Form baru</button>
         </div>
         <form onSubmit={save}>
+          <p>Status: {statusLabels[current?.status ?? "draft"]}. Nama pada kolom tanda tangan merupakan nama tercetak; tanda tangan dilakukan pada hasil cetak.</p>
+          {locked && <p>Formulir terkunci. HR dapat membuka kembali sebagai draf untuk perbaikan.</p>}
+          <fieldset disabled={busy || locked} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
+          <legend className={styles.eyebrow}>Isian formulir</legend>
           <div className={styles.formGrid}>
             {fields.map((field) => <FormField key={field.key} field={field} value={values[field.key] ?? ""} onChange={(value) => change(field.key, value)} />)}
           </div>
@@ -180,11 +216,16 @@ export function HrFormWorkspace({ type, userName, canManage }: { type: HrSection
               <div className={styles.formGrid}>{[...hrApprovalFields, ...hrBalanceFields].map((field) => <FormField key={field.key} field={field} value={values[field.key] ?? ""} onChange={(value) => change(field.key, value)} />)}</div>
             </details>
           )}
+          </fieldset>
+          {dirty && <p role="status">Ada perubahan belum disimpan. Simpan sebelum mengunduh PDF, menduplikasi, atau memilih formulir lain. <button type="button" className={styles.secondaryButton} disabled={busy} onClick={() => { setValues(current?.data ?? { employeeName: userName }); setDirty(false); setMessage(null); }}>Batalkan perubahan</button></p>}
           {message && <p className={styles.message} role="status">{message}</p>}
           <div className={styles.actions}>
-            <button className={styles.primaryButton} disabled={busy}>{busy ? "Memproses…" : current ? "Simpan perubahan" : "Simpan formulir"}</button>
-            <button type="button" className={styles.secondaryButton} onClick={duplicate} disabled={!current || busy}>Duplikasi teknisi</button>
-            <button type="button" className={styles.pdfButton} onClick={downloadPdf} disabled={!current || busy}>Unduh PDF</button>
+            <button className={styles.primaryButton} disabled={busy || locked}>{busy ? "Memproses…" : current ? "Simpan perubahan" : "Simpan formulir"}</button>
+            <button type="button" className={styles.secondaryButton} onClick={duplicate} disabled={!current || busy || dirty}>Duplikasi formulir</button>
+            <button type="button" className={styles.pdfButton} onClick={downloadPdf} disabled={!current || busy || dirty}>Unduh PDF</button>
+            {current?.status === "draft" && <button type="button" className={styles.secondaryButton} disabled={busy || dirty} onClick={() => persist("submitted")}>Ajukan ke HR</button>}
+            {canManage && current?.status === "submitted" && ["approved", "rejected", "deferred"].map((status) => <button type="button" key={status} className={styles.secondaryButton} disabled={busy || dirty} onClick={() => persist(status)}>{statusLabels[status]}</button>)}
+            {canManage && current && current.status !== "draft" && <button type="button" className={styles.secondaryButton} disabled={busy || dirty} onClick={() => persist("draft")}>Buka draf & hapus keputusan HR</button>}
           </div>
         </form>
       </section>
@@ -194,7 +235,7 @@ export function HrFormWorkspace({ type, userName, canManage }: { type: HrSection
         <div className={styles.recordList}>
           {records.length === 0 && <p className={styles.empty}>Belum ada formulir tersimpan.</p>}
           {records.map((record) => (
-            <button type="button" key={record.id} onClick={() => selectRecord(record)} className={`${styles.record} ${current?.id === record.id ? styles.selected : ""}`}>
+            <button type="button" key={record.id} disabled={busy || dirty} onClick={() => selectRecord(record)} className={`${styles.record} ${current?.id === record.id ? styles.selected : ""}`}>
               <strong>{record.formNumber}</strong><span>{record.data.employeeName || "Nama belum diisi"}</span><small>{new Date(record.updatedAt).toLocaleDateString("id-ID")}</small>
             </button>
           ))}
@@ -208,5 +249,5 @@ function FormField({ field, value, onChange }: { field: Field; value: string; on
   const className = field.wide ? styles.wide : undefined;
   if (field.type === "textarea") return <label className={className}><span>{field.label}</span><textarea rows={3} value={value} onChange={(event) => onChange(event.target.value)} /></label>;
   if (field.type === "select") return <label className={className}><span>{field.label}</span><select value={value} onChange={(event) => onChange(event.target.value)}><option value="">Pilih jenis izin</option>{field.options?.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>;
-  return <label className={className}><span>{field.label}</span><input type={field.type ?? "text"} step={field.type === "number" ? "0.5" : undefined} value={value} readOnly={field.readOnly} onChange={(event) => onChange(event.target.value)} /></label>;
+  return <label className={className}><span>{field.label}</span><input type={field.type ?? "text"} min={field.type === "number" ? 0 : undefined} step={field.type === "number" ? "0.01" : undefined} value={value} readOnly={field.readOnly} onChange={(event) => onChange(event.target.value)} /></label>;
 }

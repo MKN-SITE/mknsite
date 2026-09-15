@@ -54,6 +54,7 @@ PORT=3001
 APP_ORIGIN=https://mknsite.online,https://www.mknsite.online
 DATABASE_URL=mysql://mknsite:<PASSWORD>@<DB_CONTAINER_HOST>:3306/mknsite
 BETTER_AUTH_URL=https://api.mknsite.online
+BETTER_AUTH_SECRET=<SECRET_ACAK_MINIMAL_32_KARAKTER>
 COOKIE_DOMAIN=.mknsite.online
 ENABLE_SWAGGER=false
 DOCS_PROVIDER=swagger-ui
@@ -62,18 +63,30 @@ DOCS_PROVIDER=swagger-ui
 ### Penjelasan Variabel Environment:
 - **`APP_ORIGIN`**: Daftar origin frontend yang diizinkan CORS (dipisah koma). Pada production, hanya origin yang dikonfigurasi di sini dan domain `mknsite.online` yang dipercaya. Origin `localhost` **tidak** diizinkan pada production.
 - **`COOKIE_DOMAIN`**: Set ke `.mknsite.online` agar cookie berlaku di seluruh subdomain. Biarkan kosong untuk development lokal.
+- **`BETTER_AUTH_SECRET`**: Wajib pada produksi. Gunakan secret acak tersimpan di secret manager/Coolify, bukan password akun atau nilai contoh. Better Auth menolak secret bawaan pada produksi. Jangan mencatat nilai secret di Git atau laporan review.
 - **`ENABLE_SWAGGER`**: Secara default bernilai `false` pada production. Set ke `"true"` hanya jika dideploy pada staging.
 - **`DOCS_PROVIDER`**: Renderer dokumentasi interaktif: `"swagger-ui"` (default) atau `"scalar"`.
 
 ### Migrasi Database Otomatis
 
-Dockerfile menjalankan `bunx drizzle-kit migrate` sebelum memulai API server pada setiap container startup. Migrasi bersifat idempoten — jika tidak ada migrasi baru, langkah ini langsung selesai tanpa perubahan. Data existing tidak tersentuh.
+Dockerfile menjalankan `bunx drizzle-kit migrate` sebelum memulai API server pada setiap container startup. Migrasi yang sudah tercatat tidak dijalankan ulang. Migrasi baru dapat mengubah struktur/relasi, sehingga backup dan pengujian upgrade pada salinan database wajib dilakukan sebelum rilis.
 
 ```dockerfile
 CMD ["sh", "-c", "bunx drizzle-kit migrate && bun src/index.ts"]
 ```
 
 Tempatkan MySQL sebagai database Coolify pada private network yang sama. Jangan publikasikan port 3306 ke internet.
+
+### Rilis HR/Telco setelah integrasi main
+
+1. Backup database serta direktori unggahan dan uji pemulihannya. Hentikan sementara penulisan aplikasi saat migrasi DDL MySQL dijalankan; DDL tidak seluruhnya transactional.
+2. Periksa konfigurasi `DATABASE_URL`, `BETTER_AUTH_SECRET`, `APP_ORIGIN`, `BETTER_AUTH_URL`, `COOKIE_DOMAIN`, dan `NEXT_PUBLIC_API_URL` pada target deployment.
+3. Gunakan build context root repository agar `form-templates` ikut masuk image API. Build memverifikasi keberadaan tiga PDF master. Pastikan storage persisten untuk `/app/apps/api/uploads` di Coolify.
+4. Terapkan migrasi tersimpan, termasuk `0003_new_wraith` dan `0004_integrate_main_hr`. Jangan mengedit migrasi lama atau memakai `db:push` pada produksi. `0004` menambah schema dari main, mengganti FK HR menjadi RESTRICT, dan memasang katalog izin Telco tanpa menghapus akun/menu. Nama/grant role yang sudah dikustomisasi dipertahankan; role teknisi lama yang memiliki akses induk menerima empat izin teknisi baru satu kali.
+5. Melalui Administrasi, pastikan menu `/portal/hr` memakai `hr.view` dan `/portal/ops-telco` memakai `ops_telco.view`. Tinjau role supervisor/teknisi dan pemberian `hr.view` sesuai kebijakan perusahaan. Role teknisi tidak otomatis mendapat akses HR.
+6. Setelah restart, uji login, isolasi role, simpan formulir, dan unduh ketiga PDF di staging. Cetak Letter 100% / Actual size untuk persetujuan tata letak oleh pemilik formulir.
+
+Seed development tidak dijalankan di produksi. Jika harus rollback setelah migrasi, pulihkan kode dan backup database yang cocok secara terkoordinasi; mengganti commit saja tidak membatalkan perubahan schema. Push branch fitur dan pembuatan PR terpisah dari persetujuan merge ke main/deployment.
 
 ## CI/CD Pipeline (GitHub Webhook)
 
@@ -109,7 +122,7 @@ git push origin main
 | Edit `schema.ts` | Manual | Developer mengedit skema di laptop |
 | `bun run db:generate` | Manual | Drizzle membuat file .sql migrasi |
 | `bun run db:migrate` (lokal) | Manual | Test migrasi di database lokal |
-| `git push origin main` | Manual | Push termasuk file migrasi .sql |
+| Push branch fitur dan PR ke main | Manual | Review kode/migrasi serta persetujuan merge sebelum auto-deploy |
 | `drizzle-kit migrate` (production) | **Otomatis** | Container CMD menjalankan sebelum API start |
 
 ## Environment Variables: Lokal vs Production
@@ -119,6 +132,7 @@ git push origin main
 | `NEXT_PUBLIC_API_URL` | `http://localhost:3001` | `https://api.mknsite.online` (Vercel) |
 | `APP_ORIGIN` | `http://localhost:3000` | `https://mknsite.online,https://www.mknsite.online` (Coolify) |
 | `BETTER_AUTH_URL` | `http://localhost:3001` | `https://api.mknsite.online` (Coolify) |
+| `BETTER_AUTH_SECRET` | opsional pada development | wajib, secret acak dari secret manager (Coolify) |
 | `DATABASE_URL` | `mysql://...localhost:3306/mknsite` | `mysql://...<DB_HOST>:3306/mknsite` (Coolify) |
 | `COOKIE_DOMAIN` | *(kosong)* | `.mknsite.online` (Coolify) |
 | `NODE_ENV` | `development` | `production` (Coolify) |
@@ -131,7 +145,7 @@ File `.env` hanya untuk development lokal dan **tidak di-commit ke Git**. Variab
 - Origin `localhost` **tidak dipercaya** di production (`NODE_ENV=production`).
 - Swagger UI dinonaktifkan di production (HTTP 404 pada `/docs` dan `/docs/json`).
 - Cookie menggunakan `Secure`, `HttpOnly`, `SameSite=lax`.
-- Seed demo **tidak boleh** dijalankan di production tanpa rotasi password.
+- Seed development ditolak pada production; provisioning administrator dilakukan terpisah tanpa password contoh.
 - Port database MySQL tidak dipublikasikan ke internet.
 
 ## Urutan Rilis & Checklist Pengujian Produksi

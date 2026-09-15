@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import mknLogo from "@/public/assets/mkn-logo.webp";
-import { api, type PortalUser } from "@/lib/api";
+import mknLogoImg from "@/public/assets/Logo MKN.png";
+import { api, getAvatarUrl, type PortalUser } from "@/lib/api";
 import { RealtimeStatus } from "@/components/realtime-status";
 import { PortalIcon } from "./portal-icons";
 import styles from "./menu-grid.module.css";
@@ -33,6 +33,7 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
   const [error, setError] = useState<string | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
+  const [avatarImgError, setAvatarImgError] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const supportRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +52,7 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
       })
       .catch((err) => {
         if (mounted) {
-          setError(err?.message ?? "Gagal memuat daftar menu portal.");
+          setError(err?.message ?? "Gagal memuat daftar menu.");
         }
       })
       .finally(() => {
@@ -116,10 +117,11 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
           <Link href="/portal" className={styles.brandWrap}>
             <div className={styles.brandLogo}>
               <Image
-                src={mknLogo}
+                src={mknLogoImg}
                 alt="Logo PT Multi Kontrol Nusantara"
-                width={32}
-                height={32}
+                width={51}
+                height={38}
+                className={styles.brandLogoImg}
                 priority
               />
             </div>
@@ -141,7 +143,16 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
               aria-label="Menu profil pengguna"
             >
               <div className={styles.avatarCircle} aria-hidden="true">
-                {initial}
+                {user.avatarUrl && !avatarImgError ? (
+                  <img
+                    src={getAvatarUrl(user.avatarUrl)}
+                    alt=""
+                    className={styles.avatarImg}
+                    onError={() => setAvatarImgError(true)}
+                  />
+                ) : (
+                  initial
+                )}
               </div>
               <span className={styles.userName}>{user.name}</span>
               <svg
@@ -164,6 +175,9 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
               <div className={styles.userDropdown} role="menu">
                 <div className={styles.userDropdownInfo}>
                   <strong className={styles.dropdownUserName}>{user.name}</strong>
+                  {user.division && (
+                    <span className={styles.dropdownUserDivision}>{user.division}</span>
+                  )}
                   <span className={styles.dropdownUserRoles}>{user.roles.join(", ")}</span>
                 </div>
                 <button
@@ -334,7 +348,7 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
               </div>
             </div>
             <a
-              href="mailto:helpdesk@mknsite.online?subject=Permintaan%20Bantuan%20Portal%20MKN"
+              href="mailto:helpdesk@mknsite.online?subject=Permintaan%20Bantuan%20MKN%20Site"
               className={styles.supportActionBtn}
             >
               Kirim Tiket Bantuan
