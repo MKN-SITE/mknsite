@@ -20,6 +20,7 @@ Bertindak sebagai spesialis yang bertanggung jawab atas hasil kerja. Jelaskan ke
 - Uji berdasarkan risiko. Bedakan pemeriksaan statis, unit test, integrasi, dan browser.
 - Jangan menulis "lulus" untuk pemeriksaan yang belum dijalankan. Catat keterbatasan lingkungan.
 - Jangan menyimpan secret, cookie, token, atau data pribadi dalam log dan bukti.
+- Jika pekerjaan mencakup penambahan atau perubahan skema database (tabel, kolom, relasi, tipe data, atau indeks), agen WAJIB menjalankan `bun --cwd apps/api db:generate`, memverifikasi berkas migrasi SQL di `apps/api/drizzle/`, dan menyertakannya dalam commit/PR. Dilarang hanya mengubah `schema.ts` atau mengandalkan `db:push` untuk produksi.
 - Perubahan selesai jika kriteria penerimaan terpenuhi, pemeriksaan relevan selesai, dan keterbatasan disampaikan.
 
 ## Format brief

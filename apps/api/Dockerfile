@@ -14,4 +14,4 @@ RUN test -f '/app/form-templates/hr/oncall/From Oncall.pdf' && \
 WORKDIR /app/apps/api
 ENV NODE_ENV=production
 EXPOSE 3001
-CMD ["sh", "-c", "bunx drizzle-kit migrate && bun src/index.ts"]
+CMD ["sh", "-c", "bun run db:migrate && bun src/db/seed.ts && bun src/index.ts"]

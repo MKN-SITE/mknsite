@@ -1,8 +1,7 @@
 .header {
   color: #ffffff;
-  background: linear-gradient(135deg, #074674 0%, #09598c 45%, #053c61 100%);
-  padding: 24px 48px 84px 48px;
-  box-shadow: 0 8px 28px rgba(7, 70, 116, 0.18);
+  background: var(--portal-header-start);
+  padding: var(--space-6) var(--space-12) 76px;
   position: relative;
 }
 
@@ -24,7 +23,7 @@
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   color: inherit;
   text-decoration: none;
   transition: opacity 150ms ease;
@@ -34,67 +33,49 @@
   opacity: 0.95;
 }
 
-.logoBadge {
+.brandLogo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  height: 46px;
+  height: 68px;
   width: auto;
 }
 
-.logoImg {
-  height: 38px !important;
+.brandLogoImg {
+  height: 68px !important;
   width: auto !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
   object-fit: contain !important;
   display: block;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.22));
 }
 
-.brandIdentity {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.brandDivider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
 }
 
-.brandTitleRow {
+.brandText {
   display: flex;
   align-items: center;
-  gap: 8px;
 }
 
 .brandTitle {
-  font-size: 19px;
+  font-size: 24px;
   font-weight: 800;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: #ffffff;
-  line-height: 1.2;
-}
-
-.brandBadge {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  background: rgba(125, 211, 252, 0.2);
-  color: #7dd3fc;
-  border: 1px solid rgba(125, 211, 252, 0.35);
-  padding: 2px 7px;
-  border-radius: 999px;
-  text-transform: uppercase;
-}
-
-.brandCompany {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.75);
-  font-weight: 500;
-  letter-spacing: 0.01em;
+  line-height: 1;
 }
 
 .accountArea {
   display: flex;
   align-items: center;
   gap: var(--space-4);
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .account {
@@ -107,13 +88,12 @@
   gap: 10px;
   padding: 6px 14px 6px 8px;
   color: #ffffff;
-  background: var(--portal-glass);
-  backdrop-filter: blur(8px);
+  background: transparent;
   border: 1px solid var(--portal-border);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   min-height: 44px;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: background 150ms ease, border-color 150ms ease;
 }
 
 .accountTrigger:hover {
@@ -135,7 +115,7 @@
   color: #074674;
   border-radius: 50%;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -152,7 +132,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: var(--text-sm);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .chevron {
@@ -197,14 +177,14 @@
 .dropdownInfo {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-1);
   padding-bottom: 8px;
   border-bottom: 1px solid var(--line);
 }
 
 .dropdownInfo strong {
   font-size: var(--text-sm);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .dropdownDivision {
@@ -225,7 +205,7 @@
 .eyebrow {
   margin: 0 0 8px;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.12em;
   color: #7dd3fc;
   text-transform: uppercase;
@@ -233,23 +213,29 @@
 
 .intro h1 {
   margin: 0;
-  font-size: clamp(26px, 2.6vw, 34px);
-  font-weight: 800;
+  font-size: clamp(26px, 2.4vw, 32px);
+  font-weight: 600;
   letter-spacing: -0.025em;
   line-height: 1.25;
 }
 
 .description {
   margin: 8px 0 0;
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--portal-muted);
   font-size: 15px;
   line-height: 1.55;
   max-width: 820px;
 }
 
 @media (max-width: 960px) {
+  .top {
+    flex-wrap: wrap;
+  }
   .header {
     padding: 20px 24px 76px 24px;
+  }
+  .accountName {
+    max-width: 120px;
   }
 }
 
@@ -257,15 +243,23 @@
   .header {
     padding: 18px 16px 68px 16px;
   }
-  .logoBadge {
-    width: 56px;
-    height: 42px;
+  .top, .intro {
+    width: 100%;
   }
-  .logoImg {
-    height: 34px !important;
+  .brand {
+    gap: 12px;
   }
-  .brandCompany {
-    display: none;
+  .brandLogo {
+    height: 50px;
+  }
+  .brandLogoImg {
+    height: 50px !important;
+  }
+  .brandDivider {
+    height: 30px;
+  }
+  .brandTitle {
+    font-size: 20px;
   }
   .accountArea {
     gap: var(--space-2);
@@ -282,5 +276,14 @@
   }
   .intro h1 {
     font-size: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand, .accountTrigger, .chevron {
+    transition: none;
+  }
+  .dropdown {
+    animation: none;
   }
 }

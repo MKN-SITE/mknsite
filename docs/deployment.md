@@ -69,10 +69,10 @@ DOCS_PROVIDER=swagger-ui
 
 ### Migrasi Database Otomatis
 
-Dockerfile menjalankan `bunx drizzle-kit migrate` sebelum memulai API server pada setiap container startup. Migrasi yang sudah tercatat tidak dijalankan ulang. Migrasi baru dapat mengubah struktur/relasi, sehingga backup dan pengujian upgrade pada salinan database wajib dilakukan sebelum rilis.
+Dockerfile menjalankan `bun run db:migrate`, lalu seed, sebelum memulai API server pada setiap container startup. Migrasi yang sudah tercatat tidak dijalankan ulang. Seed produksi melengkapi katalog dan memperbaiki relasi Better Auth akun bootstrap yang hilang dengan hash yang sudah ada, tanpa membuat akun/password contoh atau mengembalikan grant role yang pernah dicabut. Migrasi baru dapat mengubah struktur/relasi, sehingga backup dan pengujian upgrade pada salinan database wajib dilakukan sebelum rilis.
 
 ```dockerfile
-CMD ["sh", "-c", "bunx drizzle-kit migrate && bun src/index.ts"]
+CMD ["sh", "-c", "bun run db:migrate && bun src/db/seed.ts && bun src/index.ts"]
 ```
 
 Tempatkan MySQL sebagai database Coolify pada private network yang sama. Jangan publikasikan port 3306 ke internet.
@@ -82,11 +82,11 @@ Tempatkan MySQL sebagai database Coolify pada private network yang sama. Jangan 
 1. Backup database serta direktori unggahan dan uji pemulihannya. Hentikan sementara penulisan aplikasi saat migrasi DDL MySQL dijalankan; DDL tidak seluruhnya transactional.
 2. Periksa konfigurasi `DATABASE_URL`, `BETTER_AUTH_SECRET`, `APP_ORIGIN`, `BETTER_AUTH_URL`, `COOKIE_DOMAIN`, dan `NEXT_PUBLIC_API_URL` pada target deployment.
 3. Gunakan build context root repository agar `form-templates` ikut masuk image API. Build memverifikasi keberadaan tiga PDF master. Pastikan storage persisten untuk `/app/apps/api/uploads` di Coolify.
-4. Terapkan migrasi tersimpan, termasuk `0003_new_wraith` dan `0004_integrate_main_hr`. Jangan mengedit migrasi lama atau memakai `db:push` pada produksi. `0004` menambah schema dari main, mengganti FK HR menjadi RESTRICT, dan memasang katalog izin Telco tanpa menghapus akun/menu. Nama/grant role yang sudah dikustomisasi dipertahankan; role teknisi lama yang memiliki akses induk menerima empat izin teknisi baru satu kali.
+4. Terapkan migrasi tersimpan melalui `bun run db:migrate`: migrasi resmi main `0003_powerful_puppet_master` lalu `0004_hr_portal`. File main dipertahankan utuh; sejarah HR lama diarsipkan di `apps/api/drizzle/history/hr-legacy`. Runner menangani schema PR #35 yang sebelumnya dipasang penuh atau sebagian melalui `db:push` hanya jika baseline `0002` sudah tercatat: melengkapi DDL yang hilang lalu mencatat hash/timestamp asli `0003`. Schema manual tanpa baseline tersebut dihentikan untuk pemeriksaan. Migrasi `0004` mempertahankan data HR lama, menerapkan FK RESTRICT, dan memasang katalog izin Telco. Nama/grant role yang sudah dikustomisasi dipertahankan; role teknisi lama yang memiliki akses induk menerima empat izin teknisi baru satu kali. Jangan mengedit migrasi lama atau memakai `db:push` pada produksi.
 5. Melalui Administrasi, pastikan menu `/portal/hr` memakai `hr.view` dan `/portal/ops-telco` memakai `ops_telco.view`. Tinjau role supervisor/teknisi dan pemberian `hr.view` sesuai kebijakan perusahaan. Role teknisi tidak otomatis mendapat akses HR.
 6. Setelah restart, uji login, isolasi role, simpan formulir, dan unduh ketiga PDF di staging. Cetak Letter 100% / Actual size untuk persetujuan tata letak oleh pemilik formulir.
 
-Seed development tidak dijalankan di produksi. Jika harus rollback setelah migrasi, pulihkan kode dan backup database yang cocok secara terkoordinasi; mengganti commit saja tidak membatalkan perubahan schema. Push branch fitur dan pembuatan PR terpisah dari persetujuan merge ke main/deployment.
+Pastikan `NODE_ENV=production` pada target; seed tidak akan membuat administrator baru dengan password development. Administrator produksi baru harus diprovisikan melalui prosedur tim. Jika harus rollback setelah migrasi, pulihkan kode dan backup database yang cocok secara terkoordinasi; mengganti commit saja tidak membatalkan perubahan schema. Push branch fitur dan pembuatan PR terpisah dari persetujuan merge ke main/deployment.
 
 ## CI/CD Pipeline (GitHub Webhook)
 
@@ -123,7 +123,7 @@ git push origin main
 | `bun run db:generate` | Manual | Drizzle membuat file .sql migrasi |
 | `bun run db:migrate` (lokal) | Manual | Test migrasi di database lokal |
 | Push branch fitur dan PR ke main | Manual | Review kode/migrasi serta persetujuan merge sebelum auto-deploy |
-| `drizzle-kit migrate` (production) | **Otomatis** | Container CMD menjalankan sebelum API start |
+| `bun run db:migrate` dan seed (production) | **Otomatis** | Container CMD menjalankan sebelum API start; seed tidak membuat akun contoh |
 
 ## Environment Variables: Lokal vs Production
 
@@ -145,7 +145,7 @@ File `.env` hanya untuk development lokal dan **tidak di-commit ke Git**. Variab
 - Origin `localhost` **tidak dipercaya** di production (`NODE_ENV=production`).
 - Swagger UI dinonaktifkan di production (HTTP 404 pada `/docs` dan `/docs/json`).
 - Cookie menggunakan `Secure`, `HttpOnly`, `SameSite=lax`.
-- Seed development ditolak pada production; provisioning administrator dilakukan terpisah tanpa password contoh.
+- Seed production tidak membuat pengguna/password contoh; provisioning administrator baru dilakukan terpisah.
 - Port database MySQL tidak dipublikasikan ke internet.
 
 ## Urutan Rilis & Checklist Pengujian Produksi

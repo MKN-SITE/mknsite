@@ -113,8 +113,21 @@ export function HrFormWorkspace({ type, userName, canManage }: { type: HrSection
   useEffect(() => {
     if (!dirty) return;
     const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ""; };
+    const protectNavigation = (event: MouseEvent) => {
+      const link = event.target instanceof Element ? event.target.closest("a[href]") : null;
+      if (!(link instanceof HTMLAnchorElement) || link.target === "_blank" || link.hasAttribute("download")) return;
+      const destination = new URL(link.href, window.location.href);
+      if (destination.pathname === window.location.pathname && destination.search === window.location.search) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      setMessage("Simpan atau batalkan perubahan sebelum berpindah halaman.");
+    };
     window.addEventListener("beforeunload", warn);
-    return () => window.removeEventListener("beforeunload", warn);
+    document.addEventListener("click", protectNavigation, true);
+    return () => {
+      window.removeEventListener("beforeunload", warn);
+      document.removeEventListener("click", protectNavigation, true);
+    };
   }, [dirty]);
 
   function change(key: string, value: string) {
@@ -205,7 +218,7 @@ export function HrFormWorkspace({ type, userName, canManage }: { type: HrSection
         <form onSubmit={save}>
           <p>Status: {statusLabels[current?.status ?? "draft"]}. Nama pada kolom tanda tangan merupakan nama tercetak; tanda tangan dilakukan pada hasil cetak.</p>
           {locked && <p>Formulir terkunci. HR dapat membuka kembali sebagai draf untuk perbaikan.</p>}
-          <fieldset disabled={busy || locked} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
+          <fieldset disabled={busy || locked} className={styles.fieldset}>
           <legend className={styles.eyebrow}>Isian formulir</legend>
           <div className={styles.formGrid}>
             {fields.map((field) => <FormField key={field.key} field={field} value={values[field.key] ?? ""} onChange={(value) => change(field.key, value)} />)}

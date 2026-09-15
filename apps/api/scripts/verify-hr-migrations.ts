@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import mysql from "mysql2/promise";
 import { drizzle } from "drizzle-orm/mysql2";
 import { migrate } from "drizzle-orm/mysql2/migrator";
+import { migrateDatabase } from "../src/db/migrate";
 
 const sourceUrl = new URL(process.env.DATABASE_URL ?? "mysql://invalid/invalid");
 if (process.env.ALLOW_TEST_DATABASE !== "1" || !sourceUrl.pathname.endsWith("_test") || process.env.NODE_ENV === "production") throw new Error("Use an explicitly authorized disposable test MySQL server.");
@@ -13,43 +14,60 @@ const migrations = resolve(import.meta.dir, "../drizzle");
 const journal = JSON.parse(await readFile(resolve(migrations, "meta/_journal.json"), "utf8"));
 const oldFolder = await mkdtemp(resolve(tmpdir(), "mkn-migrations-"));
 await mkdir(resolve(oldFolder, "meta"));
-await writeFile(resolve(oldFolder, "meta/_journal.json"), JSON.stringify({ ...journal, entries: journal.entries.filter((entry: { idx: number }) => entry.idx <= 3) }));
-for (const entry of journal.entries.filter((entry: { idx: number }) => entry.idx <= 3)) await copyFile(resolve(migrations, `${entry.tag}.sql`), resolve(oldFolder, `${entry.tag}.sql`));
+const oldEntries = [...journal.entries.filter((entry: { idx: number }) => entry.idx <= 2), { idx: 3, version: "5", when: 1789355357230, tag: "0003_new_wraith", breakpoints: true }];
+await writeFile(resolve(oldFolder, "meta/_journal.json"), JSON.stringify({ ...journal, entries: oldEntries }));
+for (const entry of oldEntries) await copyFile(resolve(migrations, entry.idx === 3 ? "history/hr-legacy/0003_new_wraith.sql" : `${entry.tag}.sql`), resolve(oldFolder, `${entry.tag}.sql`));
+const mainFolder = await mkdtemp(resolve(tmpdir(), "mkn-main-migrations-"));
+await mkdir(resolve(mainFolder, "meta"));
+await writeFile(resolve(mainFolder, "meta/_journal.json"), JSON.stringify({ ...journal, entries: journal.entries.filter((entry: { idx: number }) => entry.idx <= 3) }));
+for (const entry of journal.entries.filter((entry: { idx: number }) => entry.idx <= 3)) await copyFile(resolve(migrations, `${entry.tag}.sql`), resolve(mainFolder, `${entry.tag}.sql`));
 
 try {
-  for (const scenario of ["fresh", "legacy", "pushed"] as const) {
+  for (const scenario of ["fresh", "legacy", "pushed", "partial", "main"] as const) {
     const name = `mkn_hr_${scenario}_${Date.now()}_test`;
-    assert.match(name, /^mkn_hr_(fresh|legacy|pushed)_\d+_test$/);
+    assert.match(name, /^mkn_hr_(fresh|legacy|pushed|partial|main)_\d+_test$/);
     await root.query(`CREATE DATABASE \`${name}\``);
     const url = new URL(sourceUrl); url.pathname = `/${name}`;
     const connection = await mysql.createConnection(url.toString());
     const orm = drizzle(connection);
     try {
       if (scenario !== "fresh") {
-        await migrate(orm, { migrationsFolder: oldFolder });
+        await migrate(orm, { migrationsFolder: scenario === "main" ? mainFolder : oldFolder });
         await connection.query("INSERT INTO users (name,email,password_hash) VALUES ('Keep employee','hr@mknsite.online','not-a-login-hash')");
         await connection.query("INSERT INTO menus (title,url,required_permission) VALUES ('Custom HR','/portal/hr','hr.view')");
-        await connection.query("INSERT INTO hr_forms (form_type,form_number,data,created_by) VALUES ('cuti','CT-KEEP','{}',1)");
+        if (scenario !== "main") await connection.query("INSERT INTO hr_forms (form_type,form_number,data,created_by) VALUES ('cuti','CT-KEEP','{}',1)");
         await connection.query("INSERT INTO permissions(name,slug) VALUES ('Portal Telco','ops_telco.view')");
         await connection.query("INSERT INTO roles(name,slug) VALUES ('Custom technician name','ops-telco'),('Manager','manager')");
         await connection.query("INSERT INTO role_permissions(role_id,permission_id) VALUES (1,1),(2,1)");
         const [before]: any = await connection.query("SELECT DELETE_RULE FROM information_schema.referential_constraints WHERE constraint_schema=? AND table_name='hr_forms'", [name]);
-        assert.equal(before[0].DELETE_RULE, "CASCADE");
+        if (scenario !== "main") assert.equal(before[0].DELETE_RULE, "CASCADE");
         if (scenario === "pushed") {
           await connection.query("ALTER TABLE users ADD division varchar(100), ADD avatar_url varchar(500), ADD last_login_at timestamp NULL, ADD INDEX users_division_idx(division)");
           await connection.query("ALTER TABLE menus MODIFY icon text");
           await connection.query("CREATE TABLE divisions (id int AUTO_INCREMENT PRIMARY KEY,name varchar(100) NOT NULL,description varchar(255),created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,CONSTRAINT divisions_name_unique UNIQUE(name))");
           await connection.query("INSERT INTO divisions (name,description) VALUES ('Custom Division','Keep this')");
         }
+        if (scenario === "partial") await connection.query("ALTER TABLE users ADD division varchar(100)");
       }
-      await migrate(orm, { migrationsFolder: migrations });
-      await migrate(orm, { migrationsFolder: migrations });
+      await migrateDatabase(connection, migrations);
+      await migrateDatabase(connection, migrations);
       const [fk]: any = await connection.query("SELECT DELETE_RULE FROM information_schema.referential_constraints WHERE constraint_schema=? AND table_name='hr_forms'", [name]);
       assert.equal(fk[0].DELETE_RULE, "RESTRICT");
       const [columns]: any = await connection.query("SELECT column_name FROM information_schema.columns WHERE table_schema=? AND table_name='users'", [name]);
       for (const field of ["division", "avatar_url", "last_login_at"]) assert(columns.some((column: any) => column.COLUMN_NAME === field));
-      const seed = () => Bun.spawn([process.execPath, "src/db/seed.ts"], { cwd: resolve(import.meta.dir, ".."), env: { ...process.env, DATABASE_URL: url.toString() }, stdout: "ignore", stderr: "inherit" }).exited;
+      const seed = (production = false) => Bun.spawn([process.execPath, "src/db/seed.ts"], { cwd: resolve(import.meta.dir, ".."), env: { ...process.env, NODE_ENV: production ? "production" : "development", DATABASE_URL: url.toString() }, stdout: "ignore", stderr: "inherit" }).exited;
+      assert.equal(await seed(true), 0);
+      const [noSampleAccounts]: any = await connection.query("SELECT COUNT(*) AS n FROM users WHERE account_type='admin'");
+      assert.equal(Number(noSampleAccounts[0].n), 0, "Production bootstrap must never create sample administrators");
       assert.equal(await seed(), 0);
+      const currentHash = await Bun.password.hash("Current-test-password-only-2026");
+      await connection.query("UPDATE users SET password_hash=?,name='Preserve name',division='Preserve division' WHERE email='admin@mknsite.online'", [currentHash]);
+      await connection.query("DELETE FROM auth_user WHERE email='admin@mknsite.online'");
+      assert.equal(await seed(true), 0);
+      const [repaired]: any = await connection.query("SELECT a.password,u.name,u.division FROM auth_account a JOIN auth_user au ON au.id=a.user_id JOIN users u ON u.id=au.mkn_user_id WHERE u.email='admin@mknsite.online'");
+      assert.equal(repaired[0].password, currentHash);
+      assert.equal(repaired[0].name, "Preserve name");
+      assert.equal(repaired[0].division, "Preserve division");
       // Existing RBAC edits must survive every subsequent seed run.
       await connection.query("DELETE rp FROM role_permissions rp JOIN roles r ON r.id=rp.role_id JOIN permissions p ON p.id=rp.permission_id WHERE r.slug='ops-telco' AND p.slug='ops_telco.schedule.view'");
       assert.equal(await seed(), 0);
@@ -62,7 +80,7 @@ try {
         const [menu]: any = await connection.query("SELECT title FROM menus WHERE url='/portal/hr'");
         assert.equal(menu[0].title, "Custom HR");
         const [form]: any = await connection.query("SELECT form_number FROM hr_forms");
-        assert.equal(form[0].form_number, "CT-KEEP");
+        if (scenario !== "main") assert.equal(form[0].form_number, "CT-KEEP");
         const [role]: any = await connection.query("SELECT name FROM roles WHERE slug='ops-telco'");
         assert.equal(role[0].name, "Custom technician name");
         if (scenario === "pushed") {
@@ -76,4 +94,4 @@ try {
       await root.query(`DROP DATABASE \`${name}\``);
     }
   }
-} finally { await root.end(); await rm(oldFolder, { recursive: true }); }
+} finally { await root.end(); await rm(oldFolder, { recursive: true }); await rm(mainFolder, { recursive: true }); }

@@ -6,6 +6,7 @@
 .toolbar h2, .historyHeader h3 { margin: 3px 0 0; color: #102f42; }
 .eyebrow { margin: 0; color: #0871b3; font-size: 10px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
 .formGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 17px; }
+.fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .formGrid label { display: grid; gap: 7px; color: #365568; font-size: 12px; font-weight: 750; }
 .wide { grid-column: 1 / -1; }
 .formGrid input, .formGrid textarea, .formGrid select { width: 100%; padding: 10px 11px; color: #102f42; background: #fbfdff; border: 1px solid #cbdbe5; border-radius: 9px; font: inherit; font-weight: 500; }

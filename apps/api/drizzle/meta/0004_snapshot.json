@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "ea2fe591-47aa-447a-8a05-71c5b794386f",
-  "prevId": "c2d3d762-8bf6-44df-914e-0a6e21e2ff3d",
+  "id": "655f829c-4c64-4d80-a3f4-f57ff948970a",
+  "prevId": "80c09f44-e168-4eb6-92ba-a4e6f050718d",
   "tables": {
     "audit_logs": {
       "name": "audit_logs",

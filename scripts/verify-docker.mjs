@@ -2,13 +2,14 @@ import assert from 'node:assert/strict';
 
 const base = process.env.VERIFY_API_URL ?? 'http://localhost:3001';
 const web = process.env.VERIFY_WEB_URL ?? 'http://localhost:3100';
+const origin = process.env.VERIFY_ORIGIN ?? web;
 const employeeEmail = process.env.VERIFY_EMPLOYEE_EMAIL;
 const employeePassword = process.env.VERIFY_EMPLOYEE_PASSWORD;
 assert.ok(employeeEmail && employeePassword, 'Set VERIFY_EMPLOYEE_EMAIL and VERIFY_EMPLOYEE_PASSWORD for a dedicated employee with role HR. No employee demo account is seeded.');
 async function call(path, { body, cookie, method } = {}) {
   return fetch(base + path, {
     method: method ?? (body ? 'POST' : 'GET'),
-    headers: { 'Content-Type': 'application/json', Origin: web, ...(cookie ? { Cookie: cookie } : {}) },
+    headers: { 'Content-Type': 'application/json', Origin: origin, ...(cookie ? { Cookie: cookie } : {}) },
     ...(body ? { body: JSON.stringify(body) } : {})
   });
 }

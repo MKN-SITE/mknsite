@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { db, pool } from ".";
 import { authAccounts, authUsers, divisions, permissions, rolePermissions, roles, userRoles, users } from "./schema";
 
@@ -41,7 +41,7 @@ const accounts = [
 ] as const;
 
 async function seed() {
-  if (process.env.NODE_ENV === "production") throw new Error("Seed akun contoh hanya untuk development/test.");
+  const production = process.env.NODE_ENV === "production";
   // Seed is additive. Existing accounts, menu configuration and RBAC stay owned by Administrasi.
   const existingRoles = new Set((await db.select().from(roles)).map((role) => role.slug));
   for (const [name, slug] of permissionRows) await db.insert(permissions).ignore().values({ name, slug });
@@ -58,29 +58,35 @@ async function seed() {
     }
   }
 
-  const adminHash = await Bun.password.hash("admin12345", { algorithm: "argon2id" });
-  const superadminHash = await Bun.password.hash("superadmin12345", { algorithm: "argon2id" });
   for (const [name, email, accountType, roleSlug, division] of accounts) {
-    // Cek apakah akun sudah ada — jika sudah, JANGAN timpa password/data
-    const [existing] = await db.select().from(users).where(eq(users.email, email)).limit(1);
-    if (existing) {
-      console.log(`  → Akun ${email} sudah ada (id=${existing.id}), dilewati.`);
-      continue;
-    }
+    await db.transaction(async (tx) => {
+      const [existing] = await tx.select().from(users).where(eq(users.email, email)).limit(1).for("update");
+      if (!existing && production) return; // No sample passwords or new users in production.
+      if (existing && existing.accountType !== "admin") throw new Error("Email bootstrap sudah digunakan akun non-admin. Periksa konfigurasi.");
+      let account = existing;
+      if (!account) {
+        const passwordHash = await Bun.password.hash(email === "superadmin@mknsite.online" ? "superadmin12345" : "admin12345", { algorithm: "argon2id" });
+        const [created] = await tx.insert(users).values({ name, email, accountType, division, passwordHash }).$returningId();
+        [account] = await tx.select().from(users).where(eq(users.id, created.id));
+        const role = allRoles.find((item) => item.slug === roleSlug)!;
+        await tx.insert(userRoles).values({ userId: account.id, roleId: role.id });
+      }
 
-    // Akun belum ada — buat baru
-    const loginHash = email === "superadmin@mknsite.online" ? superadminHash : adminHash;
-    await db.insert(users).values({ name, email, accountType, division, passwordHash: loginHash });
-    const [account] = await db.select().from(users).where(eq(users.email, email)).limit(1);
-    const role = allRoles.find((item) => item.slug === roleSlug)!;
-    await db.insert(userRoles).values({ userId: account.id, roleId: role.id }).onDuplicateKeyUpdate({ set: { roleId: role.id } });
-
-    const authUserId = crypto.randomUUID();
-    await db.insert(authUsers).values({ id: authUserId, mknUserId: account.id, name, email, emailVerified: true });
-    await db.insert(authAccounts).values({
-      id: crypto.randomUUID(), accountId: authUserId, providerId: "credential", userId: authUserId, password: loginHash
+      // Repair missing Better Auth records with the account's current hash, never a demo hash.
+      const identities = await tx.select().from(authUsers).where(or(eq(authUsers.mknUserId, account.id), eq(authUsers.email, account.email)));
+      if (identities.length > 1) throw new Error("Relasi Better Auth ambigu; periksa akun bootstrap.");
+      let identity = identities[0];
+      if (identity && (identity.email !== account.email || (identity.mknUserId !== null && identity.mknUserId !== account.id))) throw new Error("Relasi Better Auth tidak cocok; periksa akun bootstrap.");
+      if (!identity) {
+        const id = crypto.randomUUID();
+        await tx.insert(authUsers).values({ id, mknUserId: account.id, name: account.name, email: account.email, emailVerified: true });
+        [identity] = await tx.select().from(authUsers).where(eq(authUsers.id, id));
+      } else if (identity.mknUserId === null) {
+        await tx.update(authUsers).set({ mknUserId: account.id }).where(eq(authUsers.id, identity.id));
+      }
+      const [credential] = await tx.select().from(authAccounts).where(and(eq(authAccounts.userId, identity.id), eq(authAccounts.providerId, "credential"))).limit(1);
+      if (!credential) await tx.insert(authAccounts).values({ id: crypto.randomUUID(), accountId: identity.id, providerId: "credential", userId: identity.id, password: account.passwordHash });
     });
-    console.log(`  ✓ Akun ${email} berhasil dibuat.`);
   }
 
   // Seed default divisions (idempoten)

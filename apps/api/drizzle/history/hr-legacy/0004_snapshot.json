@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "80c09f44-e168-4eb6-92ba-a4e6f050718d",
-  "prevId": "bf7c3a84-1a33-42ae-aedb-5cafb14576ac",
+  "id": "ea2fe591-47aa-447a-8a05-71c5b794386f",
+  "prevId": "c2d3d762-8bf6-44df-914e-0a6e21e2ff3d",
   "tables": {
     "audit_logs": {
       "name": "audit_logs",
@@ -577,6 +577,133 @@
       "compositePrimaryKeys": {
         "divisions_id": {
           "name": "divisions_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "hr_forms": {
+      "name": "hr_forms",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "form_type": {
+          "name": "form_type",
+          "type": "varchar(24)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "form_number": {
+          "name": "form_number",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(24)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'draft'"
+        },
+        "data": {
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "duplicated_from_id": {
+          "name": "duplicated_from_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "hr_forms_number_unique": {
+          "name": "hr_forms_number_unique",
+          "columns": [
+            "form_number"
+          ],
+          "isUnique": true
+        },
+        "hr_forms_type_idx": {
+          "name": "hr_forms_type_idx",
+          "columns": [
+            "form_type"
+          ],
+          "isUnique": false
+        },
+        "hr_forms_created_by_idx": {
+          "name": "hr_forms_created_by_idx",
+          "columns": [
+            "created_by"
+          ],
+          "isUnique": false
+        },
+        "hr_forms_created_at_idx": {
+          "name": "hr_forms_created_at_idx",
+          "columns": [
+            "created_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "hr_forms_owner_users_fk": {
+          "name": "hr_forms_owner_users_fk",
+          "tableFrom": "hr_forms",
+          "tableTo": "users",
+          "columnsFrom": [
+            "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "hr_forms_id": {
+          "name": "hr_forms_id",
           "columns": [
             "id"
           ]

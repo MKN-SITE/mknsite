@@ -35,7 +35,7 @@ Compose menjalankan MySQL, migrasi yang sudah tersimpan, seed akun development, 
 
 Tidak perlu memasang Bun atau MySQL pada komputer host. Gunakan commit repository yang sama; dependency dikunci lewat bun.lock. Data tiap anggota tim disimpan dalam volume lokal masing-masing dan tidak tersinkron otomatis.
 
-Lihat status dengan `docker compose ps -a` dan log dengan `docker compose logs --tail=100`. Hentikan menggunakan `docker compose down` (data tetap tersimpan). Setelah mengubah kode, jalankan kembali `docker compose up --build -d`. Compose ini khusus development dengan akun dan secret contoh, bukan konfigurasi produksi.
+Lihat status dengan `docker compose ps -a` dan log dengan `docker compose logs --tail=100`. Hentikan menggunakan `docker compose down` (data tetap tersimpan). Folder sumber frontend dipasang sebagai volume agar perubahan tampilan dimuat ulang saat development. Untuk perubahan backend, dependency, atau konfigurasi build, jalankan kembali `docker compose up --build -d`. Compose ini khusus development dengan akun dan secret contoh, bukan konfigurasi produksi.
 
 Verifikasi lingkungan tim:
 
@@ -43,7 +43,7 @@ Verifikasi lingkungan tim:
 bun scripts/verify-docker.mjs
 ```
 
-Script ini menguji halaman web, health check API, login MySQL, izin HR, penolakan akses lintas modul, serta isolasi sesi admin dan karyawan. Buat akun karyawan uji dengan role HR melalui Administrasi, lalu isi `VERIFY_EMPLOYEE_EMAIL` dan `VERIFY_EMPLOYEE_PASSWORD`. Kredensial admin dapat diatur lewat `VERIFY_ADMIN_EMAIL` / `VERIFY_ADMIN_PASSWORD`.
+Script ini menguji halaman web, health check API, login MySQL, izin HR, penolakan akses lintas modul, serta isolasi sesi admin dan karyawan. Buat akun karyawan uji dengan role HR melalui Administrasi, lalu isi `VERIFY_EMPLOYEE_EMAIL` dan `VERIFY_EMPLOYEE_PASSWORD`. Kredensial admin dapat diatur lewat `VERIFY_ADMIN_EMAIL` / `VERIFY_ADMIN_PASSWORD`. Jika tes berjalan dari network Docker dan URL koneksi berbeda dari alamat browser, isi `VERIFY_ORIGIN` dengan origin frontend yang diizinkan.
 
 ## Menjalankan lokal tanpa container aplikasi
 
@@ -65,7 +65,7 @@ Akun administrator dan superadministrator:
 - Administrator memakai `admin@mknsite.online` dengan password `admin12345`.
 - Super Administrator memakai `superadmin@mknsite.online` dengan password `superadmin12345`.
 
-Seed tidak menghapus akun/menu, tidak menimpa password, dan tidak memasang ulang grant pada role yang sudah dikonfigurasi. Akun lama tetap dipertahankan. `db:seed` ditolak jika `NODE_ENV=production`; provisioning administrator produksi harus mengikuti prosedur tim tanpa password contoh.
+Seed tidak menghapus akun/menu, tidak menimpa password, dan tidak memasang ulang grant pada role yang sudah dikonfigurasi. Pada produksi, seed hanya melengkapi katalog permission, role baru, dan divisi serta memperbaiki relasi Better Auth yang hilang pada akun bootstrap yang sudah ada menggunakan hash password akun tersebut. Seed produksi tidak membuat pengguna atau password contoh; provisioning administrator baru harus mengikuti prosedur tim. Relasi identitas yang tidak cocok menghentikan seed untuk diperiksa, bukan menimpa akun.
 
 ## Model keamanan
 
@@ -163,7 +163,8 @@ bun run check
 # Tes komponen frontend
 bun test scripts/tests
 
-# Uji migrasi fresh / legacy / db:push pada server MySQL test disposable
+# Uji migrasi fresh / legacy HR / db:push / schema parsial / main
+# pada server MySQL test disposable
 # Memerlukan kredensial test yang boleh membuat database sementara.
 bun --cwd apps/api scripts/verify-hr-migrations.ts
 
