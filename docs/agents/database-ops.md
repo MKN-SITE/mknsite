@@ -37,27 +37,44 @@ Panduan ini menjelaskan cara memeriksa, membandingkan, dan memperbaiki state dat
 > [!IMPORTANT]
 > **Docker lokal dan production TIDAK identik.** Lokal menggunakan `Dockerfile.dev` dengan 3 container (init → api → web), sedangkan production menggunakan `apps/api/Dockerfile` dengan 1 container API. Frontend production di-deploy terpisah via Vercel.
 
-## Migration History: `__drizzle_migrations`
+## Riwayat Migrasi: `__drizzle_migrations`
 
-Drizzle menyimpan riwayat migrasi di tabel internal `__drizzle_migrations`.
+Drizzle menyimpan riwayat migrasi di tabel internal database bernama `__drizzle_migrations`.
 
-### Struktur Tabel `__drizzle_migrations`
+### Mengapa Tabel Fisik Hanya Memiliki 3 Kolom?
 
 | Kolom | Tipe | Keterangan |
 |-------|------|------------|
-| `id` | bigint unsigned | Primary key, auto increment urutan eksekusi |
+| `id` | bigint unsigned | Primary key auto increment (urutan eksekusi) |
 | `hash` | text | SHA-256 hash dari berkas SQL migrasi |
 | `created_at` | bigint | Timestamp (epoch ms) saat migrasi dieksekusi |
 
-### Cara Praktis Cek Status & Detail Fitur Migrasi
+> [!NOTE]
+> Tabel fisik `__drizzle_migrations` di MySQL memang **hanya memiliki 3 kolom internal** di atas karena dikelola secara kaku oleh engine `drizzle-kit`. DILARANG menambahkan kolom manual ke tabel ini karena akan menyebabkan `drizzle-kit migrate` gagal.
 
-Untuk melihat daftar seluruh migrasi lengkap dengan nama tag, status (`TERPASANG` / `PENDING`), waktu dijalankan, dan ringkasan fitur/perubahan skemanya, jalankan:
+### Bagaimana Mengetahui Fitur dan Perubahan Skemanya?
+
+Untuk mengetahui **fitur apa yang bertambah**, **tabel apa yang dibuat**, dan **kolom apa yang dimodifikasi**, Drizzle menyimpan metadata pendukung di berkas repository:
+1. `apps/api/drizzle/meta/_journal.json`: Memetakan timestamp `created_at` ke nama tag migrasi (contoh: `0003_powerful_puppet_master`).
+2. `apps/api/drizzle/xxxx_nama.sql`: Berisi instruksi DDL lengkap (`CREATE TABLE`, `ALTER TABLE ADD COLUMN`, dll).
+
+### Perintah Pemeriksaan Lengkap: `bun run db:status`
+
+Untuk mempermudah pengembang dan agen membaca riwayat migrasi secara manusiawi (bukan sekadar hash), gunakan perintah:
 
 ```bash
 bun --cwd apps/api db:status
 ```
 
-Perintah ini secara otomatis mencocokkan record di tabel `__drizzle_migrations` dengan metadata di `apps/api/drizzle/meta/_journal.json` dan memberikan output tabel yang jelas serta mendeteksi jika ada migrasi orphan.
+Perintah ini otomatis memadukan data tabel `__drizzle_migrations` dengan `_journal.json` dan menghasilkan tabel informatif:
+
+```text
+| Idx | Tag / Berkas Migrasi           | Status       | Waktu Dijalankan    | Fitur / Perubahan Skema
+| 0   | 0000_confused_power_man        | TERPASANG    | 7/9/2026, 12.09.15  | Skema dasar RBAC (users, roles, permissions...)
+| 1   | 0001_funny_marvex              | TERPASANG    | 7/9/2026, 18.45.40  | Tabel Better Auth (auth_user, auth_session...)
+| 2   | 0002_strong_korath             | TERPASANG    | 10/9/2026, 14.39.43 | Tabel Navigasi & Menu Dinamis (menus)
+| 3   | 0003_powerful_puppet_master    | TERPASANG    | 15/9/2026, 09.37.14 | Master Divisi & kolom profil user (division, avatar, last_login)
+```
 
 ### Cara Cek Manual via SQL Query
 
@@ -69,43 +86,34 @@ docker exec mknsite-mysql-1 mysql -u mknsite -p"mknsite-local-only" mknsite \
 
 **Production (via SSH ke VPS atau Coolify terminal):**
 ```bash
-# Dari Coolify Terminal atau SSH ke VPS
 mysql -u mknsite -p"<PASSWORD>" mknsite \
   -e "SELECT * FROM __drizzle_migrations ORDER BY created_at;"
 ```
 
 ### Membandingkan Lokal vs Production
 
-1. Hitung jumlah entry di `__drizzle_migrations` di kedua environment
-2. Bandingkan dengan jumlah entry di `apps/api/drizzle/meta/_journal.json`
-3. Jika jumlah di database < jumlah di journal → ada migrasi yang belum diterapkan
-4. Jika jumlah di database > jumlah di journal → ada migrasi orphan (file sudah dihapus tapi record masih ada)
-
-```
-Contoh perbandingan:
-
-_journal.json entries: 4 (0000, 0001, 0002, 0003)
-__drizzle_migrations lokal: 3 → migrasi 0003 BELUM jalan di lokal
-__drizzle_migrations prod:  4 → semua migrasi sudah jalan di production
-```
+1. Jalankan `bun --cwd apps/api db:status` di masing-masing lingkungan.
+2. Bandingkan status seluruh migrasi (pastikan semua berstatus `TERPASANG`).
+3. Jika ada migrasi yang berstatus `PENDING` di production $\rightarrow$ Ada perubahan skema di kode yang belum diterapkan di database.
+4. Jika muncul peringatan `ORPHAN` $\rightarrow$ Ada record di database yang berkasnya sudah tidak ada di Git (biasanya terjadi pasca `git revert`).
 
 > [!WARNING]
 > **Drizzle TIDAK memiliki fitur rollback otomatis.** Jika perlu rollback migrasi, harus manual: tulis SQL `DROP TABLE` / `ALTER TABLE DROP COLUMN` sendiri, lalu hapus row dari `__drizzle_migrations`.
 
-## Patokan Otomasi Registrasi Menu Dinamis (Standar Wajib Opsi B)
+## Standar Otomasi Rilis Menu dan Modul Portal (Automated Seed & Single-PR Pattern)
 
 Sistem MKN Site menggunakan navigasi modul portal berbasis tabel `menus` di database.
-Agar modul baru yang dikembangkan di frontend langsung aktif dan muncul di portal tanpa mengandalkan input manual admin di production, tim MKN Site menetapkan **Opsi B (Otomasi via seed.ts)** sebagai standar baku proyek:
+Agar modul baru yang dikembangkan di frontend langsung aktif dan muncul di portal tanpa mengandalkan input manual admin di production, tim MKN Site menetapkan **Pola Otomasi Seed Terintegrasi** sebagai standar baku proyek:
 
 ### Prinsip Kerja Otomasi Menu:
-1. **Satu Kesatuan PR**: Setiap developer/agen yang membuat halaman modul baru (misal: `apps/web/app/portal/ops-telco/page.tsx`) **wajib** mendaftarkan permission, role, dan menu di `apps/api/src/db/seed.ts` pada PR yang sama.
-2. **Zero Human Error**: Menghindari salah ketik URL (misal typo `/telco` yang berujung 404) atau kelupaan mengisi `requiredPermission` di panel admin.
-3. **Eksekusi Otomatis Coolify**: Saat PR di-merge ke `main`, container backend Coolify di production mengeksekusi startup script:
+1. **Satu Kesatuan PR (Single PR Pattern)**: Setiap developer/agen yang membuat halaman modul baru (misal: `apps/web/app/portal/ops-telco/page.tsx`) **wajib** mendaftarkan permission, role, dan menu di `apps/api/src/db/seed.ts` pada PR yang sama.
+2. **Zero Human Error**: Menghindari salah ketik URL tujuan (misal salah ketik `/telco` yang berujung error 404) atau kelupaan mengisi izin akses (`requiredPermission`) di panel admin.
+3. **Eksekusi Otomatis pada Deployment**: Saat PR di-merge ke `main`, container backend Coolify di production mengeksekusi urutan startup:
    ```dockerfile
    CMD ["sh", "-c", "bunx drizzle-kit migrate && bun src/db/seed.ts && bun src/index.ts"]
    ```
-   Eksekusi `seed.ts` secara otomatis memasukkan menu ke database production secara idempoten.
-4. **Dilarang Bergantung pada Input Manual**: QA dilarang meloloskan PR rute portal baru jika menunya tidak terdaftar di `seed.ts`.
+   Eksekusi `seed.ts` secara otomatis menyisipkan dan menyinkronkan data menu ke database production secara idempoten.
+4. **Larangan Input Manual di Production**: QA dilarang meloloskan PR rute portal baru jika kartu menunya tidak didaftarkan di `seed.ts`. Penambahan modul baru tidak boleh bergantung pada tindakan manual pasca-deploy.
 
 ## Aturan Penting: Git Revert ≠ Database Revert
 

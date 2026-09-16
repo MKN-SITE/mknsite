@@ -40,7 +40,7 @@ Setiap fitur baru yang mengubah atau menambah tabel, kolom, relasi, tipe data, a
    ```bash
    bun --cwd apps/api db:migrate
    ```
-5. **Wajib Registrasi Menu & RBAC di Seed (Patokan Otomasi QA - Opsi B)**: Setiap fitur atau modul baru yang memiliki tampilan di portal karyawan WAJIB mendaftarkan:
+5. **Wajib Registrasi Menu & RBAC di Seed (Pola Otomasi Terintegrasi)**: Setiap fitur atau modul baru yang memiliki antarmuka di portal karyawan WAJIB mendaftarkan:
    - Izin (`permissions`) dan peran (`roles`) terkait.
    - Kartu menu navigasi di tabel `menus` melalui `apps/api/src/db/seed.ts` secara idempoten.
    - **Dilarang** meminta admin menginput menu secara manual di production; seed otomatis memastikan modul langsung aktif saat deployment Coolify selesai.

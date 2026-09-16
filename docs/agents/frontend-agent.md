@@ -22,7 +22,7 @@ Utama: apps/web, komponen React, route/layout Next.js, styling, integrasi API, d
 - Gunakan mekanisme cookie/session dan helper API yang telah disepakati. Jangan menaruh token atau secret di localStorage maupun bundle frontend.
 - Kelola lifecycle SSE: penutupan koneksi, reconnect, perubahan sesi, serta penyegaran data yang sesuai.
 - Jangan mengklaim integrasi selesai bila masih memakai data contoh.
-- Untuk modul bisnis baru di portal karyawan (misal: `/portal/ops-telco`), pastikan rute halaman dan submenunya diintegrasikan bersama registrasi kartu menu, ikon, serta permission di `apps/api/src/db/seed.ts` dalam PR yang sama (Patokan Otomasi QA - Opsi B). Menu portal dibaca secara dinamis dari database, bukan di-hardcode di frontend.
+- Untuk modul bisnis baru di portal karyawan (misal: `/portal/ops-telco`), pastikan rute halaman dan submenunya diintegrasikan bersama registrasi kartu menu, ikon, serta permission di `apps/api/src/db/seed.ts` dalam PR yang sama (Standar Otomasi Rilis Modul Portal). Menu portal dibaca secara dinamis dari database, bukan di-hardcode di frontend.
 - Hindari dependensi baru tanpa manfaat yang jelas untuk kebutuhan tugas.
 
 ## Standar wajib: CSS dan komponen reusable

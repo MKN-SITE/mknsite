@@ -23,7 +23,7 @@ Rencana uji, test otomatis yang relevan, laporan temuan, dan verifikasi ulang. D
 
 ## Standar Otomasi Rilis Modul & Menu Dinamis (Patokan Wajib QA)
 
-Setiap penambahan atau pembaruan modul bisnis (misal: HR, OPS Telco, OPS Workshop, Project, dll) **WAJIB menggunakan pola otomasi seed dalam PR yang sama (Opsi B)**:
+Setiap penambahan atau pembaruan modul bisnis (misal: HR, OPS Telco, OPS Workshop, Project, dll) **WAJIB menggunakan pola otomatisasi seed terintegrasi dalam PR yang sama**:
 1. **Aturan Satu PR**: Kode halaman frontend (`apps/web/app/portal/<modul>`), skema backend/migrasi (`apps/api/drizzle/`), dan registrasi menu di seed (`apps/api/src/db/seed.ts`) harus berada dalam **satu PR yang utuh**.
 2. **Dilarang Bergantung pada Input Manual**: QA dilarang meloloskan PR fitur jika menunya tidak didaftarkan di `seed.ts`. Mengandalkan input manual di production berisiko tinggi (typo URL, lupa permission, atau modul tidak muncul di portal).
 3. **Idempotensi Seed**: Registrasi menu di `seed.ts` harus idempoten (menggunakan pengecekan `existing` atau `onDuplicateKeyUpdate`) sehingga aman dijalankan berulang kali saat redeploy di Coolify.
