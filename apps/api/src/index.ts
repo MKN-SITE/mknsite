@@ -7,6 +7,7 @@ import { config } from "./config/env";
 import { openApiSchemas, openApiSecuritySchemes, openApiTags } from "./config/openapi";
 import { adminRoutes } from "./routes/admin";
 import { authRoutes } from "./routes/auth";
+import { hrRoutes } from "./routes/hr";
 import { menuRoutes } from "./routes/menu";
 import { realtimeRoutes } from "./routes/realtime";
 import { rbacRoutes } from "./routes/rbac";
@@ -85,6 +86,7 @@ export const createServer = (options: { enableSwagger?: boolean } = {}) => {
     .use(divisionRoutes)
     .use(realtimeRoutes)
     .use(workspaceRoutes)
+    .use(hrRoutes)
     .use(menuRoutes);
 };
 

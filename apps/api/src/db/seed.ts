@@ -2,18 +2,45 @@ import { eq, inArray, like, ne, notInArray } from "drizzle-orm";
 import { db, pool } from ".";
 import { authAccounts, authUsers, divisions, menus, permissions, rolePermissions, roles, userRoles, users } from "./schema";
 
-// Izin sistem minimal: Dashboard, HR, dan Administrasi
+// Izin sistem: Dashboard, HR, OPS Telco, dan Administrasi
 const permissionRows = [
   ["Lihat dashboard", "dashboard.view"],
   ["Lihat HR", "hr.view"],
   ["Kelola HR", "hr.manage"],
+  ["Lihat OPS Telco", "ops_telco.view"],
+  ["Lihat penugasan job", "ops_telco.job_assignment.view"],
+  ["Kelola jadwal oncall", "ops_telco.schedule.manage"],
+  ["Lihat formulir PTO", "ops_telco.pto.view"],
+  ["Lihat jadwal oncall", "ops_telco.schedule.view"],
+  ["Lihat auto report WAG", "ops_telco.wag_report.view"],
+  ["Lihat estimasi dan quotation", "ops_telco.estimate.view"],
+  ["Lihat dokumentasi pekerjaan", "ops_telco.documentation.view"],
   ["Kelola sistem", "admin.manage"],
   ["Kelola keamanan sistem", "admin.security.manage"]
 ] as const;
 
-// Role sistem minimal: HR, Administrator, dan Superadministrator
+// Role sistem: HR, Supervisor Telco, Teknisi Telco, Administrator, dan Superadministrator
 const roleRows = [
   ["HR", "hr", ["dashboard.view", "hr.view", "hr.manage"]],
+  ["Supervisor OPS Telco", "ops-telco-supervisor", [
+    "dashboard.view",
+    "ops_telco.view",
+    "ops_telco.job_assignment.view",
+    "ops_telco.schedule.manage",
+    "ops_telco.pto.view",
+    "ops_telco.schedule.view",
+    "ops_telco.wag_report.view",
+    "ops_telco.estimate.view",
+    "ops_telco.documentation.view"
+  ]],
+  ["Teknisi OPS Telco", "ops-telco-technician", [
+    "dashboard.view",
+    "ops_telco.view",
+    "ops_telco.schedule.view",
+    "ops_telco.wag_report.view",
+    "ops_telco.estimate.view",
+    "ops_telco.documentation.view"
+  ]],
   ["Administrator", "administrator", ["dashboard.view", "admin.manage"]],
   ["Superadministrator", "superadmin", ["dashboard.view", "admin.manage", "admin.security.manage"]]
 ] as const;
@@ -28,11 +55,12 @@ const accounts = [
 const defaultDivisions = [
   ["Direksi / Eksekutif", "Dewan pimpinan eksekutif dan direksi perusahaan"],
   ["Teknologi Informasi", "Infrastruktur IT, pengembangan sistem, dan keamanan siber"],
-  ["Human Resources", "Pengelolaan sumber daya manusia, kepersonaliaan, dan budaya kerja"]
+  ["Human Resources", "Pengelolaan sumber daya manusia, kepersonaliaan, dan budaya kerja"],
+  ["Operasional Telekomunikasi", "Layanan operasional telekomunikasi, jaringan, dan teknis lapangan"]
 ] as const;
 
 async function seed() {
-  console.log("Memulai seeding minimal MKN Site (Admin, Superadmin & HR)...");
+  console.log("Memulai seeding MKN Site (Admin, Superadmin, HR & OPS Telco)...");
 
   // 1. Bersihkan akun legacy berdomain @mknsite.id jika masih tertinggal
   await db.delete(users).where(like(users.email, "%@mknsite.id"));
@@ -48,38 +76,44 @@ async function seed() {
     await db.delete(users).where(eq(users.email, email));
   }
 
-  // 3. Bersihkan seluruh menu selain menu HR (sisa menu diinput manual oleh admin)
-  await db.delete(menus).where(ne(menus.url, "/portal/hr"));
+  // 3. Sinkronkan Menu Utama (HR dan OPS Telco) secara idempoten tanpa menghapus menu lain buatan Admin
+  const defaultMenus = [
+    {
+      title: "HR",
+      icon: "users",
+      description: "Pengelolaan Absensi, Cuti, dan Data Karyawan",
+      url: "/portal/hr",
+      requiredPermission: "hr.view",
+      sortOrder: 1,
+      isActive: 1,
+      badgeCount: 0,
+      badgeColor: "orange"
+    },
+    {
+      title: "OPS Telco",
+      icon: "radio",
+      description: "Operasional Telekomunikasi dan Layanan Teknis Lapangan",
+      url: "/portal/ops-telco",
+      requiredPermission: "ops_telco.view",
+      sortOrder: 2,
+      isActive: 1,
+      badgeCount: 0,
+      badgeColor: "blue"
+    }
+  ];
 
-  // 4. Seed Menu HR secara idempoten
-  const hrMenuData = {
-    title: "HR",
-    icon: "users",
-    description: "Pengelolaan Absensi, Cuti, dan Data Karyawan",
-    url: "/portal/hr",
-    requiredPermission: "hr.view",
-    sortOrder: 1,
-    isActive: 1,
-    badgeCount: 0,
-    badgeColor: "orange"
-  };
-  const [existingHrMenu] = await db.select().from(menus).where(eq(menus.url, "/portal/hr")).limit(1);
-  if (!existingHrMenu) {
-    await db.insert(menus).values(hrMenuData);
-    console.log("  ✓ Menu HR (/portal/hr) berhasil dibuat.");
-  } else {
-    await db.update(menus).set(hrMenuData).where(eq(menus.id, existingHrMenu.id));
-    console.log("  ✓ Menu HR (/portal/hr) berhasil disinkronkan.");
+  for (const menuData of defaultMenus) {
+    const [existingMenu] = await db.select().from(menus).where(eq(menus.url, menuData.url)).limit(1);
+    if (!existingMenu) {
+      await db.insert(menus).values(menuData);
+      console.log(`  ✓ Menu ${menuData.title} (${menuData.url}) berhasil dibuat.`);
+    } else {
+      await db.update(menus).set(menuData).where(eq(menus.id, existingMenu.id));
+      console.log(`  ✓ Menu ${menuData.title} (${menuData.url}) berhasil disinkronkan.`);
+    }
   }
 
-  // 5. Bersihkan role dan permission yang tidak terpakai
-  const validRoleSlugs = roleRows.map(([, slug]) => slug);
-  await db.delete(roles).where(notInArray(roles.slug, validRoleSlugs));
-
-  const validPermissionSlugs = permissionRows.map(([, slug]) => slug);
-  await db.delete(permissions).where(notInArray(permissions.slug, validPermissionSlugs));
-
-  // 6. Sinkronkan permission & role yang diizinkan
+  // 4. Sinkronkan permission & role yang diizinkan (idempoten, tidak menghapus role custom admin)
   for (const [name, slug] of permissionRows) {
     await db.insert(permissions).values({ name, slug }).onDuplicateKeyUpdate({ set: { name } });
   }

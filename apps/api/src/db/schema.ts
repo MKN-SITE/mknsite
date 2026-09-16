@@ -1,4 +1,4 @@
-import { boolean, index, int, mysqlTable, primaryKey, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
+import { boolean, foreignKey, index, int, mysqlTable, primaryKey, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
@@ -117,6 +117,24 @@ export const menus = mysqlTable("menus", {
   index("menus_sort_order_idx").on(table.sortOrder),
   index("menus_is_active_idx").on(table.isActive),
   index("menus_required_permission_idx").on(table.requiredPermission)
+]);
+
+export const hrForms = mysqlTable("hr_forms", {
+  id: int("id").autoincrement().primaryKey(),
+  formType: varchar("form_type", { length: 24 }).notNull(),
+  formNumber: varchar("form_number", { length: 80 }).notNull(),
+  status: varchar("status", { length: 24 }).notNull().default("draft"),
+  data: text("data").notNull(),
+  createdBy: int("created_by").notNull(),
+  duplicatedFromId: int("duplicated_from_id"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow()
+}, (table) => [
+  uniqueIndex("hr_forms_number_unique").on(table.formNumber),
+  foreignKey({ name: "hr_forms_owner_users_fk", columns: [table.createdBy], foreignColumns: [users.id] }).onDelete("restrict"),
+  index("hr_forms_type_idx").on(table.formType),
+  index("hr_forms_created_by_idx").on(table.createdBy),
+  index("hr_forms_created_at_idx").on(table.createdAt)
 ]);
 
 export const divisions = mysqlTable("divisions", {
