@@ -1,0 +1,22 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\KPC\
+02. Switch KPC LBTT	Host is alive	23:59:26	23:59:26	00:00:00	
+04. Exalt KPC Pelangi Camp	Host is alive	23:57:43	23:57:43	00:00:00	
+11. ALU M5                      Oncall Telco SGT	Host is alive	23:59:28	23:59:28	00:00:00	
+12. ALU SURYA              Oncall Telco SGT	Host is alive	23:59:27	23:59:27	00:00:00	
+13. ALU BINTANG          Oncall Telco SGT	Host is alive	23:40:03	23:40:03	00:00:00	
+14. ALU AB                      Oncall Telco SGT	Host is alive	23:59:26	23:59:26	00:00:00	
+15. ALU HATARI             Oncall Telco SGT	Host is alive	23:59:26	23:59:26	00:00:00	
+16. ALU PTH                    Oncall Telco SGT	Host is alive	23:59:26	23:59:26	00:00:00	
+17. ALU P11                    Oncall Telco SGT	Host is alive	23:59:21	23:59:21	00:00:00	
+18. ALU FNORTH            Oncall Telco SGT	Host is alive	23:59:26	23:59:26	00:00:00	
+19. ALU 15000                 Oncall Telco BGL	Host is alive	23:59:26	23:54:18	00:05:07	
+20. ALU LubukTutung     Oncall Telco BGL	Host is alive	23:59:25	23:44:06	00:15:19	
+21. Link TBTS Inul Middle	Host is alive	23:59:26	23:59:26	00:00:00	
+22. Link TBTS Galaxy	Host is alive	23:59:26	23:59:26	00:00:00	
+23. Link TBTS Lignite	Host is alive	23:59:26	23:59:26	00:00:00	
+24. ALU PTH to LBTT   Oncall Telco SGT	Host is alive	23:59:25	23:44:06	00:15:19	
+25. ALU Bintang to AB   Oncall Telco SGT	Host is alive	23:59:25	23:59:25	00:00:00	
+Genset CH 15000	Host is alive	23:57:46	23:53:13	00:04:32	
+

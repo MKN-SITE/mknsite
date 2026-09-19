@@ -1,0 +1,10 @@
+Test name	Dead time	Alive time	Total time	
+
+Folder: MONITORING\LIEBHER\
+1. Link M5 to Surya	00:00:00	23:58:56	23:58:56	
+2. Link Surya to M5	00:00:00	23:59:02	23:59:02	
+3. Link Surya to Farnorth	00:00:00	23:59:02	23:59:02	
+4. Link Farnorth to Surya	00:00:00	23:59:02	23:59:02	
+5. Link Farnorth to Megashop	00:00:00	1 day 00:00:14	1 day 00:00:14	
+6. Link Megashop to Farnorth	23:12:50	00:40:02	23:52:53	
+

@@ -24,6 +24,8 @@ Backend MKN Site dibangun dengan stack:
 5. `use(adminRoutes)` — Endpoint manajemen administrator dengan prefix `/admin`.
 6. `use(realtimeRoutes)` — Stream Server-Sent Events dengan prefix `/realtime`.
 7. `use(workspaceRoutes)` — Endpoint data workspace modul dengan prefix `/workspace`.
+8. `use(opsTelcoFormRoutes)` — Endpoint pengelolaan formulir teknisi OPS Telco dengan prefix `/ops-telco/forms`.
+9. `use(menuRoutes)` — Endpoint pengelolaan menu portal dan gerbang dinamis.
 
 ---
 

@@ -1,0 +1,10 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\Hexindo\
+1. Hexindo Office TD Audio Codes	Host is alive	1 day 00.00.02	23.18.54	00.41.08	
+2. Link Hexindo Office TD to Surya	Host is alive	1 day 00.03.16	1 day 00.03.16	00.00.00	
+3. Link Surya to Hexindo Office	Host is alive	1 day 00.03.05	23.57.56	00.05.08	
+4. Link Surya to Hexindo Pama	Host is alive	1 day 00.02.48	1 day 00.02.48	00.00.00	
+5. Link Hexindo PAMA To Surya	Host is alive	1 day 00.02.51	1 day 00.02.51	00.00.00	
+6. Hexindo Pama Audio Codes	Host is alive	1 day 00.03.05	23.57.56	00.05.08	
+

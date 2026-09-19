@@ -1,0 +1,10 @@
+Test name	Status	Reply	Alive %	Dead %	Average reply	
+
+Folder: MONITORING\Hexindo\
+1. Hexindo Office TD Audio Codes	Host is alive	17 ms	100.00 %	0.00 %	13	
+2. Link Hexindo Office TD to Surya	Host is alive	13 ms	100.00 %	0.00 %	13	
+3. Link Surya to Hexindo Office	Host is alive	10 ms	100.00 %	0.00 %	9.1	
+4. Link Surya to Hexindo Pama	Host is alive	11 ms	82.94 %	17.06 %	9.1	
+5. Link Hexindo PAMA To Surya	Host is alive	12 ms	39.18 %	60.82 %	11	
+6. Hexindo Pama Audio Codes	No answer		0.00 %	100.00 %	0.0	
+

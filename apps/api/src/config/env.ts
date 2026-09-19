@@ -27,8 +27,18 @@ export const config = {
   apiOrigin: process.env.BETTER_AUTH_URL ?? `http://localhost:${process.env.PORT ?? 3001}`,
   databaseUrl: process.env.DATABASE_URL ?? "mysql://mknsite:mknsite-local-only@localhost:3306/mknsite",
   isProduction,
+  betterAuthSecret: (() => {
+    const secret = process.env.BETTER_AUTH_SECRET || (isProduction ? undefined : "mknsite-local-dev-secret-key-32ch");
+    if (isProduction && (!secret || secret.length < 32)) {
+      throw new Error("[CONFIG ERROR] BETTER_AUTH_SECRET wajib diisi minimal 32 karakter pada lingkungan production.");
+    }
+    return secret || "mknsite-local-dev-secret-key-32ch";
+  })(),
   enableSwagger: process.env.ENABLE_SWAGGER === "true" || !isProduction,
   docsProvider: (process.env.DOCS_PROVIDER as "swagger-ui" | "scalar") || "swagger-ui",
-  cookieDomain: process.env.COOKIE_DOMAIN || undefined
+  cookieDomain: process.env.COOKIE_DOMAIN || undefined,
+  seedAdminPassword: process.env.SEED_ADMIN_PASSWORD || undefined,
+  seedSuperadminPassword: process.env.SEED_SUPERADMIN_PASSWORD || undefined,
+  seedHrPassword: process.env.SEED_HR_PASSWORD || undefined
 } as const;
 

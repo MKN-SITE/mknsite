@@ -1,0 +1,22 @@
+Test name	Status	Reply	Alive %	Dead %	Average reply	
+
+Folder: MONITORING\KPC\
+02. Switch KPC LBTT	Host is alive	7 ms	100.00 %	0.00 %	9.3	
+04. Exalt KPC Pelangi Camp	Host is alive	10 ms	98.33 %	1.67 %	11	
+11. ALU M5                      Oncall Telco SGT	Host is alive	10 ms	100.00 %	0.00 %	7.4	
+12. ALU SURYA              Oncall Telco SGT	Host is alive	16 ms	100.00 %	0.00 %	18	
+13. ALU BINTANG          Oncall Telco SGT	Host is alive	13 ms	100.00 %	0.00 %	28	
+14. ALU AB                      Oncall Telco SGT	Host is alive	28 ms	100.00 %	0.00 %	24	
+15. ALU HATARI             Oncall Telco SGT	Host is alive	23 ms	100.00 %	0.00 %	21	
+16. ALU PTH                    Oncall Telco SGT	Host is alive	24 ms	100.00 %	0.00 %	23	
+17. ALU P11                    Oncall Telco SGT	Host is alive	28 ms	100.00 %	0.00 %	23	
+18. ALU FNORTH            Oncall Telco SGT	Host is alive	32 ms	100.00 %	0.00 %	26	
+19. ALU 15000                 Oncall Telco BGL	Host is alive	41 ms	100.00 %	0.00 %	32	
+20. ALU LubukTutung     Oncall Telco BGL	Host is alive	29 ms	90.44 %	9.56 %	31	
+21. Link TBTS Inul Middle	Host is alive	9 ms	100.00 %	0.00 %	10	
+22. Link TBTS Galaxy	Host is alive	11 ms	100.00 %	0.00 %	11	
+23. Link TBTS Lignite	Host is alive	8 ms	100.00 %	0.00 %	11	
+24. ALU PTH to LBTT   Oncall Telco SGT	Host is alive	29 ms	90.44 %	9.56 %	34	
+25. ALU Bintang to AB   Oncall Telco SGT	Host is alive	22 ms	100.00 %	0.00 %	27	
+Genset CH 15000	Host is alive	9 ms	100.00 %	0.00 %	8.8	
+

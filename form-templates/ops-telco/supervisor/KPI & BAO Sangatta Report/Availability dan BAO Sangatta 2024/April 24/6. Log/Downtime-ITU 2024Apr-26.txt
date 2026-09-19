@@ -1,0 +1,9 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\ITU\
+Router Metro MKN Jakarta 77	Host is alive	23.51.14	23.51.14	00.00.00	
+Router ITU Sangatta	Host is alive	23.57.54	23.57.54	00.00.00	
+LINK ITU Surya To Bintang	Host is alive	23.51.11	23.51.11	00.00.00	
+LINK ITU Bintang To Surya	Host is alive	1 day 00.17.25	1 day 00.17.25	00.00.00	
+Gateway PTH	Host is alive	23.51.11	23.51.11	00.00.00	
+

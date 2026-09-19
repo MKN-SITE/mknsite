@@ -29,11 +29,86 @@
   --text-xl: 32px;
   --space-6: 24px;
   --space-12: 48px;
+
+  /* Default Theme (Ocean Classic) */
   --portal-header-start: #074674;
   --portal-header-mid: #09598c;
   --portal-header-end: #053c61;
+  --portal-accent: #0284c7;
+  --portal-accent-soft: rgba(2, 132, 199, 0.15);
+  --portal-theme-glow: rgba(2, 132, 199, 0.45);
   --portal-live: #4ade80;
   --portal-muted: rgba(255, 255, 255, 0.88);
   --portal-glass: rgba(255, 255, 255, 0.14);
   --portal-border: rgba(255, 255, 255, 0.25);
+}
+
+/* ─── Ocean Classic (Default) ─── */
+[data-theme="ocean"] {
+  --portal-header-start: #074674;
+  --portal-header-mid: #09598c;
+  --portal-header-end: #053c61;
+  --portal-accent: #0284c7;
+  --portal-accent-soft: rgba(2, 132, 199, 0.15);
+  --portal-theme-glow: rgba(2, 132, 199, 0.45);
+}
+
+/* ─── Emerald Green ─── */
+[data-theme="emerald"] {
+  --portal-header-start: #064e3b;
+  --portal-header-mid: #047857;
+  --portal-header-end: #022c22;
+  --portal-accent: #059669;
+  --portal-accent-soft: rgba(5, 150, 105, 0.15);
+  --portal-theme-glow: rgba(16, 185, 129, 0.45);
+}
+
+/* ─── Midnight Indigo ─── */
+[data-theme="indigo"] {
+  --portal-header-start: #1e1b4b;
+  --portal-header-mid: #312e81;
+  --portal-header-end: #0f172a;
+  --portal-accent: #4f46e5;
+  --portal-accent-soft: rgba(79, 70, 229, 0.15);
+  --portal-theme-glow: rgba(99, 102, 241, 0.45);
+}
+
+/* ─── Royal Violet ─── */
+[data-theme="violet"] {
+  --portal-header-start: #3b0764;
+  --portal-header-mid: #581c87;
+  --portal-header-end: #1e1b4b;
+  --portal-accent: #7c3aed;
+  --portal-accent-soft: rgba(124, 58, 237, 0.15);
+  --portal-theme-glow: rgba(139, 92, 246, 0.45);
+}
+
+/* ─── Sunset Amber ─── */
+[data-theme="amber"] {
+  --portal-header-start: #78350f;
+  --portal-header-mid: #9a3412;
+  --portal-header-end: #451a03;
+  --portal-accent: #d97706;
+  --portal-accent-soft: rgba(217, 119, 6, 0.15);
+  --portal-theme-glow: rgba(245, 158, 11, 0.45);
+}
+
+/* ─── Crimson Rose ─── */
+[data-theme="rose"] {
+  --portal-header-start: #881337;
+  --portal-header-mid: #9f1239;
+  --portal-header-end: #4c0519;
+  --portal-accent: #e11d48;
+  --portal-accent-soft: rgba(225, 29, 72, 0.15);
+  --portal-theme-glow: rgba(244, 63, 94, 0.45);
+}
+
+/* ─── Dark Slate ─── */
+[data-theme="slate"] {
+  --portal-header-start: #0f172a;
+  --portal-header-mid: #1e293b;
+  --portal-header-end: #020617;
+  --portal-accent: #38bdf8;
+  --portal-accent-soft: rgba(56, 189, 248, 0.15);
+  --portal-theme-glow: rgba(56, 189, 248, 0.4);
 }

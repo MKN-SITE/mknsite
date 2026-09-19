@@ -43,7 +43,7 @@ Verifikasi lingkungan tim:
 bun scripts/verify-docker.mjs
 ```
 
-Script ini menguji halaman web, health check API, login MySQL, izin HR, penolakan akses lintas modul, serta isolasi sesi admin dan karyawan.
+Script ini menguji halaman web, health check API, login MySQL, izin OPS Telco dan formulir teknisi, penolakan akses lintas modul, serta isolasi sesi admin dan karyawan.
 
 ## Menjalankan lokal tanpa container aplikasi
 
@@ -57,21 +57,24 @@ Script ini menguji halaman web, health check API, login MySQL, izin HR, penolaka
 
 Frontend tersedia di `http://localhost:3000` dan API di `http://localhost:3001`.
 
-## Akun seed
- 
-Semua akun karyawan memakai password `demo12345`:
+## Akun bootstrap seed
 
-- `manager@mknsite.online`
-- `hr@mknsite.online`
-- `telco@mknsite.online`
-- `workshop@mknsite.online`
-- `project@mknsite.online`
+Seed hanya membuat atau memastikan akun bootstrap awal berikut:
 
-Akun administrator dan superadministrator:
-- Administrator memakai `admin@mknsite.online` dengan password `admin12345`.
-- Super Administrator memakai `superadmin@mknsite.online` dengan password `superadmin12345`.
+- `admin@mknsite.online` (Role: Administrator)
+- `superadmin@mknsite.online` (Role: Superadministrator)
+- `hr@mknsite.online` (Role: HR)
 
-Ganti seluruh password seed sebelum memakai data produksi.
+Password bootstrap dibaca dari variabel environment saat pembuatan akun awal:
+- `SEED_ADMIN_PASSWORD`
+- `SEED_SUPERADMIN_PASSWORD`
+- `SEED_HR_PASSWORD`
+
+**Ketentuan Integritas & Keamanan Seed:**
+- **Tidak Mengubah Password Existing:** Jika akun dan kredensial sudah ada di database, seed tidak akan pernah meminta, mengubah, atau menimpa kata sandi akun tersebut.
+- **Akun Supervisor dan Teknisi:** Sistem tidak membuat akun Supervisor atau Teknisi di dalam seed. Akun Teknisi dan Supervisor berasal dari alur pendaftaran mandiri karyawan (`/register`) yang kemudian diberikan role operasional (`ops-telco-technician` atau `ops-telco-supervisor`) oleh Admin melalui Panel Administrasi (`/admin/users`).
+- **Sinkronisasi Role & Permission Sistem:** Permission bawaan dari role sistem disinkronkan secara atomik berdasarkan konfigurasi resmi di `system-seed-data.ts`. Grant usang pada role sistem dibersihkan secara otomatis.
+- **Perlindungan Role & Menu Custom:** Role dan permission custom buatan admin, role tambahan yang diberikan kepada user existing, serta menu custom tetap dipertahankan dan tidak disentuh oleh seed.
 
 ## Model keamanan
 
@@ -135,8 +138,8 @@ GET /realtime/events?context=admin
 Backend MKN Site dilengkapi dengan pengujian otomatis komprehensif mencakup 14 skenario matriks penerimaan QA (Docs lokal & production, isolasi logout ganda, validasi input & malformed JSON, atomisitas rollback transaksi, dan audit sanitasi kredensial):
 
 ```sh
-# Menjalankan seluruh 54 unit & integration test (646 assertions)
-bun --cwd apps/api test
+# Menjalankan seluruh 139 unit & integration test (1081 assertions) pada database terisolasi mknsite_test
+DATABASE_URL="mysql://mknsite:mknsite-local-only@localhost:3306/mknsite_test" bun --cwd apps/api test
 
 # Menjalankan pemeriksaan statis TypeScript di seluruh workspace
 bun run check

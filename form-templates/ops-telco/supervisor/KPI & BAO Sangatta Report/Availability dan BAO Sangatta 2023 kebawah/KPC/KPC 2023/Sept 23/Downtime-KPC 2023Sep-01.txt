@@ -1,0 +1,30 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\KPC\
+01. Node Pit B bengalon	Host is alive	23.52.28	23.39.23	00.13.05	
+02. Switch KPC LBTT	Host is alive	23.52.28	23.49.22	00.03.06	
+04. Exalt KPC Pelangi Camp	Host is alive	23.52.32	23.49.22	00.03.10	
+05. Switch KPC 15K	Host is alive	23.52.33	23.49.23	00.03.10	
+10. Link Metro MKN Jakarta-----!	Host is alive	23.52.29	23.52.29	00.00.00	
+11. ALU M5                      Oncall Telco SGT	Host is alive	23.52.31	23.49.24	00.03.07	
+12. ALU SURYA              Oncall Telco SGT	Host is alive	23.52.31	23.49.24	00.03.07	
+13. ALU BINTANG          Oncall Telco SGT	Host is alive	23.52.30	23.49.24	00.03.06	
+15. ALU HATARI             Oncall Telco SGT	Host is alive	23.52.31	23.49.24	00.03.07	
+16. ALU PTH                    Oncall Telco SGT	Host is alive	23.52.31	23.49.24	00.03.07	
+17. ALU P11                    Oncall Telco SGT	Host is alive	23.52.31	23.49.24	00.03.07	
+18. ALU FNORTH            Oncall Telco SGT	Host is alive	23.52.31	23.49.25	00.03.06	
+19. ALU 15000                 Oncall Telco BGL	Host is alive	23.52.30	23.49.24	00.03.06	
+20. ALU LubukTutung     Oncall Telco BGL	Host is alive	23.52.31	23.49.25	00.03.06	
+21. Link TBTS Inul Middle	Host is alive	23.52.33	23.49.25	00.03.08	
+22. Link TBTS Galaxy ( switch )	Host is alive	23.52.31	23.49.29	00.03.02	
+23. Link TBTS Lignite	Host is alive	23.52.33	23.49.25	00.03.08	
+26. Link Backup Nokia Lignite to Middle	Host is alive	23.52.41	23.49.33	00.03.08	
+27. Link Backup Nokia Middle toLignite	Host is alive	23.52.47	23.49.39	00.03.08	
+28. Link NEC AB-to-BIG	Host is alive	23.55.28	23.54.35	00.00.53	
+29. Link NEC BINTANG-to-AB	Host is alive	23.55.27	23.54.21	00.01.06	
+30. Link NEC AB-to-FN	Host is alive	23.55.26	23.54.29	00.00.57	
+31. Link NEC FN-to-AB	Host is alive	23.55.23	23.54.25	00.00.58	
+32. Link NEC HT to AB	Host is alive	23.55.28	23.54.25	00.01.03	
+33. Link NEC AB to HT	Host is alive	23.55.23	23.54.20	00.01.03	
+Genset CH 15000	Host is alive	23.52.32	23.49.24	00.03.08	
+

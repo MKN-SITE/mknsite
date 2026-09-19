@@ -1,0 +1,850 @@
+/* Assign Jadwal Oncall Workspace - Modern, High-Precision UI */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  text-align: left;
+}
+
+/* ── Top Header Toolbar ── */
+.topToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.toolbarTitleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toolbarTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbarSubtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.toolbarActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.periodSelector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+}
+
+.periodSelect {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1e293b;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  border: none;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+}
+
+.btnPrimary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.45);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #334155;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnSecondary:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.btnSecondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Card & Table Shell ── */
+.scheduleCard {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.scheduleHeaderInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.scheduleHeaderMain {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.scheduleLogo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
+
+.scheduleTitleGroup h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.scheduleTitleGroup p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.schedulePeriodBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 750;
+  border: 1px solid #bfdbfe;
+}
+
+/* ── The Master Oncall Table ── */
+.tableResponsive {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1.5px solid #0f172a;
+}
+
+.oncallTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  text-align: center;
+  background: #ffffff;
+}
+
+.oncallTable th,
+.oncallTable td {
+  border: 1px solid #0f172a;
+  padding: 8px 6px;
+  vertical-align: middle;
+}
+
+.thHeaderGroup {
+  background: #f8fafc;
+  font-weight: 800;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.thSubHeader {
+  background: #f1f5f9;
+  font-weight: 750;
+  color: #1e293b;
+  min-width: 65px;
+  position: relative;
+  transition: background 0.15s ease;
+}
+
+.thSubHeader:hover {
+  background: #e2e8f0;
+}
+
+.thContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.thEditBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #64748b;
+  border-radius: 4px;
+  font-size: 11px;
+  padding: 1px 3px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.15s ease;
+}
+
+.thSubHeader:hover .thEditBtn,
+.thEditBtn:hover {
+  opacity: 1;
+  color: #0284c7;
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.thColNo {
+  width: 38px;
+}
+
+.thColPeriode {
+  width: 110px;
+  min-width: 100px;
+}
+
+.tdNo {
+  font-weight: 750;
+  color: #334155;
+}
+
+.tdPeriode {
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: #1e293b;
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.dateRow {
+  display: block;
+}
+
+/* ── Interactive Row & Cell Styling ── */
+.tableRow {
+  transition: background 0.15s ease;
+}
+
+.tableRow:hover {
+  background: #f8fafc;
+}
+
+/* Cell Oncall (Yellow Highlight #FFFF00) */
+.cellOncall {
+  background-color: #FFFF00 !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  font-size: 11.5px;
+  letter-spacing: 0.5px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+  cursor: grab !important;
+  user-select: none;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.cellOncall:hover {
+  box-shadow: inset 0 0 0 2px #0f172a;
+}
+
+.cellOncall:active {
+  cursor: grabbing !important;
+  transform: scale(0.97);
+}
+
+.cellRegular {
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  position: relative;
+}
+
+.cellRegular:hover {
+  background-color: #fef9c3 !important;
+}
+
+.cellDragOver {
+  background-color: #fde047 !important;
+  outline: 2px dashed #ca8a04 !important;
+  outline-offset: -2px;
+}
+
+.cellActionOverlay {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 3px 6px;
+  border-radius: 4px;
+}
+
+.dragHandleIcon {
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+/* Move hover hint in cell */
+.cellHoverHint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #854d0e;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.cellRegular:hover .cellHoverHint {
+  opacity: 1;
+}
+
+/* ── Slot Action Buttons in Table ── */
+.slotActionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #475569;
+  padding: 2px 5px;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: all 0.15s ease;
+}
+
+.slotActionBtn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* ── Table Footer Action Bar ── */
+.tableBottomActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.btnAddSlot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #f0fdf4;
+  border: 1px dashed #22c55e;
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 750;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnAddSlot:hover:not(:disabled) {
+  background: #dcfce7;
+  border-color: #16a34a;
+  transform: translateY(-1px);
+}
+
+.tableHelpText {
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Cuti Warning Badge in Table ── */
+.cutiWarningPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+/* ── Note Section ── */
+.notesSection {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px dashed #cbd5e1;
+}
+
+.notesTitle {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.notesList {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notesList li {
+  font-size: 12.5px;
+  color: #334155;
+  font-weight: 600;
+}
+
+/* ── Footer Officials (Signatures) ── */
+.officialsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding-top: 10px;
+  border-top: 1.5px dashed #e2e8f0;
+  text-align: center;
+}
+
+.officialCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.officialRole {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.signatureSpacer {
+  height: 48px;
+  width: 100%;
+}
+
+.officialName {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0f172a;
+  text-decoration: underline;
+}
+
+.officialPhone {
+  font-size: 12px;
+  color: #475569;
+  font-weight: 600;
+}
+
+/* ── Modal Dialogs ── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modalBox {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 580px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modalHeader {
+  padding: 18px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+}
+
+.modalHeader h4 {
+  font-size: 16.5px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.modalCloseBtn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.modalCloseBtn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.modalBody {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formLabel {
+  font-size: 13px;
+  font-weight: 750;
+  color: #1e293b;
+}
+
+.formSelect,
+.formInput {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 13.5px;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  transition: border 0.15s ease;
+}
+
+.formSelect:focus,
+.formInput:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+.datesRowGroup {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+/* ── Dynamic Dates List in Modal ── */
+.datesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.dateRowItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dateIndexLabel {
+  font-size: 12px;
+  font-weight: 750;
+  color: #475569;
+  min-width: 55px;
+}
+
+.dateInputFlex {
+  flex: 1;
+}
+
+.btnRemoveDate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnRemoveDate:hover {
+  background: #fecaca;
+  color: #b91c1c;
+}
+
+.btnAddDate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #ffffff;
+  border: 1.5px dashed #0284c7;
+  color: #0284c7;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: all 0.15s ease;
+}
+
+.btnAddDate:hover {
+  background: #f0f9ff;
+  border-color: #0369a1;
+}
+
+.btnDanger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #e11d48;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnDanger:hover:not(:disabled) {
+  background: #ffe4e6;
+  border-color: #fda4af;
+}
+
+/* ── Quick Move Visual Comparison ── */
+.quickMoveCompare {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.compareCard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+}
+
+.compareCardActive {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #fef9c3;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1.5px solid #ca8a04;
+}
+
+.compareLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
+
+.compareName {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.compareArrow {
+  font-size: 20px;
+  color: #0284c7;
+  font-weight: 900;
+}
+
+.checkboxContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.checkboxInput {
+  margin-top: 3px;
+  accent-color: #0284c7;
+  width: 17px;
+  height: 17px;
+}
+
+.checkboxLabelGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.checkboxTitle {
+  font-size: 13px;
+  font-weight: 750;
+  color: #1e40af;
+}
+
+.checkboxDesc {
+  font-size: 11.5px;
+  color: #3b82f6;
+  line-height: 1.35;
+}
+
+.modalFooter {
+  padding: 16px 24px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  background: #f8fafc;
+}
+
+/* ── Alert & Status Messages ── */
+.alertSuccess {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid #bbf7d0;
+}
+
+.alertError {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid #fecaca;
+}
+
+.emptyState {
+  padding: 48px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #64748b;
+}
+
+.emptyStateTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1e293b;
+}

@@ -1,0 +1,41 @@
+CREATE TABLE IF NOT EXISTS `master_towers` (
+  `id` int AUTO_INCREMENT PRIMARY KEY,
+  `tower_no` int NULL,
+  `tower_code` varchar(50) NOT NULL,
+  `tower_name` varchar(160) NOT NULL,
+  `tower_type` varchar(100) NULL,
+  `height` varchar(50) NULL,
+  `height_meters` int NULL,
+  `location_kecamatan` varchar(100) NULL,
+  `location_kabupaten` varchar(100) NULL DEFAULT 'Kutai Timur',
+  `location_province` varchar(100) NULL DEFAULT 'Kal-Tim',
+  `latitude` varchar(100) NULL,
+  `longitude` varchar(100) NULL,
+  `altitude` varchar(50) NULL,
+  `latitude_dec` varchar(50) NULL,
+  `longitude_dec` varchar(50) NULL,
+  `operational_status` varchar(50) NOT NULL DEFAULT 'Aktif',
+  `description` text NULL,
+  `primary_photo_url` varchar(500) NULL,
+  `created_by` int NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE INDEX `master_towers_code_unique` (`tower_code`),
+  INDEX `master_towers_name_idx` (`tower_name`),
+  INDEX `master_towers_type_idx` (`tower_type`),
+  INDEX `master_towers_kecamatan_idx` (`location_kecamatan`),
+  CONSTRAINT `master_towers_created_by_fk` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `master_tower_photos` (
+  `id` int AUTO_INCREMENT PRIMARY KEY,
+  `tower_id` int NOT NULL,
+  `photo_url` varchar(500) NOT NULL,
+  `caption` varchar(255) NULL,
+  `is_cover` boolean NOT NULL DEFAULT FALSE,
+  `uploaded_by` int NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX `master_tower_photos_tower_idx` (`tower_id`),
+  CONSTRAINT `master_tower_photos_tower_fk` FOREIGN KEY (`tower_id`) REFERENCES `master_towers` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `master_tower_photos_uploaded_by_fk` FOREIGN KEY (`uploaded_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
+);

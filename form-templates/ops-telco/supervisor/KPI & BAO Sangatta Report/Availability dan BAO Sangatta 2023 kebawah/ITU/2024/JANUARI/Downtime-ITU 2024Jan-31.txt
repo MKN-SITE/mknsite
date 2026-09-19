@@ -1,0 +1,8 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\ITU\
+Gateway PTH	Host is alive	19.30.31	19.30.31	00.00.00	
+LINK ITU Bintang To Surya	Host is alive	19.38.22	19.38.22	00.00.00	
+LINK ITU Surya To Bintang	Host is alive	19.30.31	19.30.31	00.00.00	
+Router ITU Sangatta	Host is alive	19.25.35	19.25.35	00.00.00	
+

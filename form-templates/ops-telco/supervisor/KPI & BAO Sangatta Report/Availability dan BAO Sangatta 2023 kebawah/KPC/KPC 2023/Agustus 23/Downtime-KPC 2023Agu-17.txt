@@ -1,0 +1,30 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\KPC\
+01. Node Pit B bengalon	Host is alive	23.56.25	23.56.25	00.00.00	
+02. Switch KPC LBTT	Host is alive	23.56.34	23.46.24	00.10.10	
+04. Exalt KPC Pelangi Camp	Host is alive	23.56.50	23.31.24	00.25.25	
+05. Switch KPC 15K	Host is alive	23.56.40	23.41.25	00.15.15	
+10. Link Metro MKN Jakarta-----!	Host is alive	23.56.25	23.56.25	00.00.00	
+11. ALU M5                      Oncall Telco SGT	Host is alive	23.56.25	23.56.25	00.00.00	
+12. ALU SURYA              Oncall Telco SGT	Host is alive	23.56.26	23.56.26	00.00.00	
+13. ALU BINTANG          Oncall Telco SGT	Host is alive	23.56.26	23.56.26	00.00.00	
+15. ALU HATARI             Oncall Telco SGT	Host is alive	23.56.26	23.56.26	00.00.00	
+16. ALU PTH                    Oncall Telco SGT	Host is alive	23.56.25	23.56.25	00.00.00	
+17. ALU P11                    Oncall Telco SGT	Host is alive	23.56.26	23.56.26	00.00.00	
+18. ALU FNORTH            Oncall Telco SGT	Host is alive	23.56.26	23.56.26	00.00.00	
+19. ALU 15000                 Oncall Telco BGL	Host is alive	23.56.26	23.56.26	00.00.00	
+20. ALU LubukTutung     Oncall Telco BGL	Host is alive	23.56.26	23.56.26	00.00.00	
+21. Link TBTS Inul Middle	Host is alive	23.56.25	23.56.25	00.00.00	
+22. Link TBTS Galaxy ( switch )	Host is alive	23.56.28	23.56.28	00.00.00	
+23. Link TBTS Lignite	Host is alive	23.56.25	23.56.25	00.00.00	
+26. Link Backup Nokia Lignite to Middle	Host is alive	23.56.25	23.56.25	00.00.00	
+27. Link Backup Nokia Middle toLignite	Host is alive	23.56.25	23.56.25	00.00.00	
+28. Link NEC AB-to-BIG	Host is alive	23.57.04	23.57.04	00.00.00	
+29. Link NEC BINTANG-to-AB	Host is alive	23.56.54	23.56.54	00.00.00	
+30. Link NEC AB-to-FN	Host is alive	23.57.01	23.57.01	00.00.00	
+31. Link NEC FN-to-AB	Host is alive	23.56.54	23.56.54	00.00.00	
+32. Link NEC HT to AB	Host is alive	23.57.00	23.57.00	00.00.00	
+33. Link NEC AB to HT	Host is alive	23.57.01	23.57.01	00.00.00	
+Genset CH 15000	Host is alive	23.56.25	23.56.25	00.00.00	
+

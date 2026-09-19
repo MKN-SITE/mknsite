@@ -1,8 +1,10 @@
 .header {
   color: #ffffff;
   background: var(--portal-header-start);
+  background: linear-gradient(135deg, var(--portal-header-start) 0%, var(--portal-header-mid) 50%, var(--portal-header-end) 100%);
   padding: var(--space-6) var(--space-12) 76px;
   position: relative;
+  transition: background 250ms ease;
 }
 
 .top, .intro {
@@ -104,6 +106,63 @@
 .accountTrigger:focus-visible, .brand:focus-visible {
   outline: 3px solid #7dd3fc;
   outline-offset: 3px;
+}
+
+/* ── Quick Sign Out Button (Pojok Kanan Atas) ── */
+.quickSignoutBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  min-height: 44px;
+  color: #ffffff;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1.5px solid rgba(248, 113, 113, 0.45);
+  border-radius: var(--radius-control);
+  font-size: var(--text-sm);
+  font-weight: 750;
+  cursor: pointer;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.quickSignoutBtn:hover:not(:disabled) {
+  background: #dc2626;
+  border-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
+  transform: translateY(-1px);
+}
+
+.quickSignoutBtn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.quickSignoutBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.quickSignoutIcon {
+  flex-shrink: 0;
+  transition: transform 180ms ease;
+}
+
+.quickSignoutBtn:hover:not(:disabled) .quickSignoutIcon {
+  transform: translateX(2px);
+}
+
+.quickSignoutText {
+  display: inline;
+}
+
+@media (max-width: 640px) {
+  .quickSignoutText {
+    display: none;
+  }
+  .quickSignoutBtn {
+    padding: 8px 10px;
+  }
 }
 
 .avatar {

@@ -1,0 +1,74 @@
+<html><head>
+<meta name="GENERATOR" content="Advanced Host Monitor">
+<title>HostMonitor report</title>
+<STYLE TYPE="text/css"><!-- a:hover { color: "#00FFFF"; } --> </STYLE>
+</head>
+<body bgcolor="#005E00" text="#E9E9E9" link="#00FFFF" vlink="#00FFFF" alink="#00FFFF">
+<p align="left"><u><strong><big><big>HostMonitor Report</big></big></strong></u><br>
+<font face="Arial">Generated on 11/12/2018 at 23:58:49</font>
+<br>Time zone: GMT +08:00 Malaysia, Singapore, Western Australia</p>
+<div align="center"><center>
+<table border="0" bordercolor="#005E00" width="100%">
+  <tr>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Test name</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Status</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Recurrences</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Total time</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Alive time</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Dead time</font></strong></td>
+
+
+  </tr>
+  <tr><td bgcolor="#80FF80" align="left" colspan=6><font color="#000000"> Folder: MONITORING\Hexindo\ </font></td></tr>
+  <tr>
+    <td bgcolor="#005E00" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1. Hexindo Office TD Audio Codes</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>645</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:01:00</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:01:00</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:00:00</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#005E00" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>2. Link Hexindo Office TD to Surya</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>101</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:01:22</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>23:51:14</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:10:08</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#005E00" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>3. Link Surya to Hexindo Office</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>202</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>23:55:50</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>23:50:42</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:05:07</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#005E00" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>4. Link Surya to Hexindo Pama</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>202</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>23:55:50</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>23:50:42</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:05:07</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#005E00" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>5. Link Hexindo Pama to Surya</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>441</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:44</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:44</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:00:00</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#005E00" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>6. Hexindo Pama Audio Codes</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>916</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:03:52</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:03:52</font>&nbsp;</td>
+    <td bgcolor="#005E00" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:00:00</font>&nbsp;</td>
+  </tr>
+</table>
+</center></div>
+<p>This report was generated by <b><a href="http://www.ks-soft.net" target="_blank">Advanced Host Monitor</a></b></p>
+</body></html>

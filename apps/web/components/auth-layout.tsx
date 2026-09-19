@@ -1,10 +1,32 @@
+import { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Brand } from "./brand";
 import { LoginForm } from "./login-form";
 import authBgImage from "@/public/assets/hero-workers-drone.jpg";
 
-export function AuthLayout({ admin = false }: { admin?: boolean }) {
+export function AuthLayout({
+  admin = false,
+  title,
+  subtitle,
+  children,
+  wide = false,
+  backHref = "/",
+  backLabel = "Kembali ke halaman publik",
+  hideSeparation = false
+}: {
+  admin?: boolean;
+  title?: string;
+  subtitle?: string;
+  children?: ReactNode;
+  wide?: boolean;
+  backHref?: string;
+  backLabel?: string;
+  hideSeparation?: boolean;
+}) {
+  const displayTitle = title ?? (admin ? "Login Admin" : "Selamat datang");
+  const displaySubtitle = subtitle ?? (admin ? "Gunakan kredensial administrator yang terpisah." : "Masuk untuk membuka ruang kerja Anda.");
+
   return (
     <main className="auth-page" id="main">
       <aside className="auth-aside" aria-hidden="true">
@@ -18,15 +40,17 @@ export function AuthLayout({ admin = false }: { admin?: boolean }) {
         </div>
       </aside>
       <section className="auth-main">
-        <div className="auth-card">
-          <Link className="auth-back" href="/">Kembali ke halaman publik</Link>
-          <h1>{admin ? "Login Admin" : "Selamat datang"}</h1>
-          <p className="auth-subtitle">{admin ? "Gunakan kredensial administrator yang terpisah." : "Masuk untuk membuka ruang kerja Anda."}</p>
-          <LoginForm admin={admin} />
-          <div className="admin-separation">
-            {admin ? "Login ini tidak menggunakan sesi karyawan. " : "Perlu mengatur pengguna atau izin? "}
-            <Link href={admin ? "/login" : "/admin/login"}>{admin ? "Login sebagai karyawan" : "Buka login admin"}</Link>
-          </div>
+        <div className={`auth-card ${wide ? "auth-card-wide" : ""}`}>
+          <Link className="auth-back" href={backHref}>{backLabel}</Link>
+          <h1>{displayTitle}</h1>
+          {displaySubtitle && <p className="auth-subtitle">{displaySubtitle}</p>}
+          {children ?? <LoginForm admin={admin} />}
+          {!hideSeparation && !children && (
+            <div className="admin-separation">
+              {admin ? "Login ini tidak menggunakan sesi karyawan. " : "Perlu mengatur pengguna atau izin? "}
+              <Link href={admin ? "/login" : "/admin/login"}>{admin ? "Login sebagai karyawan" : "Buka login admin"}</Link>
+            </div>
+          )}
         </div>
       </section>
     </main>

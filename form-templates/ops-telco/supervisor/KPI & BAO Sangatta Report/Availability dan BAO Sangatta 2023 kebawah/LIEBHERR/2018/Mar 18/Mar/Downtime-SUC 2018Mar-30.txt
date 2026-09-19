@@ -1,0 +1,6 @@
+Test name	Dead time	Alive time	Total time	
+
+Folder: MONITORING\LIEBHER\
+01.Liebher Exalt M5	00:21:32	23:26:17	23:47:50	
+02.Liebher PBE Farnorth	00:30:32	23:16:24	23:46:56	
+

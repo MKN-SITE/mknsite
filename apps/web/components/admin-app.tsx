@@ -140,12 +140,12 @@ export function AdminApp({ view = "home" }: { view?: AdminView }) {
     <div className={styles.shell}>
       <PortalHeader
         homeHref="/admin"
-        name={admin.name}
+        name={admin.name || "Administrator"}
         avatarUrl={admin.avatarUrl}
         division={admin.division}
-        role={admin.roles.join(", ") || "Administrator"}
+        role={admin.roles?.join(", ") || "Administrator"}
         eyebrow="ADMINISTRATOR"
-        title={view === "home" ? `Selamat datang, ${admin.name.split(" ")[0]}.` : inUserManagement ? "User Management" : title}
+        title={view === "home" ? `Selamat datang, ${(admin.name || "Admin").split(" ")[0]}.` : inUserManagement ? "User Management" : title}
         description={view === "home" ? "Kelola pengguna, akses tim, dan pengaturan MKN Site." : inUserManagement ? "Satu ruang untuk mengelola pengguna, role, dan izin akses." : description}
         onLogout={logout}
         loggingOut={loggingOut}

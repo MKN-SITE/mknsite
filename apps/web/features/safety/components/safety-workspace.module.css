@@ -1,0 +1,533 @@
+/* Safety Portal Workspace - Scoped Daylight Theme */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.statCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.statTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statValue {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.statSub {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.tabBar {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.25rem;
+  overflow-x: auto;
+}
+
+.tabButton {
+  padding: 0.65rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.tabButton:hover {
+  color: #ea580c;
+}
+
+.tabActive {
+  color: #ea580c;
+  border-bottom: 2px solid #ea580c;
+  background: #fff7ed;
+  border-radius: 6px 6px 0 0;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.cardTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.cardSubtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+/* Actions & Buttons */
+.btnPrimary {
+  background: #ea580c;
+  color: #ffffff;
+  border: none;
+  padding: 0.6rem 1.15rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.15s ease;
+}
+
+.btnPrimary:hover {
+  background: #c2410c;
+}
+
+.btnSecondary {
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 0.6rem 1.15rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease;
+}
+
+.btnSecondary:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.btnDanger {
+  background: #ef4444;
+  color: #ffffff;
+  border: none;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btnDanger:hover {
+  background: #dc2626;
+}
+
+.btnEdit {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnEdit:hover {
+  background: #e2e8f0;
+}
+
+/* Form Styles - Strictly White Backgrounds */
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.input,
+.select,
+.textarea {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: #ea580c !important;
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+}
+
+.textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Tables - White Theme */
+.tableWrapper {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.table th {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #0f172a !important;
+  background: #ffffff !important;
+  vertical-align: middle;
+}
+
+.table td strong {
+  color: #0f172a !important;
+}
+
+.table td code {
+  color: #0284c7 !important;
+  background: #f0f9ff !important;
+  border: 1px solid #bae6fd !important;
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background: #f8fafc !important;
+}
+
+/* Matrix Training Specific Table */
+.matrixWrapper {
+  overflow-x: auto;
+  max-height: 620px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff !important;
+  position: relative;
+}
+
+.matrixTable {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+.matrixTable th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  font-weight: 700;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #e2e8f0 !important;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.matrixTable td {
+  padding: 0.5rem 0.65rem;
+  border: 1px solid #e2e8f0 !important;
+  text-align: center;
+  white-space: nowrap;
+  color: #0f172a !important;
+  background: #ffffff !important;
+}
+
+.stickyColNo {
+  position: sticky;
+  left: 0;
+  width: 48px;
+  min-width: 48px;
+  max-width: 48px;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  font-weight: 700;
+  text-align: center !important;
+  z-index: 5;
+  box-shadow: 1px 0 2px rgba(0, 0, 0, 0.04);
+}
+
+.matrixTable th.stickyColNo {
+  z-index: 20;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.stickyColBadge {
+  position: sticky;
+  left: 48px;
+  width: 95px;
+  min-width: 95px;
+  max-width: 95px;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  text-align: center !important;
+  z-index: 5;
+  box-shadow: 1px 0 2px rgba(0, 0, 0, 0.04);
+}
+
+.matrixTable th.stickyColBadge {
+  z-index: 20;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.stickyColBadge code {
+  color: #0284c7 !important;
+  background: #f0f9ff !important;
+  border: 1px solid #bae6fd !important;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.775rem;
+  display: inline-block;
+}
+
+.stickyColName {
+  position: sticky;
+  left: 143px;
+  min-width: 170px;
+  max-width: 220px;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  font-weight: 700;
+  text-align: left !important;
+  z-index: 5;
+  box-shadow: 3px 0 5px rgba(0, 0, 0, 0.06);
+}
+
+.matrixTable th.stickyColName {
+  z-index: 20;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.matrixEmployeeName {
+  color: #0f172a !important;
+  font-weight: 700;
+}
+
+.matrixCellC {
+  background: #dcfce7 !important;
+  color: #166534 !important;
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 0.2rem 0.4rem;
+  display: inline-block;
+}
+
+.matrixCellR {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 0.2rem 0.4rem;
+  display: inline-block;
+}
+
+.matrixCellEmpty {
+  color: #94a3b8 !important;
+  font-weight: 600;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badgeGreen {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.badgeYellow {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.badgeRed {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.badgeBlue {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.badgeOrange {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+/* Signature Pad Area */
+.signatureContainer {
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  overflow: hidden;
+  margin-top: 0.5rem;
+  position: relative;
+}
+
+.signatureCanvas {
+  display: block;
+  width: 100%;
+  height: 180px;
+  background: #ffffff;
+  cursor: crosshair;
+}
+
+.signatureControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Modal Dialog */
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+.modalContent {
+  background: #ffffff !important;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  padding: 1.5rem;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.modalTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.modalClose {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}

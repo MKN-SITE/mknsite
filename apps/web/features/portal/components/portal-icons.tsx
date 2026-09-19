@@ -75,6 +75,7 @@ const ICON_COLORS: Record<string, string> = {
   users: "#4f46e5",
   briefcase: "#0284c7",
   "radio-tower": "#0d9488",
+  radio: "#0d9488",
   wrench: "#d97706",
   "folder-kanban": "#10b981",
   "chart-bar": "#7c3aed",
@@ -118,14 +119,18 @@ const ICON_COLORS: Record<string, string> = {
   "check-circle": "#16a34a"
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api-backend";
 
 function resolveIconSrc(src: string): string {
   if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("data:")) {
     return src;
   }
   if (src.startsWith("/")) {
-    return `${API_URL}${src}`;
+    if (API_URL.startsWith("/")) {
+      return src;
+    }
+    const base = API_URL.endsWith("/") ? API_URL.slice(0, -1) : API_URL;
+    return `${base}${src}`;
   }
   return src;
 }
@@ -224,6 +229,7 @@ export function PortalIcon({ name, size = 64, className, style }: PortalIconProp
           <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
         </svg>
       );
+    case "radio":
     case "radio-tower":
       return (
         <svg {...iconProps}>

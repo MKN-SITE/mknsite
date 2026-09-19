@@ -1,0 +1,14 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\KPC LINK\
+01. Node Pit B bengalon	Host is alive	23.57.17	23.31.51	00.25.26	
+02. Switch KPC LBTT	Host is alive	23.58.03	23.58.03	00.00.00	
+04. Exalt KPC Pelangi Camp	Host is alive	23.57.09	23.36.48	00.20.21	
+05. Switch KPC 15K	Host is alive	23.57.33	23.27.01	00.30.32	
+22. Link TBTS Galaxy ( switch )	Host is alive	23.57.56	23.57.56	00.00.00	
+Exalt CH15000 (arah CH22)	Host is alive	23.57.55	23.27.35	00.30.19	
+Exalt CH15000 (arah Explor)	Host is alive	23.57.47	23.27.26	00.30.20	
+Exalt CH15000 (arah Pelangi)	Host is alive	23.57.47	23.42.36	00.15.10	
+Exalt CH15000 (arah Pos 14)	Host is alive	23.58.04	23.37.50	00.20.14	
+Genset CH 15000	Host is alive	23.57.57	23.52.49	00.05.08	
+

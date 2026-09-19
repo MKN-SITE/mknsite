@@ -21,7 +21,7 @@ export const menuRoutes = new Elysia()
         });
       }
 
-      const data = await menuService.getMenusForUser(user.permissions);
+      const data = await menuService.getMenusForUser(user.permissions, user.roles);
       return { data };
     },
     {
@@ -88,6 +88,13 @@ export const menuRoutes = new Elysia()
           if (!auth.success) return status(auth.failure.status, auth.failure.error);
 
           const created = await menuService.createMenu(body, auth.admin.id);
+          if ("error" in created) {
+            return status(created.error.status, {
+              code: created.error.code,
+              message: created.error.message
+            });
+          }
+
           publishAdminMenusUpdated();
           return status(201, { data: created });
         },
@@ -111,6 +118,10 @@ export const menuRoutes = new Elysia()
               403: {
                 description: "Akun admin tidak memiliki hak admin.manage atau Origin tidak valid",
                 content: { "application/json": { schema: { $ref: "#/components/schemas/ForbiddenError" } } }
+              },
+              409: {
+                description: "URL menu sudah digunakan oleh menu lain",
+                content: { "application/json": { schema: { $ref: "#/components/schemas/ConflictError" } } }
               },
               422: {
                 description: "Validasi format data gagal",
@@ -167,6 +178,10 @@ export const menuRoutes = new Elysia()
               404: {
                 description: "Menu tidak ditemukan",
                 content: { "application/json": { schema: { $ref: "#/components/schemas/NotFoundError" } } }
+              },
+              409: {
+                description: "URL menu sudah digunakan oleh menu lain",
+                content: { "application/json": { schema: { $ref: "#/components/schemas/ConflictError" } } }
               },
               422: {
                 description: "Validasi format data gagal",

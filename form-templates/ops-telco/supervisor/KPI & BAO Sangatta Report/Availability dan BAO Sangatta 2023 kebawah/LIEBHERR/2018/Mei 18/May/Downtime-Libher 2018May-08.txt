@@ -1,0 +1,9 @@
+Test name	Dead time	Alive time	Total time	
+
+Folder: MONITORING\LIEBHER\
+02.Liebher PBE Farnorth	00:00:00	23:58:45	23:58:45	
+02.Link Surya to M5	00:00:00	06:51:10	06:51:10	
+1. Link M5 to Surya	00:00:00	23:58:37	23:58:37	
+3. Link Surya to Farnorth	00:00:00	06:51:06	06:51:06	
+4. Link Farnorth to Surya	00:00:00	06:51:07	06:51:07	
+

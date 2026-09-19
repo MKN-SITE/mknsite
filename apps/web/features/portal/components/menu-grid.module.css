@@ -10,11 +10,12 @@
 
 /* Header Gradient */
 .header {
-  background: linear-gradient(135deg, #074674 0%, #09598c 45%, #053c61 100%);
+  background: linear-gradient(135deg, var(--portal-header-start, #074674) 0%, var(--portal-header-mid, #09598c) 45%, var(--portal-header-end, #053c61) 100%);
   color: #ffffff;
   padding: 24px 36px 96px 36px;
-  box-shadow: 0 8px 24px rgba(7, 70, 116, 0.15);
+  box-shadow: 0 8px 24px var(--portal-theme-glow, rgba(7, 70, 116, 0.15));
   position: relative;
+  transition: background 250ms ease, box-shadow 250ms ease;
 }
 
 .headerTop {
@@ -103,6 +104,58 @@
 .userMenuTrigger:hover {
   background: rgba(255, 255, 255, 0.22);
   border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Quick Sign Out Button (Pojok Kanan Atas) ── */
+.quickSignoutBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  min-height: 44px;
+  color: #ffffff;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1.5px solid rgba(248, 113, 113, 0.45);
+  border-radius: 999px;
+  font-size: var(--text-sm);
+  font-weight: 750;
+  cursor: pointer;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.quickSignoutBtn:hover {
+  background: #dc2626;
+  border-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
+  transform: translateY(-1px);
+}
+
+.quickSignoutBtn:active {
+  transform: translateY(0);
+}
+
+.quickSignoutIcon {
+  flex-shrink: 0;
+  transition: transform 180ms ease;
+}
+
+.quickSignoutBtn:hover .quickSignoutIcon {
+  transform: translateX(2px);
+}
+
+.quickSignoutText {
+  display: inline;
+}
+
+@media (max-width: 640px) {
+  .quickSignoutText {
+    display: none;
+  }
+  .quickSignoutBtn {
+    padding: 8px 10px;
+  }
 }
 
 .avatarCircle {

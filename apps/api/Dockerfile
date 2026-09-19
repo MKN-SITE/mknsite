@@ -6,6 +6,7 @@ COPY apps/api/package.json ./apps/api/package.json
 COPY apps/web/package.json ./apps/web/package.json
 RUN bun install --production --frozen-lockfile
 
+COPY form-templates ./form-templates
 COPY apps/api ./apps/api
 WORKDIR /app/apps/api
 ENV NODE_ENV=production

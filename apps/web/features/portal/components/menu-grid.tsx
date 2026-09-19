@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import mknLogoImg from "@/public/assets/mkn-logo-white-hd.png";
 import { api, getAvatarUrl, type PortalUser } from "@/lib/api";
+
 import { PortalIcon } from "./portal-icons";
 import styles from "./menu-grid.module.css";
 
@@ -105,8 +106,9 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
     }
   };
 
-  const firstName = user.name.split(" ")[0] ?? user.name;
-  const initial = user.name.charAt(0).toUpperCase();
+  const safeName = user?.name || "User";
+  const firstName = safeName.split(" ")[0] ?? safeName;
+  const initial = (safeName.charAt(0) || "U").toUpperCase();
 
   return (
     <div className={styles.portalShell}>
@@ -131,6 +133,7 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
           </Link>
 
           <div className={styles.headerRight} ref={dropdownRef}>
+
             <button
               type="button"
               className={styles.userMenuTrigger}
@@ -140,7 +143,7 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
               aria-label="Menu profil pengguna"
             >
               <div className={styles.avatarCircle} aria-hidden="true">
-                {user.avatarUrl && !avatarImgError ? (
+                {user?.avatarUrl && !avatarImgError ? (
                   <img
                     src={getAvatarUrl(user.avatarUrl)}
                     alt=""
@@ -151,7 +154,7 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
                   initial
                 )}
               </div>
-              <span className={styles.userName}>{user.name}</span>
+              <span className={styles.userName}>{safeName}</span>
               <svg
                 width="14"
                 height="14"
@@ -171,11 +174,11 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
             {dropdownOpen && (
               <div className={styles.userDropdown} role="menu">
                 <div className={styles.userDropdownInfo}>
-                  <strong className={styles.dropdownUserName}>{user.name}</strong>
-                  {user.division && (
+                  <strong className={styles.dropdownUserName}>{safeName}</strong>
+                  {user?.division && (
                     <span className={styles.dropdownUserDivision}>{user.division}</span>
                   )}
-                  <span className={styles.dropdownUserRoles}>{user.roles.join(", ")}</span>
+                  <span className={styles.dropdownUserRoles}>{user?.roles?.join(", ") || "Karyawan"}</span>
                 </div>
                 <button
                   type="button"
@@ -190,6 +193,32 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
                 </button>
               </div>
             )}
+
+            <button
+              type="button"
+              className={styles.quickSignoutBtn}
+              onClick={onLogout}
+              title="Keluar / Sign Out dari sistem"
+              aria-label="Keluar / Sign Out"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={styles.quickSignoutIcon}
+                aria-hidden="true"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              <span className={styles.quickSignoutText}>Keluar</span>
+            </button>
           </div>
         </div>
 
@@ -201,6 +230,31 @@ export function MenuGrid({ user, onLogout }: MenuGridProps) {
           </p>
         </div>
       </header>
+
+      {user.emailVerified === false && (
+        <div className="portal-unverified-banner" role="alert">
+          <div>
+            <strong>Status Email Belum Terverifikasi:</strong> Anda dapat melihat modul dan menyimpan draf formulir, namun pengajuan resmi dan unduh PDF memerlukan verifikasi email.
+          </div>
+          <button
+            type="button"
+            className="portal-unverified-action"
+            onClick={async () => {
+              try {
+                await api("/auth/resend-verification", {
+                  method: "POST",
+                  body: JSON.stringify({ email: user.email })
+                });
+                alert("Tautan verifikasi baru telah dikirimkan ke alamat email " + user.email);
+              } catch (e) {
+                alert(e instanceof Error ? e.message : "Gagal mengirimkan verifikasi.");
+              }
+            }}
+          >
+            Kirim Ulang Verifikasi
+          </button>
+        </div>
+      )}
 
       {/* Main Content Area */}
       <main className={styles.mainContent} id="main">

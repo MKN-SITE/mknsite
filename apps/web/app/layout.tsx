@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -6,9 +7,10 @@ export const metadata: Metadata = {
   description: "Satu ruang kerja untuk HR, operasi telco, workshop, dan proyek."
 };
 
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="id">
+    <html lang="id" suppressHydrationWarning>
       <body>
         <a className="skip-link" href="#main">Lewati ke konten</a>
         {children}
@@ -16,3 +18,4 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     </html>
   );
 }
+

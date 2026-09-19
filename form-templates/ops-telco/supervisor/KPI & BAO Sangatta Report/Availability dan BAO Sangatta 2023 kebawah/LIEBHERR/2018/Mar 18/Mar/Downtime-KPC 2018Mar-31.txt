@@ -1,0 +1,22 @@
+Test name	Dead time	Alive time	Total time	
+
+Folder: MONITORING\KPC Bengalon\
+01. Exalt KPC Exploration Camp	00:03:05	23:57:10	1 day 00:00:16	
+04. Exalt KPC Pelangi Camp	00:00:00	1 day 00:00:02	1 day 00:00:02	
+06. Exalt KPC di LBTT (arah Pineridge) -----!	00:00:00	23:59:58	23:59:58	
+08. Exalt KPC di Pineridge -----!	00:00:00	23:59:55	23:59:55	
+10. Link Metro PTDH Jakarta-----!	00:04:20	23:57:17	1 day 00:01:38	
+11. ALU M5                      Oncall Telco SGT	00:00:00	23:59:15	23:59:15	
+12. ALU SURYA              Oncall Telco SGT	00:00:00	23:57:48	23:57:48	
+13. ALU BINTANG          Oncall Telco SGT	00:00:00	23:58:26	23:58:26	
+14. ALU AB                      Oncall Telco SGT	00:00:00	23:58:30	23:58:30	
+15. ALU HATARI             Oncall Telco SGT	00:00:00	23:57:58	23:57:58	
+16. ALU PTH                    Oncall Telco SGT	00:00:00	23:57:58	23:57:58	
+17. ALU P11                    Oncall Telco SGT	00:00:00	23:58:30	23:58:30	
+18. ALU FNORTH            Oncall Telco SGT	00:00:00	23:58:46	23:58:46	
+19. ALU 15000                 Oncall Telco BGL	00:00:00	1 day 00:00:46	1 day 00:00:46	
+Exalt-6 di Telkom Sgta	00:33:35	23:26:14	23:59:50	
+Genset CH 15000	00:00:00	23:59:19	23:59:19	
+Link M5 to PTH di M5	00:02:20	23:53:41	23:56:01	
+Link PTH to M5 di PTH	00:01:10	23:55:03	23:56:14	
+

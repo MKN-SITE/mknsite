@@ -6,6 +6,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import mknLogo from "@/public/assets/mkn-logo-white-hd.png";
 import { Button } from "@/components/ui/button";
 import { getAvatarUrl } from "@/lib/api";
+
 import styles from "./portal-header.module.css";
 
 export type PortalHeaderProps = {
@@ -82,6 +83,7 @@ export function PortalHeader({
         <div className={styles.accountArea}>
           {status}
           {accountActions}
+
           <div
             ref={account}
             className={styles.account}
@@ -113,10 +115,10 @@ export function PortalHeader({
                     onError={() => setAvatarImgError(true)}
                   />
                 ) : (
-                  name.charAt(0).toUpperCase()
+                  (name || "U").charAt(0).toUpperCase()
                 )}
               </span>
-              <span className={styles.accountName}>{name}</span>
+              <span className={styles.accountName}>{name || "User"}</span>
               <svg
                 width="14"
                 height="14"
@@ -145,6 +147,35 @@ export function PortalHeader({
               </div>
             )}
           </div>
+
+          <button
+            type="button"
+            className={styles.quickSignoutBtn}
+            onClick={onLogout}
+            disabled={loggingOut}
+            title="Keluar / Sign Out dari sistem"
+            aria-label="Keluar / Sign Out"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={styles.quickSignoutIcon}
+              aria-hidden="true"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            <span className={styles.quickSignoutText}>
+              {loggingOut ? "Keluar..." : "Keluar"}
+            </span>
+          </button>
         </div>
       </div>
 

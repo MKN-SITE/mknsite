@@ -8,6 +8,13 @@ services:
     command: ["sh", "-c", "until bun run db:migrate; do echo 'Menunggu MySQL siap menerima koneksi...'; sleep 3; done; bun run db:seed"]
     environment:
       DATABASE_URL: mysql://mknsite:mknsite-local-only@mysql:3306/mknsite
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-changeme-dev-admin}
+      SEED_SUPERADMIN_PASSWORD: ${SEED_SUPERADMIN_PASSWORD:-changeme-dev-superadmin}
+      SEED_HR_PASSWORD: ${SEED_HR_PASSWORD:-changeme-dev-hr}
+    volumes:
+      - ./apps/api/drizzle:/app/apps/api/drizzle:ro
+      - ./apps/api/src:/app/apps/api/src:ro
+      - ./form-templates:/app/form-templates:ro
     depends_on:
       mysql:
         condition: service_healthy
@@ -22,11 +29,17 @@ services:
       PORT: "3001"
       APP_ORIGIN: http://localhost:3100
       BETTER_AUTH_URL: http://localhost:3001
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-mknsite-local-dev-secret-key-32ch}
       DATABASE_URL: mysql://mknsite:mknsite-local-only@mysql:3306/mknsite
     ports:
       - "127.0.0.1:3001:3001"
     volumes:
       - ./apps/api/uploads:/app/apps/api/uploads
+      - ./apps/api/src:/app/apps/api/src:ro
+      - ./apps/api/drizzle:/app/apps/api/drizzle:ro
+      - ./apps/api/test:/app/apps/api/test:ro
+      - ./storage:/app/storage
+      - ./form-templates:/app/form-templates:ro
     depends_on:
       init:
         condition: service_completed_successfully
@@ -40,19 +53,21 @@ services:
     image: mknsite-dev
     pull_policy: never
     working_dir: /app/apps/web
-    command: ["bun", "--bun", "next", "dev", "--hostname", "0.0.0.0", "--port", "3000"]
+    command: ["bun", "--bun", "next", "dev", "--webpack", "--hostname", "0.0.0.0", "--port", "3000"]
     environment:
       INTERNAL_API_URL: http://api:3001
-      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_API_URL: /api-backend
       NEXT_TELEMETRY_DISABLED: "1"
+      WATCHPACK_POLLING: "true"
     ports:
-      - "127.0.0.1:3100:3000"
+      - "3100:3000"
     volumes:
       # Share frontend source while keeping container dependencies and build cache isolated.
       - ./apps/web/app:/app/apps/web/app:ro
       - ./apps/web/components:/app/apps/web/components:ro
       - ./apps/web/features:/app/apps/web/features:ro
       - ./apps/web/lib:/app/apps/web/lib:ro
+      - ./apps/web/next.config.ts:/app/apps/web/next.config.ts:ro
       - ./apps/web/public:/app/apps/web/public:ro
       - ./apps/web/styles:/app/apps/web/styles:ro
     depends_on:

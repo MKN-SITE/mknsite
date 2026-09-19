@@ -1,0 +1,8 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\LIEBHER\
+1. Link M5 to Surya	Host is alive	23:55:46	23:55:46	00:00:00	
+2. Link Surya to M5	Host is alive	23:55:46	23:55:46	00:00:00	
+5. Link Farnorth to Megashop	Host is alive	23:55:46	23:55:46	00:00:00	
+6. Link Megashop to Farnorth	Host is alive	1 day 00:01:39	22:40:44	01:20:54	
+

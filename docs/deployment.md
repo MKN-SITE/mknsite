@@ -11,7 +11,7 @@ Browser
   |-- https://mail.mknsite.online  -> Mailu Mail Server
   |-- https://proxmox.mknsite.online:8006 -> Proxmox VE
                                          |
-            Coolify internal network ->  MySQL private (hasihg61agfgvuxib0rp1yzd:3306)
+            Coolify internal network ->  MySQL private (<DB_CONTAINER_HOST>:3306)
 ```
 
 Gunakan subdomain dari domain induk yang sama agar cookie, CORS, dan kebijakan browser lebih mudah dikelola.
@@ -57,6 +57,9 @@ BETTER_AUTH_URL=https://api.mknsite.online
 COOKIE_DOMAIN=.mknsite.online
 ENABLE_SWAGGER=false
 DOCS_PROVIDER=swagger-ui
+SEED_ADMIN_PASSWORD=<PASSWORD_ADMIN>
+SEED_SUPERADMIN_PASSWORD=<PASSWORD_SUPERADMIN>
+SEED_HR_PASSWORD=<PASSWORD_HR>
 ```
 
 ### Penjelasan Variabel Environment:
@@ -123,6 +126,9 @@ git push origin main
 | `COOKIE_DOMAIN` | *(kosong)* | `.mknsite.online` (Coolify) |
 | `NODE_ENV` | `development` | `production` (Coolify) |
 | `ENABLE_SWAGGER` | `true` (default) | `false` (Coolify) |
+| `SEED_ADMIN_PASSWORD` | *(opsional / kosong)* | Password akun bootstrap admin saat pembuatan awal |
+| `SEED_SUPERADMIN_PASSWORD` | *(opsional / kosong)* | Password akun bootstrap superadmin saat pembuatan awal |
+| `SEED_HR_PASSWORD` | *(opsional / kosong)* | Password akun bootstrap HR saat pembuatan awal |
 
 File `.env` hanya untuk development lokal dan **tidak di-commit ke Git**. Variabel production disimpan di dashboard Vercel dan Coolify.
 
@@ -131,7 +137,8 @@ File `.env` hanya untuk development lokal dan **tidak di-commit ke Git**. Variab
 - Origin `localhost` **tidak dipercaya** di production (`NODE_ENV=production`).
 - Swagger UI dinonaktifkan di production (HTTP 404 pada `/docs` dan `/docs/json`).
 - Cookie menggunakan `Secure`, `HttpOnly`, `SameSite=lax`.
-- Seed demo **tidak boleh** dijalankan di production tanpa rotasi password.
+- Seed bersifat idempoten dan **tidak pernah menimpa password akun existing**. Password bootstrap dari environment hanya digunakan saat pembuatan akun baru pertama kali.
+- Rotasi password dan credential production merupakan prosedur operasional mandiri administrator di luar kode lokal.
 - Port database MySQL tidak dipublikasikan ke internet.
 
 ## Urutan Rilis & Checklist Pengujian Produksi

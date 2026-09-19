@@ -1,0 +1,30 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\KPC\
+01. Node Pit B bengalon	Host is alive	23.59.56	23.34.30	00.25.25	
+02. Switch KPC LBTT	Host is alive	23.59.37	23.54.32	00.05.04	
+04. Exalt KPC Pelangi Camp	Host is alive	23.59.48	23.54.43	00.05.05	
+05. Switch KPC 15K	Host is alive	23.59.32	23.59.32	00.00.00	
+10. Link Metro MKN Jakarta-----!	Host is alive	23.59.42	23.59.42	00.00.00	
+11. ALU M5                      Oncall Telco SGT	Host is alive	23.59.58	23.59.58	00.00.00	
+12. ALU SURYA              Oncall Telco SGT	Host is alive	23.59.58	23.59.58	00.00.00	
+13. ALU BINTANG          Oncall Telco SGT	Host is alive	23.59.58	23.59.58	00.00.00	
+15. ALU HATARI             Oncall Telco SGT	Host is alive	23.59.58	23.59.58	00.00.00	
+16. ALU PTH                    Oncall Telco SGT	Host is alive	23.59.56	23.59.56	00.00.00	
+17. ALU P11                    Oncall Telco SGT	Host is alive	23.59.56	23.59.56	00.00.00	
+18. ALU FNORTH            Oncall Telco SGT	Host is alive	23.59.50	23.59.50	00.00.00	
+19. ALU 15000                 Oncall Telco BGL	Host is alive	23.59.50	23.59.50	00.00.00	
+20. ALU LubukTutung     Oncall Telco BGL	Host is alive	23.59.57	23.59.57	00.00.00	
+21. Link TBTS Inul Middle	Host is alive	1 day 00.00.00	1 day 00.00.00	00.00.00	
+22. Link TBTS Galaxy ( switch )	Host is alive	23.59.48	23.59.48	00.00.00	
+23. Link TBTS Lignite	Host is alive	23.59.58	23.59.58	00.00.00	
+26. Link Backup Nokia Lignite to Middle	Host is alive	23.59.58	23.59.58	00.00.00	
+27. Link Backup Nokia Middle toLignite	Host is alive	23.59.47	23.59.47	00.00.00	
+28. Link NEC AB-to-BIG	Host is alive	23.57.51	23.57.51	00.00.00	
+29. Link NEC BINTANG-to-AB	Host is alive	23.57.45	23.57.45	00.00.00	
+30. Link NEC AB-to-FN	Host is alive	23.57.57	23.57.57	00.00.00	
+31. Link NEC FN-to-AB	Host is alive	23.57.42	23.57.42	00.00.00	
+32. Link NEC HT to AB	Host is alive	23.57.59	23.57.59	00.00.00	
+33. Link NEC AB to HT	Host is alive	23.57.47	23.57.47	00.00.00	
+Genset CH 15000	Host is alive	23.59.54	23.59.54	00.00.00	
+

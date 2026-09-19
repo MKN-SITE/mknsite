@@ -1,0 +1,26 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\KPC\
+02. Switch KPC LBTT	No answer	21:44:14	19:08:17	02:35:56	
+03. Exalt KPC Pit A -----!	No answer	21:46:55	19:26:07	02:20:47	
+04. Exalt KPC Pelangi Camp	No answer	21:44:13	19:28:15	02:15:58	
+05. Switch KPC 15K	No answer	21:44:14	19:28:48	02:15:26	
+11. ALU M5                      Oncall Telco SGT	No answer	21:39:46	19:28:46	02:11:00	
+12. ALU SURYA              Oncall Telco SGT	No answer	21:39:46	19:28:46	02:11:00	
+13. ALU BINTANG          Oncall Telco SGT	No answer	21:53:53	19:08:43	02:45:09	
+14. ALU AB                      Oncall Telco SGT	No answer	21:39:46	19:28:46	02:11:00	
+15. ALU HATARI             Oncall Telco SGT	No answer	21:39:46	19:28:46	02:11:00	
+16. ALU PTH                    Oncall Telco SGT	No answer	21:39:39	19:08:36	02:31:02	
+17. ALU P11                    Oncall Telco SGT	No answer	21:39:39	19:08:36	02:31:02	
+18. ALU FNORTH            Oncall Telco SGT	No answer	21:39:46	19:28:47	02:10:59	
+19. ALU 15000                 Oncall Telco BGL	No answer	21:39:46	19:28:48	02:10:58	
+20. ALU LubukTutung     Oncall Telco BGL	No answer	21:44:18	17:14:58	04:29:19	
+21. Link TBTS Inul Middle	No answer	21:39:49	19:28:49	02:11:00	
+22. Link TBTS Galaxy	No answer	21:39:48	19:08:46	02:31:02	
+23. Link TBTS Lignite	No answer	21:39:48	19:28:48	02:11:00	
+24. ALU PTH to LBTT   Oncall Telco SGT	No answer	21:44:14	16:29:24	05:14:50	
+25. ALU Bintang to AB   Oncall Telco SGT	No answer	21:39:48	19:13:47	02:26:01	
+26. Link Backup Nokia Lignite to Middle	No answer	21:39:51	19:28:50	02:11:00	
+27. Link Backup Nokia Lignite to Middle	No answer	21:39:51	19:28:54	02:10:56	
+Genset CH 15000	No answer	21:43:44	19:30:03	02:13:40	
+

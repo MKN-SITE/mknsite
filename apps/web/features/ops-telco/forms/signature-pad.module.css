@@ -1,0 +1,186 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #ffffff;
+  border: 1px solid #dbe6ed;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(16, 47, 66, 0.05);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 750;
+  color: #102f42;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 11px;
+  color: #5c7b8d;
+  margin: 2px 0 0;
+}
+
+.canvasWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  background: #ffffff;
+  overflow: hidden;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.canvasWrapper:hover {
+  border-color: #075d91;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 160px;
+}
+
+.guideLine {
+  position: absolute;
+  bottom: 36px;
+  left: 20px;
+  right: 20px;
+  border-bottom: 1px solid #d8e5ec;
+  pointer-events: none;
+}
+
+.guideText {
+  position: absolute;
+  bottom: 12px;
+  left: 20px;
+  font-size: 10px;
+  color: #8da4b2;
+  pointer-events: none;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.clearBtn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #c93b3b;
+  background: #fff3f3;
+  border: 1px solid #ffd4d4;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.clearBtn:hover {
+  background: #ffe6e6;
+}
+
+.clearBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.submitBtn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+  background: #075d91;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(7, 93, 145, 0.25);
+  transition: all 0.15s ease;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: #064d78;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* Modal Overlay */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 47, 66, 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+}
+
+.modalBox {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
+  text-align: left;
+}
+
+.modalTitle {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #102f42;
+}
+
+.modalText {
+  font-size: 13px;
+  color: #496574;
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modalCancelBtn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #496574;
+  background: #f1f6f9;
+  border: 1px solid #d4e2eb;
+  cursor: pointer;
+}
+
+.modalConfirmBtn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+  background: #075d91;
+  border: none;
+  cursor: pointer;
+}

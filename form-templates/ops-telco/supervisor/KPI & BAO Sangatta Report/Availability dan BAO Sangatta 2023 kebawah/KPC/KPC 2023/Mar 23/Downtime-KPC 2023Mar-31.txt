@@ -1,0 +1,29 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\KPC\
+01. Node Pit B bengalon	Host is alive	23.57.11	23.57.11	00.00.00	
+04. Exalt KPC Pelangi Camp	Host is alive	23.57.11	23.52.06	00.05.04	
+05. Switch KPC 15K	Host is alive	23.57.14	23.57.14	00.00.00	
+11. ALU M5                      Oncall Telco SGT	Host is alive	23.57.09	23.57.09	00.00.00	
+12. ALU SURYA              Oncall Telco SGT	Host is alive	23.57.09	23.57.09	00.00.00	
+13. ALU BINTANG          Oncall Telco SGT	Host is alive	23.57.07	23.57.07	00.00.00	
+14. ALU AB                      Oncall Telco SGT	Host is alive	23.57.08	23.57.08	00.00.00	
+15. ALU HATARI             Oncall Telco SGT	Host is alive	23.57.08	23.57.08	00.00.00	
+16. ALU PTH                    Oncall Telco SGT	Host is alive	23.57.07	23.30.32	00.26.34	
+17. ALU P11                    Oncall Telco SGT	Host is alive	23.57.08	23.26.01	00.31.06	
+18. ALU FNORTH            Oncall Telco SGT	Host is alive	23.57.09	23.31.10	00.25.58	
+19. ALU 15000                 Oncall Telco BGL	Host is alive	23.57.07	23.36.18	00.20.48	
+20. ALU LubukTutung     Oncall Telco BGL	Host is alive	23.57.08	23.31.09	00.25.58	
+21. Link TBTS Inul Middle	Host is alive	23.57.07	23.57.07	00.00.00	
+22. Link TBTS Galaxy ( switch )	Host is alive	23.57.09	23.52.01	00.05.07	
+23. Link TBTS Lignite	Host is alive	23.57.07	23.57.07	00.00.00	
+26. Link Backup Nokia Lignite to Middle	Host is alive	23.57.07	23.57.07	00.00.00	
+27. Link Backup Nokia Middle toLignite	Host is alive	23.57.07	23.57.07	00.00.00	
+28. Link NEC AB-to-BIG	Host is alive	23.55.54	23.55.08	00.00.46	
+29. Link NEC BINTANG-to-AB	Host is alive	23.55.55	23.55.32	00.00.23	
+30. Link NEC AB-to-FN	Host is alive	23.55.59	23.51.37	00.04.21	
+31. Link NEC FN-to-AB	Host is alive	23.55.46	23.52.12	00.03.34	
+32. Link NEC HT to AB	Host is alive	13.28.36	13.10.51	00.17.44	
+33. Link NEC AB to HT	Host is alive	13.27.47	10.54.14	02.33.33	
+Genset CH 15000	Host is alive	23.57.07	23.57.07	00.00.00	
+

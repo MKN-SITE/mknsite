@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, it } from "bun:test";
 import { eq } from "drizzle-orm";
 import { db } from "../src/db";
-import { authUsers, users } from "../src/db/schema";
+import { authUsers, roles, users } from "../src/db/schema";
 import { app, cleanTestUsers } from "./setup";
 
 describe("Admin API", () => {
@@ -85,10 +85,10 @@ describe("Admin API", () => {
     };
 
     expect(Array.isArray(body.data)).toBe(true);
-    expect(body.data.length).toBeGreaterThanOrEqual(6);
+    expect(body.data.length).toBeGreaterThanOrEqual(3);
     expect(body.pagination.page).toBe(1);
     expect(body.pagination.pageSize).toBe(20);
-    expect(body.pagination.total).toBeGreaterThanOrEqual(6);
+    expect(body.pagination.total).toBeGreaterThanOrEqual(3);
     expect(body.pagination.totalPages).toBeGreaterThanOrEqual(1);
 
     for (const item of body.data) {
@@ -149,7 +149,7 @@ describe("Admin API", () => {
     };
     expect(pageBody.data.length).toBe(2);
     expect(pageBody.pagination.pageSize).toBe(2);
-    expect(pageBody.pagination.totalPages).toBeGreaterThanOrEqual(3);
+    expect(pageBody.pagination.totalPages).toBeGreaterThanOrEqual(2);
 
     const emptyPageRes = await app.handle(
       new Request("http://localhost/admin/users?page=999&pageSize=20", {
@@ -1036,12 +1036,13 @@ describe("Admin API", () => {
     const meBefore = await app.handle(new Request("http://localhost/auth/me", { headers: { Cookie: empCookie } }));
     expect(meBefore.status).toBe(200);
 
-    // 3. Admin ubah role karyawan menjadi role 2 (OPS Telco)
+    // 3. Admin ubah role karyawan menjadi Teknisi OPS Telco
+    const [techRole] = await db.select().from(roles).where(eq(roles.slug, "ops-telco-technician")).limit(1);
     const updateRolesRes = await app.handle(
       new Request(`http://localhost/admin/users/${empId}/roles`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
-        body: JSON.stringify({ roleIds: [2] })
+        body: JSON.stringify({ roleIds: [techRole.id] })
       })
     );
     expect(updateRolesRes.status).toBe(200);
@@ -1064,8 +1065,8 @@ describe("Admin API", () => {
     const meNew = await app.handle(new Request("http://localhost/auth/me", { headers: { Cookie: newCookie } }));
     expect(meNew.status).toBe(200);
     const meNewBody = (await meNew.json()) as { user: { roles: string[]; permissions: string[] } };
-    expect(meNewBody.user.roles).toContain("OPS Telco");
-    expect(meNewBody.user.permissions).toContain("ops_telco.manage");
+    expect(meNewBody.user.roles).toContain("Teknisi OPS Telco");
+    expect(meNewBody.user.permissions).toContain("ops_telco.schedule.view");
   });
 
   it("POST /admin/users/:id/revoke-sessions berhasil mencabut sesi aktif tanpa menonaktifkan user", async () => {

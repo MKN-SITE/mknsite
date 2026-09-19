@@ -1,0 +1,14 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\LIEBHER\
+1. Link M5 to Surya	Host is alive	23.57.38	23.37.20	00.20.18	
+10. Link Liebherr Office To Surya	Host is alive	23.58.17	23.38.08	00.20.08	
+2. Link Surya to M5	Host is alive	23.57.38	23.37.16	00.20.22	
+3. Link Surya to New AB	Host is alive	23.57.38	23.37.16	00.20.22	
+4. Link New AB to Surya	Host is alive	23.57.38	23.37.17	00.20.21	
+5. Link New AB to Farnorth	Host is alive	23.57.38	23.37.16	00.20.22	
+6. Link Farnorth to New AB	Host is alive	23.58.17	23.38.08	00.20.08	
+7. Farnorth to Mega Shop	Host is alive	23.58.10	22.55.53	01.02.16	
+8. Mega Shop to Farnorth	No answer	23.58.03	00.00.00	23.58.03	
+9. Link Surya To Liebherr Office	Host is alive	23.58.17	23.38.08	00.20.08	
+

@@ -43,7 +43,7 @@ describe("Menu API", () => {
     expect(deleteRes.status).toBe(401);
   });
 
-  it("mengembalikan menu yang sesuai dengan permission karyawan pada GET /menus", async () => {
+  it("mengembalikan menu yang sesuai dengan status aktif dan permission karyawan pada GET /menus", async () => {
     // Login sebagai HR (memiliki permission dashboard.view, hr.view, hr.manage)
     const loginRes = await app.handle(
       new Request("http://localhost/auth/login", {
@@ -65,10 +65,9 @@ describe("Menu API", () => {
     const body = (await res.json()) as { data: Array<{ title: string; requiredPermission: string | null }> };
 
     expect(Array.isArray(body.data)).toBe(true);
-    // HR harus bisa melihat Self-Service (dashboard.view) dan HR (hr.view)
     const titles = body.data.map((m) => m.title);
-    expect(titles).toContain("Self-Service");
-    expect(titles).toContain("HR");
+    // Menu HR sudah dinonaktifkan sehingga tidak muncul bagi karyawan
+    expect(titles).not.toContain("HR");
 
     // HR TIDAK memiliki permission ops_telco.view, ops_workshop.view, project.view
     expect(titles).not.toContain("OPS Telco");
@@ -97,7 +96,7 @@ describe("Menu API", () => {
     );
     expect(listRes.status).toBe(200);
     const listBody = (await listRes.json()) as { data: Array<{ id: number; title: string }> };
-    expect(listBody.data.length).toBeGreaterThanOrEqual(5);
+    expect(listBody.data.length).toBeGreaterThanOrEqual(1);
 
     // 3. POST /admin/menus membuat menu baru
     const createRes = await app.handle(

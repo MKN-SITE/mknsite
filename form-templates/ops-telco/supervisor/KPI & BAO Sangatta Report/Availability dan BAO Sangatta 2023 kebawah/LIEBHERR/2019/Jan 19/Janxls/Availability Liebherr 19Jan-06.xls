@@ -1,0 +1,221 @@
+<html><head>
+<meta name="GENERATOR" content="Advanced Host Monitor">
+<title>HostMonitor report</title>
+<STYLE TYPE="text/css"><!-- a:hover { color: "#00FFFF"; } --> </STYLE>
+</head>
+<body bgcolor="#000080" text="#E9E9E9" link="#00FFFF" vlink="#00FFFF" alink="#00FFFF">
+<p align="left"><u><strong><big><big>HostMonitor Report</big></big></strong></u><br>
+<font face="Arial">Generated on 1/6/2019 at 11:57:12 PM</font>
+<br>Time zone: GMT +08:00 Malaysia, Singapore, Western Australia</p>
+<div align="center"><center>
+<table border="0" bordercolor="#000080" width="100%">
+  <tr>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Test name</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Status</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Recurrences</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Reply</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Last test time</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Last status</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Last reply</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Interval</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Test method</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Comment</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Related URL</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Master test</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Alive %</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Dead %</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Unknown %</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Total time</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Alive time</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Dead time</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Total tests</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Passed tests</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Failed tests</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Average reply</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Min reply</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Max reply</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Status changed at</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Status changes</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Modified at</font></strong></td>
+
+
+  </tr>
+  <tr><td bgcolor="#0080FF" align="left" colspan=27><font color="#FFFFFF"> Folder: MONITORING\LIEBHER\ </font></td></tr>
+  <tr>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1. Link M5 to Surya</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>11076</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>5 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/6/2019 11:57:04 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>4 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:05:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>ping (timeout - 2000 ms)</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>100.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:46</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:46</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:00:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>288</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>288</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>4.6</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>2</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>10</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>11/22/2018 6:48:28 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/2/2019 4:31:57 PM</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>2. Link Surya to M5</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1350</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>6 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/6/2019 11:52:17 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>6 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:05:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>ping (timeout - 2000 ms)</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>100.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>23:55:58</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>23:55:58</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:00:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>287</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>287</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>5.8</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>3</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>9</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>12/27/2018 9:02:07 AM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>12/3/2018 9:41:13 AM</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>3. Link Surya to Farnorth</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1825</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>6 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/6/2019 11:57:05 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>6 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:05:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>ping (timeout - 2000 ms)</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>100.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:46</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:46</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:00:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>288</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>288</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>7.6</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>4</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>18</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>12/25/2018 5:24:21 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>12/3/2018 9:41:18 AM</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>4. Link Farnorth to Surya</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1825</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>7 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/6/2019 11:57:05 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>10 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:05:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>ping (timeout - 2000 ms)</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>100.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:46</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:46</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:00:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>288</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>288</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>7.5</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>4</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>23</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>12/25/2018 5:24:21 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>12/3/2018 9:41:24 AM</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>5. Link Farnorth to Megashop</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1825</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>7 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/6/2019 11:57:05 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>7 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:05:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>ping (timeout - 2000 ms)</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>100.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:46</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:46</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:00:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>288</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>288</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>7.6</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>4</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>14</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>12/25/2018 5:24:21 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/2/2019 4:32:08 PM</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>6. Link Megashop to Farnorth</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>776</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>18 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/6/2019 11:52:05 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>18 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:10:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>ping (timeout - 2000 ms)</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>100.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:46</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:46</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:00:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>144</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>144</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>12</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>6</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>21</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>12/26/2018 4:34:35 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/2/2019 4:32:16 PM</font>&nbsp;</td>
+  </tr>
+</table>
+</center></div>
+<p>This report was generated by <b><a href="http://www.ks-soft.net" target="_blank">Advanced Host Monitor</a></b></p>
+</body></html>

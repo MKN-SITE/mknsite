@@ -1,0 +1,30 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\KPC\
+01. Node Pit B bengalon	Host is alive	1 day 00.00.53	23.56.37	00.04.15	
+02. Switch KPC LBTT	Host is alive	1 day 00.00.09	23.50.49	00.09.19	
+04. Exalt KPC Pelangi Camp	Host is alive	1 day 00.00.10	23.55.54	00.04.15	
+05. Switch KPC 15K	Host is alive	1 day 00.00.30	23.46.10	00.14.19	
+10. Link Metro MKN Jakarta-----!	Host is alive	1 day 00.00.39	1 day 00.00.39	00.00.00	
+11. ALU M5                      Oncall Telco SGT	Host is alive	1 day 00.01.06	1 day 00.01.06	00.00.00	
+12. ALU SURYA              Oncall Telco SGT	Host is alive	1 day 00.00.58	1 day 00.00.58	00.00.00	
+13. ALU BINTANG          Oncall Telco SGT	Host is alive	1 day 00.00.58	1 day 00.00.58	00.00.00	
+15. ALU HATARI             Oncall Telco SGT	Host is alive	1 day 00.00.58	1 day 00.00.58	00.00.00	
+16. ALU PTH                    Oncall Telco SGT	Host is alive	1 day 00.01.05	1 day 00.01.05	00.00.00	
+17. ALU P11                    Oncall Telco SGT	Host is alive	1 day 00.00.59	1 day 00.00.59	00.00.00	
+18. ALU FNORTH            Oncall Telco SGT	Host is alive	1 day 00.00.54	1 day 00.00.54	00.00.00	
+19. ALU 15000                 Oncall Telco BGL	Host is alive	1 day 00.00.53	1 day 00.00.53	00.00.00	
+20. ALU LubukTutung     Oncall Telco BGL	Host is alive	1 day 00.00.59	1 day 00.00.59	00.00.00	
+21. Link TBTS Inul Middle	Host is alive	1 day 00.00.57	23.56.39	00.04.17	
+22. Link TBTS Galaxy ( switch )	Host is alive	1 day 00.00.06	1 day 00.00.06	00.00.00	
+23. Link TBTS Lignite	Host is alive	1 day 00.00.59	23.56.41	00.04.17	
+26. Link Backup Nokia Lignite to Middle	Host is alive	1 day 00.01.06	23.56.54	00.04.11	
+27. Link Backup Nokia Middle toLignite	Host is alive	1 day 00.00.53	23.56.51	00.04.01	
+28. Link NEC AB-to-BIG	Host is alive	23.59.01	23.59.01	00.00.00	
+29. Link NEC BINTANG-to-AB	Host is alive	23.59.07	23.59.07	00.00.00	
+30. Link NEC AB-to-FN	Host is alive	23.59.18	23.58.41	00.00.36	
+31. Link NEC FN-to-AB	Host is alive	23.59.08	23.58.31	00.00.36	
+32. Link NEC HT to AB	Host is alive	23.59.10	23.59.10	00.00.00	
+33. Link NEC AB to HT	Host is alive	23.59.08	23.56.45	00.02.22	
+Genset CH 15000	Host is alive	1 day 00.00.41	23.56.24	00.04.16	
+

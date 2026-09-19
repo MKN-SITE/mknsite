@@ -1,0 +1,24 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\KPC\
+01. Node Pit B bengalon	Host is alive	23.56.10	23.56.10	00.00.00	
+04. Exalt KPC Pelangi Camp	Host is alive	23.56.11	23.51.06	00.05.04	
+05. Switch KPC 15K	Host is alive	23.56.04	23.56.04	00.00.00	
+11. ALU M5                      Oncall Telco SGT	Host is alive	23.56.04	23.56.04	00.00.00	
+12. ALU SURYA              Oncall Telco SGT	Host is alive	23.56.04	23.56.04	00.00.00	
+13. ALU BINTANG          Oncall Telco SGT	Host is alive	23.56.05	23.56.05	00.00.00	
+14. ALU AB                      Oncall Telco SGT	Host is alive	23.56.04	23.56.04	00.00.00	
+15. ALU HATARI             Oncall Telco SGT	Host is alive	23.56.04	23.56.04	00.00.00	
+16. ALU PTH                    Oncall Telco SGT	Host is alive	23.56.14	23.51.06	00.05.07	
+17. ALU P11                    Oncall Telco SGT	Host is alive	23.56.20	23.46.03	00.10.16	
+18. ALU FNORTH            Oncall Telco SGT	Host is alive	23.56.06	23.56.06	00.00.00	
+19. ALU 15000                 Oncall Telco BGL	Host is alive	23.56.08	23.56.08	00.00.00	
+20. ALU LubukTutung     Oncall Telco BGL	Host is alive	23.56.06	23.56.06	00.00.00	
+21. Link TBTS Inul Middle	Host is alive	23.56.04	23.56.04	00.00.00	
+22. Link TBTS Galaxy ( switch )	Host is alive	23.56.13	23.51.05	00.05.07	
+23. Link TBTS Lignite	Host is alive	23.56.06	23.56.06	00.00.00	
+24. ALU PTH to LBTT   Oncall Telco SGT	Host is alive	1 day 00.01.27	23.51.11	00.10.15	
+26. Link Backup Nokia Lignite to Middle	Host is alive	23.56.05	23.56.05	00.00.00	
+27. Link Backup Nokia Middle toLignite	Host is alive	1 day 00.01.11	1 day 00.01.11	00.00.00	
+Genset CH 15000	Host is alive	23.56.04	23.56.04	00.00.00	
+

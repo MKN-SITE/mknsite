@@ -1,0 +1,361 @@
+/* View Jadwal Oncall Workspace - Read-Only Technician Interface */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  text-align: left;
+}
+
+/* ── Top Header Toolbar ── */
+.topToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.toolbarTitleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toolbarTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbarSubtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.toolbarActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.periodSelector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+}
+
+.periodSelect {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1e293b;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  border: none;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+}
+
+.btnPrimary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.45);
+}
+
+/* ── Personal Oncall Callout ── */
+.myTurnBanner {
+  background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%);
+  border: 1.5px solid #facc15;
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: #854d0e;
+  box-shadow: 0 2px 8px rgba(234, 179, 8, 0.15);
+}
+
+.myTurnInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.myTurnIcon {
+  font-size: 24px;
+}
+
+.myTurnTitle {
+  font-size: 14px;
+  font-weight: 800;
+  margin: 0;
+  color: #713f12;
+}
+
+.myTurnDates {
+  font-size: 12.5px;
+  margin: 2px 0 0 0;
+  color: #854d0e;
+}
+
+/* ── Schedule Card / Table ── */
+.scheduleCard {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.scheduleHeaderInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.scheduleHeaderMain {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.scheduleLogo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
+
+.scheduleTitleGroup h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.scheduleTitleGroup p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.schedulePeriodBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 750;
+  border: 1px solid #bfdbfe;
+}
+
+/* ── The Master Oncall Table ── */
+.tableResponsive {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1.5px solid #0f172a;
+}
+
+.oncallTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  text-align: center;
+  background: #ffffff;
+}
+
+.oncallTable th,
+.oncallTable td {
+  border: 1px solid #0f172a;
+  padding: 8px 6px;
+  vertical-align: middle;
+}
+
+.thHeaderGroup {
+  background: #f8fafc;
+  font-weight: 800;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.thSubHeader {
+  background: #f1f5f9;
+  font-weight: 750;
+  color: #1e293b;
+  min-width: 52px;
+}
+
+.thColNo {
+  width: 38px;
+}
+
+.thColPeriode {
+  width: 100px;
+  min-width: 95px;
+}
+
+.tdNo {
+  font-weight: 750;
+  color: #334155;
+}
+
+.tdPeriode {
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: #1e293b;
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.dateRow {
+  display: block;
+}
+
+/* Active Row Highlight for current logged-in user */
+.rowMyTurn {
+  background: #fefce8;
+}
+
+/* Cell Oncall (Yellow Highlight #FFFF00) */
+.cellOncall {
+  background-color: #FFFF00 !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  font-size: 11.5px;
+  letter-spacing: 0.5px;
+}
+
+.cellRegular {
+  background-color: transparent;
+}
+
+/* ── Note Section ── */
+.notesSection {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px dashed #cbd5e1;
+}
+
+.notesTitle {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.notesList {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notesList li {
+  font-size: 12.5px;
+  color: #334155;
+  font-weight: 600;
+}
+
+/* ── Footer Officials (Signatures) ── */
+.officialsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding-top: 10px;
+  border-top: 1.5px dashed #e2e8f0;
+  text-align: center;
+}
+
+.officialCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.officialRole {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.signatureSpacer {
+  height: 48px;
+  width: 100%;
+}
+
+.officialName {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0f172a;
+  text-decoration: underline;
+}
+
+.officialPhone {
+  font-size: 12px;
+  color: #475569;
+  font-weight: 600;
+}
+
+.emptyState {
+  padding: 48px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #64748b;
+}
+
+.emptyStateTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1e293b;
+}

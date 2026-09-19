@@ -13,13 +13,13 @@ import { publishAdminRbacUpdated, publishRealtimeEvent } from "../realtime/hub";
 
 type ServiceError = { error: { status: 400 | 403 | 404 | 409; code: string; message: string } };
 
-// Hanya role dan permission inti sistem yang dikunci permanen dari penghapusan
-export const PROTECTED_SYSTEM_ROLES = new Set(["administrator", "superadmin"]);
-export const PROTECTED_SYSTEM_PERMISSIONS = new Set([
-  "dashboard.view",
-  "admin.manage",
-  "admin.security.manage"
-]);
+import {
+  PROTECTED_SYSTEM_PERMISSIONS,
+  PROTECTED_SYSTEM_ROLES,
+  SYSTEM_ROLES
+} from "../db/system-seed-data";
+
+export { PROTECTED_SYSTEM_PERMISSIONS, PROTECTED_SYSTEM_ROLES };
 
 function normalizeIds(ids: number[] = []) {
   return [...new Set(ids)];
@@ -223,6 +223,22 @@ export class RbacService {
       }
       if (existing.slug === "superadmin" && (!slugs.has("admin.manage") || !slugs.has("admin.security.manage"))) {
         return { error: { status: 403, code: "SYSTEM_ROLE_REQUIREMENT", message: "Role Superadministrator harus tetap memiliki izin admin.manage dan admin.security.manage." } };
+      }
+      if (existing.slug === "ops-telco-supervisor") {
+        const supervisorRoleDef = SYSTEM_ROLES.find((r) => r.slug === "ops-telco-supervisor");
+        const requiredSupervisorPerms = supervisorRoleDef
+          ? supervisorRoleDef.permissions.filter((p) => p.startsWith("ops_telco."))
+          : [];
+        const missing = requiredSupervisorPerms.filter((p) => !slugs.has(p));
+        if (missing.length > 0) {
+          return {
+            error: {
+              status: 403,
+              code: "SYSTEM_ROLE_REQUIREMENT",
+              message: `Role Supervisor OPS Telco wajib mempertahankan izin: ${missing.join(", ")}.`
+            }
+          };
+        }
       }
     }
 

@@ -78,11 +78,16 @@ export async function* userEventStream(
     adminSubscribers.add(send);
   }
 
-  // Heartbeat transport (25s) dengan revalidasi sesi berkala
+  // Heartbeat transport (25s) dengan revalidasi sesi berkala (setiap 5 menit per koneksi, bukan setiap 25 detik)
+  let lastSessionRevalidatedAt = Date.now();
+  const SESSION_REVALIDATE_INTERVAL_MS = 5 * 60 * 1000;
+
   const heartbeat = setInterval(async () => {
     if (isClosed) return;
 
-    if (headers) {
+    const now = Date.now();
+    if (headers && now - lastSessionRevalidatedAt >= SESSION_REVALIDATE_INTERVAL_MS) {
+      lastSessionRevalidatedAt = now;
       const activeUser = await getAuthenticatedProfile(headers, context);
       if (!activeUser) {
         send({

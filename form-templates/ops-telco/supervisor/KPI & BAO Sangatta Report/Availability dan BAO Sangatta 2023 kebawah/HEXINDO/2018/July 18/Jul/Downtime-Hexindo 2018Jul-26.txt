@@ -1,0 +1,10 @@
+Test name	Dead time	Alive time	Total time	
+
+Folder: MONITORING\Hexindo\
+1. Hexindo Office TD Audio Codes	00:10:10	23:54:24	1 day 00:04:34	
+2. Link Hexindo Office TD to Surya	00:50:49	23:01:22	23:52:12	
+3. Link Surya to Hexindo Office	00:00:00	23:59:09	23:59:09	
+4. Link Surya to Hexindo Pama	00:00:00	23:59:09	23:59:09	
+5. Link Hexindo Pama to Surya	00:00:00	23:51:39	23:51:39	
+6. Hexindo Pama Audio Codes	01:51:55	22:03:31	23:55:27	
+

@@ -162,7 +162,7 @@ docker exec mknsite-mysql-1 mysql -u mknsite -p"mknsite-local-only" mknsite \
 
 ```powershell
 # Login dan hapus via API
-$body = '{"email":"superadmin@mknsite.online","password":"superadmin12345"}'
+$body = '{"email":"superadmin@mknsite.online","password":"<SUPERADMIN_PASSWORD>"}'
 $r = Invoke-WebRequest -Uri "https://api.mknsite.online/auth/admin/login" `
   -Method POST -ContentType "application/json" -Body $body `
   -UseBasicParsing -SessionVariable sess
@@ -179,13 +179,80 @@ Invoke-WebRequest -Uri "https://api.mknsite.online/admin/menus/<ID>" `
 
 Atau hapus langsung via Admin Panel di `https://www.mknsite.online/admin/menus`.
 
+## Migrasi 0006: Pemindahan Formulir HR ke OPS Telco (`ops_telco_forms`)
+
+Migrasi `0006_ops_telco_forms.sql` memindahkan formulir operasional (Oncall, Overtime, Cuti) dari modul HR ke submenu Teknisi pada OPS Telco:
+1. **Zero Data Loss Table Rename**: Menggunakan `RENAME TABLE hr_forms TO ops_telco_forms;` sehingga seluruh baris historis, ID, status, relasi duplikasi, dan timestamp tetap 100% utuh tanpa penghapusan atau pembuatan ulang data.
+2. **Indeks & Foreign Key**: Merename seluruh indeks (`hr_forms_*` → `ops_telco_forms_*`) dan memperbarui constraint foreign key `ops_telco_forms_owner_users_fk`.
+3. **Permissions Baru**:
+   - `ops_telco.forms.view`: Diberikan ke role `ops-telco-supervisor`, `ops-telco-technician`, dan `employee-basic`.
+   - `ops_telco.forms.manage`: Diberikan ke role `ops-telco-supervisor`.
+   - Role legacy `hr` **tidak otomatis** diberikan `ops-telco-supervisor` untuk mencegah eskalasi hak akses (*privilege escalation*).
+4. **Deaktivasi Menu HR**: Menu URL `/portal/hr` dinonaktifkan (`is_active = 0`), sementara menu `/portal/ops-telco` tetap aktif.
+
+## Migrasi 0007: Normalisasi Menu dan Unique Constraint `menus.url`
+
+Migrasi `0007_menu_url_unique.sql` mencegah menu duplikat di tingkat skema database:
+1. **Pembersihan URL Kosong**: Mengubah string kosong atau spasi menjadi NULL.
+2. **Normalisasi Canonical**: Memastikan rute internal diawali slash dan menghapus trailing slash (kecuali URL root `/`).
+3. **Deduplikasi Deterministik**: Menghapus row duplikat sebelum index dibuat dengan prioritas canonical: `is_active = 1`, disusul `updated_at` paling baru, lalu `id` paling kecil. Baris dengan URL NULL tidak disentuh.
+4. **Unique Constraint**: Menambahkan constraint unik `menus_url_unique` pada kolom `menus.url`.
+
+## Migrasi 0008: Oncall Job Model Multi-Teknisi & Supervisor Approval
+
+Migrasi `0008_oncall_job_model.sql` mengubah Form Oncall dari model satu form per teknisi menjadi satu Job Order dengan banyak teknisi (multi-teknisi) dan persetujuan Supervisor:
+1. **Modifikasi Tabel `ops_telco_forms`**:
+   - Menambahkan kolom `job_order_no` (VARCHAR 100, indeks `ops_telco_forms_job_order_no_idx`).
+   - Menambahkan kolom `workflow_version` (INT, default 1).
+   - Menambahkan kolom status timestamp: `locked_at`, `submitted_at`, `approved_at`.
+   - Menambahkan flag `is_legacy` (TINYINT(1), default 0).
+2. **Tabel Baru `ops_telco_form_participants`**:
+   - Menghubungkan satu form oncall ke banyak teknisi pelaksana (`form_id`, `user_id`).
+   - Menyimpan `participant_role` (`pic` atau `member`).
+   - Menyimpan snapshot identitas teknisi saat penugasan (`name_snapshot`, `kpc_id_snapshot`).
+   - Unique constraint: `(form_id, user_id)`.
+3. **Tabel Baru `ops_telco_form_signatures`**:
+   - Menyimpan tanda tangan digital teknisi dan supervisor.
+   - Relasi ke file privat lokal: `signature_file` (`uploads/signatures/{formId}/{uuid}.png`).
+   - Jejak integritas digital: `signature_sha256` dan `signed_payload_hash`.
+   - Unique constraint: `(form_id, signer_user_id, workflow_version)` — satu tanda tangan per user per versi workflow.
+4. **Tabel Baru `ops_telco_form_approval_history`**:
+   - Log append-only untuk setiap keputusan supervisor (`approved`, `revision_requested`, `rejected`).
+   - Menyimpan catatan/alasan supervisi dan referensi tanda tangan supervisor.
+5. **Permissions Baru**:
+   - `ops_telco.oncall.assign`: Hak menambahkan/menghapus teknisi ke pekerjaan.
+   - `ops_telco.oncall.approve`: Hak menyetujui, meminta revisi, atau menolak formulir Oncall.
+   - Keduanya otomatis diberikan kepada role `ops-telco-supervisor`.
+6. **Migrasi Data Legacy**:
+   - Semua record lama dengan `form_type = 'oncall'` ditandai `is_legacy = 1`, `workflow_version = 1`.
+   - Kolom `job_order_no` diisi dari JSON field `jobOrder` (atau fallback ke `form_number`).
+   - Record PIC otomatis dibuat di `ops_telco_form_participants` dari `created_by` dan dihubungkan ke `users`.
+   - Seluruh data lama tetap utuh, tidak digabung atau dihapus.
+
+## Isolasi Database Pengujian (`mknsite_test`)
+
+> [!WARNING]
+> **JANGAN PERNAH MENJALANKAN TEST OTOMATIS PADA DATABASE UTAMA (`mknsite`).**
+> Test suite membersihkan akun non-resmi pada tahap teardown (`cleanTestUsers`). Menjalankan test pada database aplikasi berisiko menghapus akun karyawan lokal yang sedang digunakan untuk development.
+
+1. Seluruh pengujian otomatis **wajib** menggunakan database uji `mknsite_test`.
+2. Guard keamanan telah dipasang di `apps/api/test/setup.ts` yang memvalidasi nama database dari pathname URL berakhiran `_test`, serta memvalidasi `SELECT DATABASE()` aktual sebelum operasi cleanup.
+3. Cara menjalankan test:
+   ```bash
+   docker exec -e NODE_ENV=test -e DATABASE_URL="mysql://mknsite:mknsite-local-only@mysql:3306/mknsite_test" mknsite-api-1 bun test
+   ```
+
 ## Checklist Verifikasi Database Setelah Deploy/Revert
 
-- [ ] Cek `__drizzle_migrations` — jumlah entry sesuai dengan `_journal.json`
-- [ ] Cek tabel `menus` — tidak ada menu orphan (mengarah ke halaman yang tidak ada)
-- [ ] Cek tabel `roles` — tidak ada role orphan
-- [ ] Cek tabel `permissions` — tidak ada permission orphan
+- [ ] Cek `__drizzle_migrations` — jumlah entry sesuai dengan `_journal.json` (8 migrasi: 0000 s/d 0007; migrasi terbaru 0008)
+- [ ] Cek tabel `ops_telco_forms` — seluruh data lama terbaca utuh dan kolom baru tersedia
+- [ ] Cek tabel `ops_telco_form_participants` — peserta oncall terisi
+- [ ] Cek tabel `ops_telco_form_signatures` — tanda tangan tersimpan
+- [ ] Cek tabel `menus` — menu `/portal/hr` nonaktif (`is_active = 0`), `/portal/ops-telco` aktif (`is_active = 1`), constraint `menus_url_unique` terpasang
+- [ ] Cek tabel `roles` — seluruh 6 role sistem terlindungi dan tidak ada role orphan
+- [ ] Cek tabel `permissions` — 17 permission sistem terdaftar (termasuk `ops_telco.oncall.assign` & `ops_telco.oncall.approve`)
 - [ ] Cek tabel `users` — semua user punya `auth_user` dan `auth_account` yang valid
 - [ ] Test login superadmin → HTTP 200
 - [ ] Test login admin → HTTP 200
 - [ ] Test login employee → HTTP 200
+

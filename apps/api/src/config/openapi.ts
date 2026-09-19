@@ -18,6 +18,7 @@ export const openApiTags = [
   { name: "Auth Employee", description: "Autentikasi dan sesi portal karyawan" },
   { name: "Auth Admin", description: "Autentikasi dan sesi terisolasi administrator" },
   { name: "Workspace", description: "Data modul bisnis berbasis otorisasi RBAC" },
+  { name: "OPS Telco Forms", description: "Pengelolaan formulir operasional teknisi dan pengajuan resmi (Oncall, Overtime, Cuti)" },
   { name: "Admin", description: "Operasi administratif dan manajemen pengguna" },
   { name: "Admin RBAC", description: "Pengelolaan role dan izin oleh superadministrator" },
   { name: "Realtime", description: "Streaming event langsung Server-Sent Events (SSE)" },

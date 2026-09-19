@@ -1,0 +1,10 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\UT Sangatta\
+UT_UT-Crystal_Lignite	Host is alive	1 day 00.02.15	1 day 00.02.15	00.00.00	
+UT_Lignite_UT-Crystal	Host is alive	1 day 00.02.16	1 day 00.02.16	00.00.00	
+UT_Lignite_FN	Host is alive	1 day 00.02.07	1 day 00.02.07	00.00.00	
+UT_FN-Lignite	Host is alive	1 day 00.02.16	1 day 00.02.16	00.00.00	
+Router UT Cristall 203.153.125.210	Host is alive	1 day 00.02.21	23.57.17	00.05.04	
+Router UT Cristall 203.153.125.209 GW	Host is alive	1 day 00.02.01	1 day 00.02.01	00.00.00	
+

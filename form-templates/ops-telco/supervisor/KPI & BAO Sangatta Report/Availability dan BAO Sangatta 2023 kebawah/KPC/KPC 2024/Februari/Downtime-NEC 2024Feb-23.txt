@@ -1,0 +1,18 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\NEC_MKN_KPC-Link\
+01. NEC M5	Host is alive	23.59.35	23.49.24	00.10.10	
+02. NEC Harapan	Host is alive	23.59.32	23.49.21	00.10.10	
+03. NEC AB	Host is alive	23.59.35	23.49.24	00.10.10	
+04. NEC Farnorth	Host is alive	23.59.28	23.49.17	00.10.10	
+05. NEC Middle	Host is alive	23.59.39	23.49.28	00.10.11	
+06. NEC Lignite	Host is alive	23.59.41	23.49.30	00.10.11	
+07. NEC Surya	Host is alive	23.59.40	23.49.29	00.10.11	
+08. NEC Bintang	Host is alive	23.59.33	23.49.22	00.10.10	
+09. NEC PTH	Host is alive	23.59.38	23.49.27	00.10.10	
+10. NEC PNS	Host is alive	23.56.49	23.46.48	00.10.01	
+11. NEC LBTT	Host is alive	23.59.38	23.49.27	00.10.11	
+11.1 NEC LBTT via MKN	Host is alive	23.56.31	23.56.31	00.00.00	
+12. NEC 15K	Host is alive	23.59.43	23.49.32	00.10.11	
+12.1 NEC 15K via MKN	Host is alive	23.56.44	23.56.44	00.00.00	
+

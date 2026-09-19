@@ -1,0 +1,10 @@
+Test name	Status	Reply	Alive %	Dead %	Average reply	
+
+Folder: MONITORING\Hexindo\
+1. Hexindo Office TD Audio Codes	No answer		87.50 %	12.50 %	13	
+2. Link Hexindo Office TD to Surya	No answer		93.73 %	6.27 %	15	
+3. Link Surya to Hexindo Office	No answer		93.73 %	6.27 %	9.1	
+4. Link Surya to Hexindo Pama	No answer		93.73 %	6.27 %	9.1	
+5. Link Hexindo PAMA To Surya	No answer		93.73 %	6.27 %	11	
+6. Hexindo Pama Audio Codes	No answer		50.00 %	50.00 %	11	
+

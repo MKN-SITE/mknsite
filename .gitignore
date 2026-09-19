@@ -13,3 +13,5 @@ dist
 scratch/
 uploads/
 apps/api/uploads/
+storage/*.pdf
+storage/signatures/

@@ -1,0 +1,8 @@
+Test name	Dead time	Alive time	Total time	
+
+Folder: MONITORING\Hexindo\
+Hexindo Office TD Audio Codes	00:00:00	00:00:00	00:00:00	
+Hexindo Pama Audio Codes	00:00:00	00:00:00	00:00:00	
+Link Hexindo Office TD	00:00:00	00:10:00	00:10:00	
+Link Hexindo Pama	00:00:00	00:00:00	00:00:00	
+

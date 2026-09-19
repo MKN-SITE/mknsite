@@ -1,0 +1,10 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\UT Sangatta\
+UT_UT-Crystal_Lignite	Host is alive	23.53.30	23.53.30	00.00.00	
+UT_Lignite_UT-Crystal	Host is alive	23.53.28	23.53.28	00.00.00	
+UT_Lignite_FN	Host is alive	23.53.36	23.53.36	00.00.00	
+UT_FN-Lignite	Host is alive	23.53.26	23.53.26	00.00.00	
+Router UT Cristall 203.153.125.210	Host is alive	23.53.43	23.53.43	00.00.00	
+Router UT Cristall 203.153.125.209 GW	Host is alive	23.53.30	23.53.30	00.00.00	
+

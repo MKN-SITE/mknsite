@@ -1,0 +1,30 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\KPC\
+01. Node Pit B bengalon	Host is alive	14.43.44	14.34.10	00.09.33	
+02. Switch KPC LBTT	Host is alive	14.43.37	14.26.07	00.17.29	
+04. Exalt KPC Pelangi Camp	Host is alive	14.43.26	14.34.10	00.09.15	
+05. Switch KPC 15K	Host is alive	14.43.44	14.34.10	00.09.34	
+10. Link Metro MKN Jakarta-----!	Host is alive	14.43.38	14.43.38	00.00.00	
+11. ALU M5                      Oncall Telco SGT	Host is alive	14.44.06	14.44.06	00.00.00	
+12. ALU SURYA              Oncall Telco SGT	Host is alive	14.43.57	14.43.57	00.00.00	
+13. ALU BINTANG          Oncall Telco SGT	Host is alive	14.43.57	14.43.57	00.00.00	
+15. ALU HATARI             Oncall Telco SGT	Host is alive	14.43.57	14.43.57	00.00.00	
+16. ALU PTH                    Oncall Telco SGT	Host is alive	14.43.57	14.43.57	00.00.00	
+17. ALU P11                    Oncall Telco SGT	Host is alive	14.43.49	14.43.49	00.00.00	
+18. ALU FNORTH            Oncall Telco SGT	Host is alive	14.43.49	14.43.49	00.00.00	
+19. ALU 15000                 Oncall Telco BGL	Host is alive	14.43.50	14.43.50	00.00.00	
+20. ALU LubukTutung     Oncall Telco BGL	Host is alive	14.43.57	14.43.57	00.00.00	
+21. Link TBTS Inul Middle	Host is alive	14.43.43	14.34.07	00.09.36	
+22. Link TBTS Galaxy ( switch )	Host is alive	14.42.59	14.37.51	00.05.08	
+23. Link TBTS Lignite	Host is alive	14.43.42	14.29.06	00.14.36	
+26. Link Backup Nokia Lignite to Middle	Host is alive	14.43.43	14.29.06	00.14.37	
+27. Link Backup Nokia Middle toLignite	Host is alive	14.43.30	14.34.06	00.09.24	
+28. Link NEC AB-to-BIG	Host is alive	14.43.28	14.43.28	00.00.00	
+29. Link NEC BINTANG-to-AB	Host is alive	14.43.28	14.43.28	00.00.00	
+30. Link NEC AB-to-FN	Host is alive	14.43.23	14.31.13	00.12.09	
+31. Link NEC FN-to-AB	Host is alive	14.43.27	14.31.02	00.12.24	
+32. Link NEC HT to AB	Host is alive	14.43.22	14.43.22	00.00.00	
+33. Link NEC AB to HT	Host is alive	14.43.32	11.47.57	02.55.34	
+Genset CH 15000	Host is alive	14.43.43	14.34.07	00.09.36	
+

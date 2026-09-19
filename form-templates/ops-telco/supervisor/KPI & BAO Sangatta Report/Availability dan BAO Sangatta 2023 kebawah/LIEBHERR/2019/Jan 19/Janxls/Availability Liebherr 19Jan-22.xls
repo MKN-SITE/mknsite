@@ -1,0 +1,67 @@
+<html><head>
+<meta name="GENERATOR" content="Advanced Host Monitor">
+<title>HostMonitor report</title>
+<STYLE TYPE="text/css"><!-- a:hover { color: "#0000FF"; } --> </STYLE>
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#0000FF" alink="#0000FF">
+<p align="left"><u><strong><big><big>HostMonitor Report</big></big></strong></u><br>
+<font face="Arial">Generated on 1/22/2019 at 11:58:32 PM</font>
+<br>Time zone: GMT +08:00 Malaysia, Singapore, Western Australia</p>
+<div align="center"><center>
+<table border="0" bordercolor="#FFFFFF" width="100%">
+  <tr>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Test name</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Status</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Total time</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Alive time</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Dead time</font></strong></td>
+
+
+  </tr>
+  <tr><td bgcolor="#00FF00" align="left" colspan=5><font color="#000000"> Folder: MONITORING\LIEBHER\ </font></td></tr>
+  <tr>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="left">&nbsp;<font color=#000000>1. Link M5 to Surya</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>23:55:41</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>23:55:41</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>00:00:00</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="left">&nbsp;<font color=#000000>2. Link Surya to M5</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>23:55:41</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>23:55:41</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>00:00:00</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="left">&nbsp;<font color=#000000>3. Link Surya to Farnorth</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>1 day 00:00:42</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>1 day 00:00:42</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>00:00:00</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="left">&nbsp;<font color=#000000>4. Link Farnorth to Surya</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>1 day 00:00:42</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>1 day 00:00:42</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>00:00:00</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="left">&nbsp;<font color=#000000>5. Link Farnorth to Megashop</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>1 day 00:00:42</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>1 day 00:00:42</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>00:00:00</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="left">&nbsp;<font color=#000000>6. Link Megashop to Farnorth</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>1 day 00:00:42</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>1 day 00:00:42</font>&nbsp;</td>
+    <td bgcolor="#FFFFFF" nowrap valign="top" align="center">&nbsp;<font color=#000000>00:00:00</font>&nbsp;</td>
+  </tr>
+</table>
+</center></div>
+<p>This report was generated by <b><a href="http://www.ks-soft.net" target="_blank">Advanced Host Monitor</a></b></p>
+</body></html>

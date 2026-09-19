@@ -1,0 +1,17 @@
+Test name	Status	Total time	Alive time	Dead time	
+
+Folder: MONITORING\MKN\
+Airfiber di M5 ==>PTH	Host is alive	23:57:54	23:57:54	00:00:00	
+Airfiber di PTH ==>M5	Host is alive	23:57:54	23:57:54	00:00:00	
+Canopy D8 --> M5	Host is alive	23:57:54	23:57:54	00:00:00	
+Canopy M5 --> D8	Host is alive	23:57:54	23:57:54	00:00:00	
+Exalt-1 di Tower Pineridge	Host is alive	23:57:54	23:57:54	00:00:00	
+Exalt-2 di Tower 15000	Host is alive	23:57:54	23:57:54	00:00:00	
+Exalt-3 di Tower 15000	Host is alive	23:57:54	23:57:54	00:00:00	
+Exalt-4 di Ktr Bengalon	Host is alive	23:57:54	23:57:54	00:00:00	
+Router Gateway di Pineridge	Host is alive	23:57:54	23:57:54	00:00:00	
+Router Monitor di Pineridge	Host is alive	23:57:54	23:57:54	00:00:00	
+Switch-1 di Pineridge	Host is alive	23:57:54	23:57:54	00:00:00	
+Switch-2 di Telkom Sangatta	Host is alive	23:57:54	23:57:54	00:00:00	
+Switch-5 di Lubuk Tutung	Host is alive	23:57:49	23:57:49	00:00:00	
+

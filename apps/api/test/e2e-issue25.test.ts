@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, it } from "bun:test";
 import { and, eq } from "drizzle-orm";
 import { db } from "../src/db";
-import { auditLogs, menus, users } from "../src/db/schema";
+import { auditLogs, menus, roles, users } from "../src/db/schema";
 import { app, cleanTestUsers } from "./setup";
 
 describe("QA Matrix End-to-End Suite — Issue #25", () => {
@@ -101,7 +101,7 @@ describe("QA Matrix End-to-End Suite — Issue #25", () => {
             name: "Akun Uji Nonaktif",
             email: `nonaktif_${stamp}@mknsite.online`,
             password: "password12345",
-            roleIds: [2]
+            roleIds: [1]
           })
         })
       );
@@ -259,7 +259,7 @@ describe("QA Matrix End-to-End Suite — Issue #25", () => {
             name: "User Pendek",
             email: "pendek@mknsite.online",
             password: "pendek",
-            roleIds: [2]
+            roleIds: [1]
           })
         })
       );
@@ -276,7 +276,7 @@ describe("QA Matrix End-to-End Suite — Issue #25", () => {
             name: "QA User Baru",
             email: validEmail,
             password: "password12345",
-            roleIds: [2]
+            roleIds: [1]
           })
         })
       );
@@ -291,7 +291,7 @@ describe("QA Matrix End-to-End Suite — Issue #25", () => {
             name: "QA User Kloning",
             email: validEmail,
             password: "password12345",
-            roleIds: [2]
+            roleIds: [1]
           })
         })
       );
@@ -318,7 +318,7 @@ describe("QA Matrix End-to-End Suite — Issue #25", () => {
             name: "QA Target Modifikasi",
             email: testEmail,
             password: "password12345",
-            roleIds: [2]
+            roleIds: [1]
           })
         })
       );
@@ -347,11 +347,12 @@ describe("QA Matrix End-to-End Suite — Issue #25", () => {
       expect(patchEmailRes.status).toBe(200);
 
       // USR-12: Ubah role user
+      const [empBasicRole] = await db.select().from(roles).where(eq(roles.slug, "employee-basic")).limit(1);
       const patchRoleRes = await app.handle(
         new Request(`http://localhost/admin/users/${testId}/roles`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
-          body: JSON.stringify({ roleIds: [3] })
+          body: JSON.stringify({ roleIds: [empBasicRole?.id ?? 1] })
         })
       );
       expect(patchRoleRes.status).toBe(200);
@@ -416,7 +417,7 @@ describe("QA Matrix End-to-End Suite — Issue #25", () => {
         new Request(`http://localhost/admin/users/${adminRow.id}/roles`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
-          body: JSON.stringify({ roleIds: [2] }) // role non-admin
+          body: JSON.stringify({ roleIds: [1] }) // role non-admin
         })
       );
       expect(selfRevoke.status).toBe(403);
@@ -450,90 +451,104 @@ describe("QA Matrix End-to-End Suite — Issue #25", () => {
       const hrCookie = hrLogin.headers.get("set-cookie") ?? "";
 
       // MNU-01: Admin buat menu baru dengan permission hr.view
-      const createMenuRes = await app.handle(
-        new Request("http://localhost/admin/menus", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
-          body: JSON.stringify({
-            title: "Payroll & Compensation",
-            icon: "calculator",
-            description: "Modul penggajian karyawan",
-            url: "/portal/payroll",
-            requiredPermission: "hr.view",
-            sortOrder: 20,
-            badgeCount: 1,
-            badgeColor: "orange",
-            isActive: true
+      let createdMenuId: number | null = null;
+      const ts = Date.now();
+      const testMenuUrl = `/portal/test-menu-${ts}`;
+      const testMenuTitle = `Test Menu ${ts}`;
+
+      try {
+        const createMenuRes = await app.handle(
+          new Request("http://localhost/admin/menus", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
+            body: JSON.stringify({
+              title: testMenuTitle,
+              icon: "calculator",
+              description: "Modul pengujian sementara",
+              url: testMenuUrl,
+              requiredPermission: "hr.view",
+              sortOrder: 20,
+              badgeCount: 1,
+              badgeColor: "orange",
+              isActive: true
+            })
           })
-        })
-      );
-      expect(createMenuRes.status).toBe(201);
-      const createBody = (await createMenuRes.json()) as { data: { id: number; title: string } };
-      const menuId = createBody.data.id;
+        );
+        expect(createMenuRes.status).toBe(201);
+        const createBody = (await createMenuRes.json()) as { data: { id: number; title: string } };
+        createdMenuId = createBody.data.id;
+        const menuId = createdMenuId;
 
-      // Verifikasi muncul di GET /menus karyawan HR
-      const hrMenus1 = await app.handle(
-        new Request("http://localhost/menus", {
-          headers: { Cookie: hrCookie }
-        })
-      );
-      const hrMenus1Body = (await hrMenus1.json()) as { data: Array<{ id: number; title: string }> };
-      expect(hrMenus1Body.data.some((m) => m.id === menuId)).toBe(true);
+        // Verifikasi muncul di GET /menus karyawan HR
+        const hrMenus1 = await app.handle(
+          new Request("http://localhost/menus", {
+            headers: { Cookie: hrCookie }
+          })
+        );
+        const hrMenus1Body = (await hrMenus1.json()) as { data: Array<{ id: number; title: string }> };
+        expect(hrMenus1Body.data.some((m) => m.id === menuId)).toBe(true);
 
-      // MNU-05: User tanpa permission (misal project.view untuk modul telco) tidak melihat menu tersebut
-      expect(hrMenus1Body.data.some((m) => m.title === "OPS Telco")).toBe(false);
+        // MNU-05: User tanpa permission (misal project.view untuk modul telco) tidak melihat menu tersebut
+        expect(hrMenus1Body.data.some((m) => m.title === "OPS Telco")).toBe(false);
 
-      // MNU-03: Admin edit menu
-      const patchMenuRes = await app.handle(
-        new Request(`http://localhost/admin/menus/${menuId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
-          body: JSON.stringify({ title: "Payroll & Salary" })
-        })
-      );
-      expect(patchMenuRes.status).toBe(200);
+        // MNU-03: Admin edit menu
+        const updatedTitle = `Test Menu Updated ${ts}`;
+        const patchMenuRes = await app.handle(
+          new Request(`http://localhost/admin/menus/${menuId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
+            body: JSON.stringify({ title: updatedTitle })
+          })
+        );
+        expect(patchMenuRes.status).toBe(200);
 
-      // MNU-02: Admin nonaktifkan menu
-      const deactMenuRes = await app.handle(
-        new Request(`http://localhost/admin/menus/${menuId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
-          body: JSON.stringify({ isActive: false })
-        })
-      );
-      expect(deactMenuRes.status).toBe(200);
+        // MNU-02: Admin nonaktifkan menu
+        const deactMenuRes = await app.handle(
+          new Request(`http://localhost/admin/menus/${menuId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
+            body: JSON.stringify({ isActive: false })
+          })
+        );
+        expect(deactMenuRes.status).toBe(200);
 
-      // Verifikasi hilang dari GET /menus karyawan HR
-      const hrMenus2 = await app.handle(
-        new Request("http://localhost/menus", {
-          headers: { Cookie: hrCookie }
-        })
-      );
-      const hrMenus2Body = (await hrMenus2.json()) as { data: Array<{ id: number }> };
-      expect(hrMenus2Body.data.some((m) => m.id === menuId)).toBe(false);
+        // Verifikasi hilang dari GET /menus karyawan HR
+        const hrMenus2 = await app.handle(
+          new Request("http://localhost/menus", {
+            headers: { Cookie: hrCookie }
+          })
+        );
+        const hrMenus2Body = (await hrMenus2.json()) as { data: Array<{ id: number }> };
+        expect(hrMenus2Body.data.some((m) => m.id === menuId)).toBe(false);
 
-      // MNU-06: Reorder menu
-      const reorderRes = await app.handle(
-        new Request(`http://localhost/admin/menus/${menuId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
-          body: JSON.stringify({ sortOrder: 1, isActive: true })
-        })
-      );
-      expect(reorderRes.status).toBe(200);
+        // MNU-06: Reorder menu
+        const reorderRes = await app.handle(
+          new Request(`http://localhost/admin/menus/${menuId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json", Origin: "http://localhost:3000", Cookie: adminCookie },
+            body: JSON.stringify({ sortOrder: 1, isActive: true })
+          })
+        );
+        expect(reorderRes.status).toBe(200);
 
-      // MNU-04: Admin hapus menu
-      const deleteMenuRes = await app.handle(
-        new Request(`http://localhost/admin/menus/${menuId}`, {
-          method: "DELETE",
-          headers: { Origin: "http://localhost:3000", Cookie: adminCookie }
-        })
-      );
-      expect(deleteMenuRes.status).toBe(200);
+        // MNU-04: Admin hapus menu
+        const deleteMenuRes = await app.handle(
+          new Request(`http://localhost/admin/menus/${menuId}`, {
+            method: "DELETE",
+            headers: { Origin: "http://localhost:3000", Cookie: adminCookie }
+          })
+        );
+        expect(deleteMenuRes.status).toBe(200);
 
-      // Verifikasi tidak ada lagi di database
-      const [deletedRow] = await db.select().from(menus).where(eq(menus.id, menuId)).limit(1);
-      expect(deletedRow).toBeUndefined();
+        // Verifikasi tidak ada lagi di database
+        const [deletedRow] = await db.select().from(menus).where(eq(menus.id, menuId)).limit(1);
+        expect(deletedRow).toBeUndefined();
+      } finally {
+        // Jaminan pembersihan jika terjadi error sebelum DELETE atau saat expect gagal
+        if (createdMenuId !== null) {
+          await db.delete(menus).where(eq(menus.id, createdMenuId));
+        }
+      }
     });
   });
 

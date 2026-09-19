@@ -1,0 +1,221 @@
+<html><head>
+<meta name="GENERATOR" content="Advanced Host Monitor">
+<title>HostMonitor report</title>
+<STYLE TYPE="text/css"><!-- a:hover { color: "#00FFFF"; } --> </STYLE>
+</head>
+<body bgcolor="#000080" text="#E9E9E9" link="#00FFFF" vlink="#00FFFF" alink="#00FFFF">
+<p align="left"><u><strong><big><big>HostMonitor Report</big></big></strong></u><br>
+<font face="Arial">Generated on 1/6/2019 at 11:59:39 PM</font>
+<br>Time zone: GMT +08:00 Malaysia, Singapore, Western Australia</p>
+<div align="center"><center>
+<table border="0" bordercolor="#000080" width="100%">
+  <tr>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Test name</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Status</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Recurrences</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Reply</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Last test time</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Last status</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Last reply</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Interval</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Test method</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Comment</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Related URL</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Master test</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Alive %</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Dead %</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Unknown %</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Total time</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Alive time</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Dead time</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Total tests</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Passed tests</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Failed tests</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Average reply</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Min reply</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Max reply</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Status changed at</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="center"><strong><font color=#FFFFFF>Status changes</font></strong></td>
+    <td bgcolor="#0000FF" nowrap align="left"><strong><font color=#FFFFFF>Modified at</font></strong></td>
+
+
+  </tr>
+  <tr><td bgcolor="#0080FF" align="left" colspan=27><font color="#FFFFFF"> Folder: MONITORING\Hexindo\ </font></td></tr>
+  <tr>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1. Hexindo Office TD Audio Codes</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>677</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>12 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/6/2019 11:52:31 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>18 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:10:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>ping (timeout - 2000 ms)</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>Ping 192.168.1.10</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>100.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:54</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:54</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:00:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>144</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>144</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>42</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>7</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1013</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>12/27/2018 9:19:10 AM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/2/2019 4:32:31 PM</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>2. Link Hexindo Office TD to Surya</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>922</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>18 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/6/2019 11:52:16 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>13 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:10:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>ping (timeout - 2000 ms)</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>Ping 192.168.1.11</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>100.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:51</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:51</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:00:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>144</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>144</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>47</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>7</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1009</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>12/25/2018 5:29:25 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>11/17/2018 4:15:04 PM</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>3. Link Surya to Hexindo Office</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1833</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>7 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/6/2019 11:57:05 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>4 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:05:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>ping (timeout - 2000 ms)</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>Ping 192.168.1.12</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>100.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:46</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:46</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:00:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>288</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>288</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>5.2</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>3</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>10</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>12/25/2018 5:24:21 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>7/24/2018 5:21:52 PM</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>4. Link Surya to Hexindo Pama</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1833</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>6 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/6/2019 11:57:05 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>5 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:05:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>ping (timeout - 2000 ms)</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>Ping 192.168.1.13</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>100.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:46</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:46</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:00:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>288</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>288</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>5.3</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>3</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>10</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>12/25/2018 5:24:21 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>7/24/2018 5:21:59 PM</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>5. Link Hexindo Pama to Surya</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>922</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>13 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/6/2019 11:52:23 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>12 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:10:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>ping (timeout - 2000 ms)</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>Ping 192.168.1.14</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>100.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:55</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:55</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:00:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>144</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>144</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>64</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>8</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1020</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>12/25/2018 5:29:20 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>11/17/2018 7:59:28 PM</font>&nbsp;</td>
+  </tr>
+  <tr>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>6. Hexindo Pama Audio Codes</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1947</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>20 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/6/2019 11:42:05 PM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>Host is alive</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>11 ms</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:20:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>ping (timeout - 2000 ms)</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>Ping 192.168.1.15</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF></font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>100.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0.00 %</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:47</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1 day 00:00:47</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>00:00:00</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>72</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>72</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>29</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>11</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>1009</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>12/4/2018 9:39:52 AM</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="center">&nbsp;<font color=#C4FFFF>0</font>&nbsp;</td>
+    <td bgcolor="#000080" nowrap valign="top" align="left">&nbsp;<font color=#C4FFFF>1/2/2019 4:32:48 PM</font>&nbsp;</td>
+  </tr>
+</table>
+</center></div>
+<p>This report was generated by <b><a href="http://www.ks-soft.net" target="_blank">Advanced Host Monitor</a></b></p>
+</body></html>

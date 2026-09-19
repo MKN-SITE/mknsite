@@ -18,15 +18,18 @@
     "@elysiajs/cors": "latest",
     "@elysiajs/swagger": "^1.3.1",
     "better-auth": "^1.7.3",
+    "docx": "^9.7.1",
     "dotenv": "latest",
     "drizzle-kit": "latest",
     "drizzle-orm": "latest",
     "elysia": "latest",
+    "exceljs": "^4.4.0",
     "mysql2": "latest",
-    "pdf-lib": "^1.17.1"
+    "pdf-lib": "^1.17.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "typescript": "latest"
+    "@types/bun": "^1.2.4",
+    "typescript": "^5.8.2"
   }
 }
